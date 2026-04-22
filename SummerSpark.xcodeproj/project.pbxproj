@@ -7,6 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5CB1960D958040CEA425AFE2 /* GeoAddressing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F5597436404B6FBF4BE873 /* GeoAddressing.swift */; };
+		B197D6FC719A4C5BBDC6359A /* GeoMeshNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1786273EFF141FB94C6348F /* GeoMeshNavigator.swift */; };
+		ACE3E938597A4C739666E32E /* RouteStabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CBD30B59FC4EDDB6FA02A6 /* RouteStabilityMonitor.swift */; };
+		8DF999FB29664EB4AEF265C9 /* QoSRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6D78F21F5E4B51A5C793EA /* QoSRouter.swift */; };
+		8FE64A3123524E63A0171833 /* RouteHandoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1298A844CA64FEAA805DE74 /* RouteHandoverManager.swift */; };
+		724ADAE00CEC49BBBB7E78C6 /* MapRelayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA37A1E318640FFADF5A5BA /* MapRelayService.swift */; };
+		FEB99E87F7414E5D81C55AC3 /* MapPackageP2P.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69497D877462493B88CB2AA0 /* MapPackageP2P.swift */; };
+		8AD204E3D8AE4CDF81A296A4 /* TileIntegrityVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4943CBE5951447A5BB173745 /* TileIntegrityVerifier.swift */; };
+		F7B1F44BACCF48679F2F6BF5 /* PriorityScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5C6C7CB0C54A37A32FD6AA /* PriorityScheduler.swift */; };
+		0AFDFAA97D394443862FDEEB /* CreditQoSController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1F4247AE8A4F4781662560 /* CreditQoSController.swift */; };
+		587EBE58526C4D9AB9B07EB0 /* ReputationTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C16FB9C46844FB08EC1F4EC /* ReputationTracker.swift */; };
+		AA88D0E723534379B441A46B /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1755E831AC8C470B958709BF /* PowerSaveManager.swift */; };
+		BBC30AE413F24E9AB4B563D3 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF83AAC466DC4B4B99FAD4D9 /* BackgroundMeshListener.swift */; };
+		DC11DFE577E64C379DAF0ECE /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37AA43F7B114D808E28CD23 /* AdaptiveBeaconController.swift */; };
+		A21F019479B948DB831E8D48 /* GeoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CAA886992D44A39AEF0202 /* GeoModels.swift */; };
+		7933E89878EF4FF1B8EED5FA /* QoSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AEB3CD4E65845D69FEBA136 /* QoSModels.swift */; };
+		96E78525ABEF446C8F9CCFBC /* MeshRelayProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD80DA6B8D3C4F7EA2AA3839 /* MeshRelayProtocols.swift */; };
 		01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */; };
 		02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */; };
 		040228378FBF4B2DDBAF4D7F /* ConnectivitySwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */; };
@@ -48,6 +65,23 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A9F5597436404B6FBF4BE873 /* GeoAddressing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoAddressing.swift; sourceTree = "<group>"; };
+		D1786273EFF141FB94C6348F /* GeoMeshNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMeshNavigator.swift; sourceTree = "<group>"; };
+		E5CBD30B59FC4EDDB6FA02A6 /* RouteStabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStabilityMonitor.swift; sourceTree = "<group>"; };
+		0B6D78F21F5E4B51A5C793EA /* QoSRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QoSRouter.swift; sourceTree = "<group>"; };
+		A1298A844CA64FEAA805DE74 /* RouteHandoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteHandoverManager.swift; sourceTree = "<group>"; };
+		3AA37A1E318640FFADF5A5BA /* MapRelayService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRelayService.swift; sourceTree = "<group>"; };
+		69497D877462493B88CB2AA0 /* MapPackageP2P.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPackageP2P.swift; sourceTree = "<group>"; };
+		4943CBE5951447A5BB173745 /* TileIntegrityVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileIntegrityVerifier.swift; sourceTree = "<group>"; };
+		4B5C6C7CB0C54A37A32FD6AA /* PriorityScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityScheduler.swift; sourceTree = "<group>"; };
+		2C1F4247AE8A4F4781662560 /* CreditQoSController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditQoSController.swift; sourceTree = "<group>"; };
+		7C16FB9C46844FB08EC1F4EC /* ReputationTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationTracker.swift; sourceTree = "<group>"; };
+		1755E831AC8C470B958709BF /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSaveManager.swift; sourceTree = "<group>"; };
+		EF83AAC466DC4B4B99FAD4D9 /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundMeshListener.swift; sourceTree = "<group>"; };
+		D37AA43F7B114D808E28CD23 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveBeaconController.swift; sourceTree = "<group>"; };
+		85CAA886992D44A39AEF0202 /* GeoModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoModels.swift; sourceTree = "<group>"; };
+		1AEB3CD4E65845D69FEBA136 /* QoSModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QoSModels.swift; sourceTree = "<group>"; };
+		FD80DA6B8D3C4F7EA2AA3839 /* MeshRelayProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshRelayProtocols.swift; sourceTree = "<group>"; };
 		0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedCache.swift; sourceTree = "<group>"; };
 		11FD4DF938D24B67263656AB /* SummerSparkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerSparkApp.swift; sourceTree = "<group>"; };
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
