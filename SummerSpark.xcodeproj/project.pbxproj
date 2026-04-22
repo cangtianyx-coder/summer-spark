@@ -1,0 +1,555 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */; };
+		02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */; };
+		040228378FBF4B2DDBAF4D7F /* ConnectivitySwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */; };
+		099FC1FB3F67C3042AE4733F /* MapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0F4B790BD5565FD9190A85 /* MapService.swift */; };
+		10A24121848C294E4E3C6F78 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE110374026BF49593FD9127 /* Constants.swift */; };
+		11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */; };
+		355A9F4FD75B8CCC48F7BC01 /* CreditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */; };
+		4B963173EC0E7AF592CDE526 /* MeshMessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */; };
+		4F8DF55227A1D7FBC5ACFAD5 /* SummerSparkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FD4DF938D24B67263656AB /* SummerSparkApp.swift */; };
+		4FE951BF91CD1A50F067523E /* WiFiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96088AB8CBF8CF5C566AE498 /* WiFiService.swift */; };
+		51686D15F594655F2FD76DF7 /* PathPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E273769AFF26E02A4E6F020 /* PathPlanner.swift */; };
+		5260B1AE8A0AA91FC1132DE4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C870FCBEF85581B599E4CA3B /* ContentView.swift */; };
+		54C6544773252F7BF245850C /* OfflineMapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442A105684A6E24BD0436954 /* OfflineMapManager.swift */; };
+		638869712B31398A694AD581 /* SecureEnclaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */; };
+		6C14383CCD851BAE5A3FA23B /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A163FBF71E2B35BC085492E /* BluetoothService.swift */; };
+		6C57A434F6D1A42AB501E9FB /* ServiceProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */; };
+		7A32A15AC55C1A335B91E31B /* PushToTalkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */; };
+		811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */; };
+		8B9A024B9BE1BEB36D22FE91 /* MapCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7866E4614D06A00AF14EADEF /* MapCacheManager.swift */; };
+		98EC2AD1B90A04E44A96FBA4 /* AudioCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */; };
+		990A902F409FA0F9738D960B /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AFF2162A771F4B5763629 /* Logger.swift */; };
+		9A4995F51F314935D77BCAC0 /* RouteTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F328CF87E70ECA105B7F9F9 /* RouteTable.swift */; };
+		9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2596A86288D658D5502C81 /* UIDGenerator.swift */; };
+		A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */; };
+		A38E720C7911497ECA20916A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDBA060EB076DFA292D381F /* Extensions.swift */; };
+		AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */; };
+		B7AE4148E76D221BB5007294 /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7C8C4B6BE895F7BD154C42 /* SharedModels.swift */; };
+		BE687545F0336567C59AFC57 /* IdentityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C933A2BD61217AACDF75292 /* IdentityManager.swift */; };
+		CB39C0FC5631C7EABBBFF7AE /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEED88770AEACDE39B2798B6 /* KeychainHelper.swift */; };
+		D333E64E9D78DC81D220FD35 /* EncryptedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */; };
+		DFB9873628A6C9135395EE57 /* CreditSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6359FCDA70B449265545A8C /* CreditSyncManager.swift */; };
+		E33961916E975414DC7EDB1F /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D999311B7B835CB217D069 /* DatabaseManager.swift */; };
+		EA1BC36CD10750193741C1FE /* ObserverProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B4AC93FD57D7FC9F3BB835 /* ObserverProtocols.swift */; };
+		EF0861C76B279103DF8D3F15 /* GroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A93AFEE76567ED8352F5E3A /* GroupStore.swift */; };
+		F0C0CA784596A1EA06A23D9C /* EncryptedPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6BC2852851878B44107929 /* EncryptedPackage.swift */; };
+		F15C503FD8439AB4D255C9A7 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */; };
+		F314111CA97BBF5E61770606 /* CreditCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A37E29F4500C621178D32A0 /* CreditCalculator.swift */; };
+		F88215840F03CD3F9CC39E69 /* AppMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedCache.swift; sourceTree = "<group>"; };
+		11FD4DF938D24B67263656AB /* SummerSparkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerSparkApp.swift; sourceTree = "<group>"; };
+		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
+		1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
+		2A93AFEE76567ED8352F5E3A /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
+		2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEngine.swift; sourceTree = "<group>"; };
+		2E0F4B790BD5565FD9190A85 /* MapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapService.swift; sourceTree = "<group>"; };
+		33B4AC93FD57D7FC9F3BB835 /* ObserverProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserverProtocols.swift; sourceTree = "<group>"; };
+		3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivitySwitchManager.swift; sourceTree = "<group>"; };
+		3C5AFF2162A771F4B5763629 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		3FDBA060EB076DFA292D381F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		442A105684A6E24BD0436954 /* OfflineMapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapManager.swift; sourceTree = "<group>"; };
+		4A37E29F4500C621178D32A0 /* CreditCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCalculator.swift; sourceTree = "<group>"; };
+		4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
+		573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoEngine.swift; sourceTree = "<group>"; };
+		5A163FBF71E2B35BC085492E /* BluetoothService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothService.swift; sourceTree = "<group>"; };
+		5C933A2BD61217AACDF75292 /* IdentityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityManager.swift; sourceTree = "<group>"; };
+		721E45379F7B8B8CB7F9708E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7866E4614D06A00AF14EADEF /* MapCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCacheManager.swift; sourceTree = "<group>"; };
+		7E273769AFF26E02A4E6F020 /* PathPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathPlanner.swift; sourceTree = "<group>"; };
+		8D6BC2852851878B44107929 /* EncryptedPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedPackage.swift; sourceTree = "<group>"; };
+		96088AB8CBF8CF5C566AE498 /* WiFiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiService.swift; sourceTree = "<group>"; };
+		9F328CF87E70ECA105B7F9F9 /* RouteTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTable.swift; sourceTree = "<group>"; };
+		A6359FCDA70B449265545A8C /* CreditSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditSyncManager.swift; sourceTree = "<group>"; };
+		AA2596A86288D658D5502C81 /* UIDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDGenerator.swift; sourceTree = "<group>"; };
+		ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSession.swift; sourceTree = "<group>"; };
+		AD3B81187B5622CF1BC02CD6 /* SummerSpark.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SummerSpark.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE110374026BF49593FD9127 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		B0D999311B7B835CB217D069 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMode.swift; sourceTree = "<group>"; };
+		B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCodec.swift; sourceTree = "<group>"; };
+		BEED88770AEACDE39B2798B6 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushToTalkButton.swift; sourceTree = "<group>"; };
+		C870FCBEF85581B599E4CA3B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CC7C8C4B6BE895F7BD154C42 /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
+		CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationEngine.swift; sourceTree = "<group>"; };
+		D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshMessageType.swift; sourceTree = "<group>"; };
+		DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProtocols.swift; sourceTree = "<group>"; };
+		EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntiAttackGuard.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		14B4AE05890A5EA9A4F975E8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */,
+				D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */,
+				CC7C8C4B6BE895F7BD154C42 /* SharedModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		44FC33AAA42D60D4092E8850 /* Identity */ = {
+			isa = PBXGroup;
+			children = (
+				5C933A2BD61217AACDF75292 /* IdentityManager.swift */,
+				BEED88770AEACDE39B2798B6 /* KeychainHelper.swift */,
+				1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */,
+				AA2596A86288D658D5502C81 /* UIDGenerator.swift */,
+			);
+			path = Identity;
+			sourceTree = "<group>";
+		};
+		4E57C45F9A9A4AA25F8F02E1 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				BD1C841A56CF886F0E9EC882 /* App */,
+				DE4DA9D4A084DEC00073B442 /* Modules */,
+				951B2379D31D637083B73C4B /* Shared */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		640BEF825AB5CA788BCF33D2 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				AE110374026BF49593FD9127 /* Constants.swift */,
+				3FDBA060EB076DFA292D381F /* Extensions.swift */,
+				3C5AFF2162A771F4B5763629 /* Logger.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		646F5D543371AC328B7B08A3 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				B0D999311B7B835CB217D069 /* DatabaseManager.swift */,
+				0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */,
+				2A93AFEE76567ED8352F5E3A /* GroupStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		8B7B0FA530DC533CFC355F74 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				33B4AC93FD57D7FC9F3BB835 /* ObserverProtocols.swift */,
+				DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		951B2379D31D637083B73C4B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				14B4AE05890A5EA9A4F975E8 /* Models */,
+				8B7B0FA530DC533CFC355F74 /* Protocols */,
+				640BEF825AB5CA788BCF33D2 /* Utils */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		AB36FA329CB5EF2662BD104E /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				7866E4614D06A00AF14EADEF /* MapCacheManager.swift */,
+				2E0F4B790BD5565FD9190A85 /* MapService.swift */,
+				CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */,
+				442A105684A6E24BD0436954 /* OfflineMapManager.swift */,
+				7E273769AFF26E02A4E6F020 /* PathPlanner.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		BD1C841A56CF886F0E9EC882 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */,
+				C870FCBEF85581B599E4CA3B /* ContentView.swift */,
+				721E45379F7B8B8CB7F9708E /* Info.plist */,
+				11FD4DF938D24B67263656AB /* SummerSparkApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C2CC3B9BCD4F6D2B0FA39CE4 /* Mesh */ = {
+			isa = PBXGroup;
+			children = (
+				5A163FBF71E2B35BC085492E /* BluetoothService.swift */,
+				3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */,
+				14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */,
+				9F328CF87E70ECA105B7F9F9 /* RouteTable.swift */,
+				96088AB8CBF8CF5C566AE498 /* WiFiService.swift */,
+			);
+			path = Mesh;
+			sourceTree = "<group>";
+		};
+		C69D0D1220552CF680035136 /* Points */ = {
+			isa = PBXGroup;
+			children = (
+				4A37E29F4500C621178D32A0 /* CreditCalculator.swift */,
+				2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */,
+				A6359FCDA70B449265545A8C /* CreditSyncManager.swift */,
+			);
+			path = Points;
+			sourceTree = "<group>";
+		};
+		CEC3483CB8A06D65293BD7B7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AD3B81187B5622CF1BC02CD6 /* SummerSpark.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DC5D5790C784E1BEA41E4B32 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */,
+				573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */,
+				8D6BC2852851878B44107929 /* EncryptedPackage.swift */,
+			);
+			path = Crypto;
+			sourceTree = "<group>";
+		};
+		DD9F8159B173650E6EC88A76 = {
+			isa = PBXGroup;
+			children = (
+				4E57C45F9A9A4AA25F8F02E1 /* src */,
+				CEC3483CB8A06D65293BD7B7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DE4DA9D4A084DEC00073B442 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				DC5D5790C784E1BEA41E4B32 /* Crypto */,
+				44FC33AAA42D60D4092E8850 /* Identity */,
+				AB36FA329CB5EF2662BD104E /* Map */,
+				C2CC3B9BCD4F6D2B0FA39CE4 /* Mesh */,
+				C69D0D1220552CF680035136 /* Points */,
+				646F5D543371AC328B7B08A3 /* Storage */,
+				EAC0E59F05F1FE2B71F0B97A /* Voice */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		EAC0E59F05F1FE2B71F0B97A /* Voice */ = {
+			isa = PBXGroup;
+			children = (
+				B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */,
+				C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */,
+				4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */,
+				ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */,
+			);
+			path = Voice;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FD76B27ED9925B7D66E41C94 /* SummerSpark */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F2B26C03CFF7B87319CDA8B /* Build configuration list for PBXNativeTarget "SummerSpark" */;
+			buildPhases = (
+				938244E0C206540D23E6B506 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SummerSpark;
+			packageProductDependencies = (
+			);
+			productName = SummerSpark;
+			productReference = AD3B81187B5622CF1BC02CD6 /* SummerSpark.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		81CCD16BB6A99F9BD26D9AF0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					FD76B27ED9925B7D66E41C94 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = DE3FE86D7E4539D63BEFD248 /* Build configuration list for PBXProject "SummerSpark" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = DD9F8159B173650E6EC88A76;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CEC3483CB8A06D65293BD7B7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FD76B27ED9925B7D66E41C94 /* SummerSpark */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		938244E0C206540D23E6B506 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */,
+				11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */,
+				F88215840F03CD3F9CC39E69 /* AppMode.swift in Sources */,
+				98EC2AD1B90A04E44A96FBA4 /* AudioCodec.swift in Sources */,
+				6C14383CCD851BAE5A3FA23B /* BluetoothService.swift in Sources */,
+				040228378FBF4B2DDBAF4D7F /* ConnectivitySwitchManager.swift in Sources */,
+				10A24121848C294E4E3C6F78 /* Constants.swift in Sources */,
+				5260B1AE8A0AA91FC1132DE4 /* ContentView.swift in Sources */,
+				F314111CA97BBF5E61770606 /* CreditCalculator.swift in Sources */,
+				355A9F4FD75B8CCC48F7BC01 /* CreditEngine.swift in Sources */,
+				DFB9873628A6C9135395EE57 /* CreditSyncManager.swift in Sources */,
+				811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */,
+				E33961916E975414DC7EDB1F /* DatabaseManager.swift in Sources */,
+				D333E64E9D78DC81D220FD35 /* EncryptedCache.swift in Sources */,
+				F0C0CA784596A1EA06A23D9C /* EncryptedPackage.swift in Sources */,
+				A38E720C7911497ECA20916A /* Extensions.swift in Sources */,
+				EF0861C76B279103DF8D3F15 /* GroupStore.swift in Sources */,
+				BE687545F0336567C59AFC57 /* IdentityManager.swift in Sources */,
+				CB39C0FC5631C7EABBBFF7AE /* KeychainHelper.swift in Sources */,
+				990A902F409FA0F9738D960B /* Logger.swift in Sources */,
+				8B9A024B9BE1BEB36D22FE91 /* MapCacheManager.swift in Sources */,
+				099FC1FB3F67C3042AE4733F /* MapService.swift in Sources */,
+				4B963173EC0E7AF592CDE526 /* MeshMessageType.swift in Sources */,
+				A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */,
+				02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */,
+				EA1BC36CD10750193741C1FE /* ObserverProtocols.swift in Sources */,
+				54C6544773252F7BF245850C /* OfflineMapManager.swift in Sources */,
+				51686D15F594655F2FD76DF7 /* PathPlanner.swift in Sources */,
+				7A32A15AC55C1A335B91E31B /* PushToTalkButton.swift in Sources */,
+				9A4995F51F314935D77BCAC0 /* RouteTable.swift in Sources */,
+				638869712B31398A694AD581 /* SecureEnclaveManager.swift in Sources */,
+				6C57A434F6D1A42AB501E9FB /* ServiceProtocols.swift in Sources */,
+				B7AE4148E76D221BB5007294 /* SharedModels.swift in Sources */,
+				4F8DF55227A1D7FBC5ACFAD5 /* SummerSparkApp.swift in Sources */,
+				9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */,
+				F15C503FD8439AB4D255C9A7 /* VoiceService.swift in Sources */,
+				01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */,
+				4FE951BF91CD1A50F067523E /* WiFiService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2DD8E0DBD53667662C93F70A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = configs/SummerSpark.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = src/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.summerspark.app;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7F843C7A6DFF67BD51025580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = configs/SummerSpark.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = src/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.summerspark.app;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AFCA0428615B32EBF263074C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = src/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.summerspark.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		F90E752660318CA884B6553B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = src/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.summerspark.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8F2B26C03CFF7B87319CDA8B /* Build configuration list for PBXNativeTarget "SummerSpark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F843C7A6DFF67BD51025580 /* Debug */,
+				2DD8E0DBD53667662C93F70A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DE3FE86D7E4539D63BEFD248 /* Build configuration list for PBXProject "SummerSpark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AFCA0428615B32EBF263074C /* Debug */,
+				F90E752660318CA884B6553B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 81CCD16BB6A99F9BD26D9AF0 /* Project object */;
+}

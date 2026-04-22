@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+        <key>UISceneConfigurations</key>
+        <dict>
+            <key>UIWindowSceneSessionRoleApplication</key>
+            <array>
+                <dict>
+                    <key>UISceneConfigurationName</key>
+                    <string>Default Configuration</string>
+                    <key>UISceneDelegateClassName</key>
+                    <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+                </dict>
+            </array>
+        </dict>
+    </dict>
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string>LaunchScreenBackground</string>
+        <key>UIImageName</key>
+        <string>LaunchLogo</string>
+    </dict>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>armv7</string>
+    </array>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- ========== 权限配置说明 ========== -->
+
+    <!-- 相机权限 -->
+    <key>NSCameraUsageDescription</key>
+    <string>需要使用相机拍摄照片和视频，用于头像设置、内容发布等功能</string>
+
+    <!-- 相册权限 -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>需要访问相册以选择照片或视频用于发布内容</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>需要保存照片和视频到您的相册</string>
+
+    <!-- 位置权限 -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>需要获取您的位置信息以提供本地化服务和内容推荐</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>需要在后台访问您的位置以提供持续的位置服务和功能</string>
+
+    <!-- 麦克风权限 -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>需要使用麦克风录制音频，用于语音聊天和视频拍摄</string>
+
+    <!-- 通讯录权限 -->
+    <key>NSContactsUsageDescription</key>
+    <string>需要访问通讯录以查找好友和提供社交功能</string>
+
+    <!-- 日历权限 -->
+    <key>NSCalendarsUsageDescription</key>
+    <string>需要访问日历以创建和管理活动提醒</string>
+
+    <!-- 提醒事项权限 -->
+    <key>NSRemindersUsageDescription</key>
+    <string>需要访问提醒事项以同步和管理您的提醒</string>
+
+    <!-- 蓝牙权限 -->
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>需要蓝牙权限以连接外部设备和提供相关服务</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>需要蓝牙权限以连接外部设备</string>
+
+    <!-- Face ID 权限 -->
+    <key>NSFaceIDUsageDescription</key>
+    <string>需要使用 Face ID 进行安全身份验证</string>
+
+    <!-- Apple Music 权限 -->
+    <key>NSAppleMusicUsageDescription</key>
+    <string>需要访问 Apple Music 以播放音乐内容</string>
+
+    <!-- 健康数据权限 -->
+    <key>NSHealthShareUsageDescription</key>
+    <string>需要读取健康数据以提供个性化的健康建议</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>需要更新健康数据以同步您的健身活动</string>
+
+    <!-- 运动与健身权限 -->
+    <key>NSMotionUsageDescription</key>
+    <string>需要访问运动数据以记录您的健身活动</string>
+
+    <!-- 网络权限 -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>需要访问本地网络以发现和连接附近的设备</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_http._tcp</string>
+        <string>_https._tcp</string>
+    </array>
+
+    <!-- 推送通知权限 -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+        <string>location</string>
+        <string>audio</string>
+        <string>bluetooth-central</string>
+        <string>bluetooth-peripheral</string>
+    </array>
+
+</dict>
+</plist>
