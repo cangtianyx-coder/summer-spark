@@ -1,5 +1,6 @@
 import Foundation
 import CoreBluetooth
+import CryptoKit
 
 // MARK: - MeshServiceDelegate
 
@@ -339,5 +340,15 @@ final class MeshService {
         }
 
         discoveredNodes[nodeId] = node
+    }
+    
+    // P0-FIX: 获取指定节点的公钥
+    /// Get public key for a specific node ID
+    func getPublicKey(for nodeId: UUID) -> P256.Signing.PublicKey? {
+        // 从已发现节点中获取公钥
+        if let node = discoveredNodes[nodeId], let publicKey = node.publicKey {
+            return publicKey
+        }
+        return nil
     }
 }

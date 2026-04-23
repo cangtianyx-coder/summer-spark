@@ -820,10 +820,36 @@ final class CreditSyncManager {
         )
     }
 
+    // P0-FIX: 从MeshService获取对应节点的公钥，而不是返回本地公钥
     private func getPublicKey(for nodeId: UUID) -> P256.Signing.PublicKey? {
-        // In a full implementation, this would look up cached public keys
-        // from discovered nodes in MeshService
-        return IdentityManager.shared.getPublicKey()
+        // 优先从MeshService获取该节点的公钥
+        if let publicKey = MeshService.shared.getPublicKey(for: nodeId) {
+            return publicKey
+        }
+        
+        // 如果是本地节点，返回本地公钥
+        if nodeId == localNodeId {
+            return IdentityManager.shared.getPublicKey()
+        }
+        
+        // 从缓存中查找
+        if let cachedKey = publicKeyCache[nodeId] {
+            return cachedKey
+        }
+        
+        Logger.shared.warn("CreditSyncManager: Public key not found for node \(nodeId)")
+        return nil
+    }
+    
+    // P0-FIX: 添加公钥缓存
+    private var publicKeyCache: [UUID: P256.Signing.PublicKey] = [:]
+    private let keyCacheLock = NSLock()
+    
+    // P0-FIX: 缓存公钥的方法
+    func cachePublicKey(_ publicKey: P256.Signing.PublicKey, for nodeId: UUID) {
+        keyCacheLock.lock()
+        publicKeyCache[nodeId] = publicKey
+        keyCacheLock.unlock()
     }
 
     // MARK: - Cleanup

@@ -195,9 +195,15 @@ final class EmergencyChannel {
     private func broadcastMessage(_ message: EmergencyChannelMessage) {
         guard let messageData = try? JSONEncoder().encode(message) else { return }
         
+        // P0-FIX: 对紧急通道消息进行加密和签名
+        guard let encryptedData = CryptoEngine.shared.encryptAndSign(messageData) else {
+            Logger.shared.error("EmergencyChannel: Failed to encrypt message")
+            return
+        }
+        
         let meshMessage = MeshMessage(
             source: IdentityManager.shared.uid.flatMap { UUID(uuidString: $0) } ?? UUID(),
-            payload: messageData,
+            payload: encryptedData,  // 使用加密后的数据
             ttl: 64,
             messageType: .emergency
         )

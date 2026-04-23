@@ -12,11 +12,21 @@ struct SearchArea: Codable, Identifiable {
     var assignedTeam: String?
     let createdAt: Date
     
+    // P0-FIX: 国际化枚举
     enum SearchStatus: String, Codable {
-        case pending = "待搜索"
-        case inProgress = "搜索中"
-        case completed = "已完成"
-        case partiallyCompleted = "部分完成"
+        case pending = "pending"
+        case inProgress = "in_progress"
+        case completed = "completed"
+        case partiallyCompleted = "partially_completed"
+        
+        var displayName: String {
+            switch self {
+            case .pending: return "search_status_pending".localized
+            case .inProgress: return "search_status_in_progress".localized
+            case .completed: return "search_status_completed".localized
+            case .partiallyCompleted: return "search_status_partially_completed".localized
+            }
+        }
     }
 }
 
@@ -24,22 +34,44 @@ struct SearchArea: Codable, Identifiable {
 
 /// 救援任务类型
 enum TaskType: String, Codable {
-    case search = "搜索"
-    case rescue = "救援"
-    case evacuate = "撤离"
-    case supply = "物资运送"
-    case medical = "医疗救助"
-    case reconnaissance = "侦察"
+    case search = "search"
+    case rescue = "rescue"
+    case evacuate = "evacuate"
+    case supply = "supply"
+    case medical = "medical"
+    case reconnaissance = "reconnaissance"
+    
+    var displayName: String {
+        switch self {
+        case .search: return "task_type_search".localized
+        case .rescue: return "task_type_rescue".localized
+        case .evacuate: return "task_type_evacuate".localized
+        case .supply: return "task_type_supply".localized
+        case .medical: return "task_type_medical".localized
+        case .reconnaissance: return "task_type_reconnaissance".localized
+        }
+    }
 }
 
 /// 救援任务状态
 enum TaskStatus: String, Codable {
-    case pending = "待分配"
-    case assigned = "已分配"
-    case inProgress = "进行中"
-    case completed = "已完成"
-    case failed = "失败"
-    case cancelled = "已取消"
+    case pending = "pending"
+    case assigned = "assigned"
+    case inProgress = "in_progress"
+    case completed = "completed"
+    case failed = "failed"
+    case cancelled = "cancelled"
+    
+    var displayName: String {
+        switch self {
+        case .pending: return "task_status_pending".localized
+        case .assigned: return "task_status_assigned".localized
+        case .inProgress: return "task_status_in_progress".localized
+        case .completed: return "task_status_completed".localized
+        case .failed: return "task_status_failed".localized
+        case .cancelled: return "task_status_cancelled".localized
+        }
+    }
 }
 
 /// 救援任务
@@ -77,11 +109,21 @@ struct RescueTask: Codable, Identifiable {
 
 /// 救援队成员角色
 enum TeamRole: String, Codable {
-    case leader = "队长"
-    case medic = "医疗员"
-    case searcher = "搜索员"
-    case communicator = "通讯员"
-    case support = "支援人员"
+    case leader = "leader"
+    case medic = "medic"
+    case searcher = "searcher"
+    case communicator = "communicator"
+    case support = "support"
+    
+    var displayName: String {
+        switch self {
+        case .leader: return "team_role_leader".localized
+        case .medic: return "team_role_medic".localized
+        case .searcher: return "team_role_searcher".localized
+        case .communicator: return "team_role_communicator".localized
+        case .support: return "team_role_support".localized
+        }
+    }
 }
 
 /// 救援队成员
@@ -304,6 +346,32 @@ final class RescueCoordinator {
         return queue.sync { Array(searchAreas.values) }
     }
     
+    // P0-FIX: 检查用户是否为医疗人员
+    /// Check if user is medical staff
+    func isMedicalStaff(_ userId: String) -> Bool {
+        return queue.sync {
+            for team in teams.values {
+                if let member = team.members.first(where: { $0.userId == userId }) {
+                    return member.role == .medic
+                }
+            }
+            return false
+        }
+    }
+    
+    // P0-FIX: 检查用户是否为队长
+    /// Check if user is team leader
+    func isTeamLeader(_ userId: String) -> Bool {
+        return queue.sync {
+            for team in teams.values {
+                if team.leaderId == userId {
+                    return true
+                }
+            }
+            return false
+        }
+    }
+
     // MARK: - Statistics
     
     /// 获取救援统计

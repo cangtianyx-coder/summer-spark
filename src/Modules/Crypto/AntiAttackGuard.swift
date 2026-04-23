@@ -349,20 +349,59 @@ public final class AntiAttackGuard {
         return nodeId.range(of: pattern, options: .regularExpression) != nil
     }
     
+    // P0-FIX: 实现真正的证书验证
     private func verifyCertificate(_ certificate: String, forNodeId nodeId: String) -> Bool {
-        // 简化验证：证书应包含节点ID信息
-        // 实际实现应使用加密库验证签名
-        return certificate.contains(nodeId) || certificate.count >= 32
+        // 方案1: 验证证书签名
+        guard let certData = Data(base64Encoded: certificate) else {
+            Logger.shared.warn("AntiAttackGuard: Invalid certificate encoding for node \(nodeId)")
+            return false
+        }
+        
+        // 证书格式: [原始数据(变长) || 签名(64字节)]
+        guard certData.count > 64 else {
+            Logger.shared.warn("AntiAttackGuard: Certificate too short for node \(nodeId)")
+            return false
+        }
+        
+        let signatureData = certData.suffix(64)
+        let originalData = certData.dropLast(64)
+        
+        // 从IdentityManager获取CA公钥验证证书
+        if let caPublicKey = IdentityManager.shared.getCAPublicKey() {
+            return CryptoEngine.shared.verify(
+                signature: signatureData,
+                data: originalData,
+                publicKey: caPublicKey
+            )
+        }
+        
+        // 方案2: 检查证书格式和内容（降级验证）
+        // 检查证书是否包含节点ID（基础验证）
+        guard certificate.contains(nodeId) else {
+            Logger.shared.warn("AntiAttackGuard: Certificate doesn't contain node ID")
+            return false
+        }
+        
+        return true
     }
+    
+    // P0-FIX: 使用DispatchSourceTimer替代while true无限循环
+    private var cleanupTimer: DispatchSourceTimer?
     
     private func setupBlocklistTimer() {
         // 定期清理过期数据
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            while true {
-                Thread.sleep(forTimeInterval: 3600) // 每小时
-                self?.cleanupExpiredData()
-            }
+        cleanupTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global(qos: .background))
+        cleanupTimer?.schedule(deadline: .now() + 3600, repeating: 3600) // 每小时
+        cleanupTimer?.setEventHandler { [weak self] in
+            self?.cleanupExpiredData()
         }
+        cleanupTimer?.resume()
+    }
+    
+    // P0-FIX: 添加deinit清理
+    deinit {
+        cleanupTimer?.cancel()
+        cleanupTimer = nil
     }
     
     private func cleanupExpiredData() {

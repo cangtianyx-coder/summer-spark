@@ -65,6 +65,7 @@ final class SecureEnclaveManager {
             throw SecureEnclaveError.unexpectedStatus(status)
         }
 
+        // P0-FIX: SecKey是CoreFoundation类型，直接返回
         return result as! SecKey
     }
 

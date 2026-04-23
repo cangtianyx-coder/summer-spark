@@ -176,10 +176,28 @@ final class SOSManager {
                 return
             }
             
-            // Get current location
+            // P0-FIX: 强制切换到活跃状态，确保低电量模式下SOS可用
+            PowerSaveManager.shared.transitionTo(.active)
+            
+            // P0-FIX: 确保Mesh服务运行
+            if !MeshService.shared.isRunning {
+                MeshService.shared.start()
+            }
+            
+            // Get current location with validation
             guard let location = LocationManager.shared.currentLocation else {
                 Logger.shared.error("SOSManager: No location available for SOS")
+                // P0-FIX: 通知代理位置不可用，让UI显示错误
+                DispatchQueue.main.async {
+                    self.delegate?.sosManager(self, didFailWithError: .locationUnavailable)
+                }
                 return
+            }
+            
+            // P0-FIX: 验证位置有效性
+            let validation = LocationManager.shared.validateLocation(location)
+            if !validation.isValid {
+                Logger.shared.warning("SOSManager: Location validation failed: \(validation.anomaly ?? "unknown")")
             }
             
             // Get sender info
@@ -352,7 +370,15 @@ final class SOSManager {
     }
     
     private func handleReceivedSOS(_ message: EmergencyMessage) {
-        guard let sos = try? JSONDecoder().decode(EmergencySOS.self, from: message.payload) else {
+        // P0-FIX: 验证消息签名
+        guard let verifiedData = CryptoEngine.shared.verify(message.payload, from: message.senderId) else {
+            Logger.shared.warning("SOSManager: SOS signature verification failed from \(message.senderId)")
+            AntiAttackGuard.shared.reportSuspiciousActivity(from: message.senderId, type: .invalidSignature)
+            return
+        }
+        
+        guard let sos = try? JSONDecoder().decode(EmergencySOS.self, from: verifiedData) else {
+            Logger.shared.warning("SOSManager: Failed to decode SOS after verification")
             return
         }
         
@@ -362,6 +388,13 @@ final class SOSManager {
             // Don't process our own SOS
             if sos.senderId == IdentityManager.shared.uid {
                 return
+            }
+            
+            // P0-FIX: 验证位置合理性
+            let locationValidation = LocationManager.shared.validateLocation(sos.location)
+            if !locationValidation.isValid {
+                Logger.shared.warning("SOSManager: SOS location suspicious: \(locationValidation.anomaly ?? "unknown")")
+                // 仍然处理，但标记可疑
             }
             
             // Store received SOS
@@ -408,11 +441,17 @@ final class SOSManager {
             return
         }
         
+        // P0-FIX: 对SOS消息进行签名
+        guard let signedData = CryptoEngine.shared.sign(sosData) else {
+            Logger.shared.error("SOSManager: Failed to sign SOS")
+            return
+        }
+        
         let emergencyMessage = EmergencyMessage(
             type: .sos,
             senderId: sos.senderId,
             priority: sos.priority,
-            payload: sosData
+            payload: signedData  // 使用签名后的数据
         )
         
         sendEmergencyMessage(emergencyMessage)

@@ -1,8 +1,9 @@
 import Foundation
+import CryptoKit
 
 // MARK: - MeshNode
 
-struct MeshNode: Identifiable, Equatable, Codable {
+struct MeshNode: Identifiable, Equatable {
     let id: UUID
     var name: String
     var lastSeen: Date
@@ -10,6 +11,8 @@ struct MeshNode: Identifiable, Equatable, Codable {
     var connectionState: ConnectionState
     var supportedMedia: Set<TransportMedium>
     var address: String
+    // P0-FIX: 添加公钥属性用于加密通信
+    var publicKey: P256.Signing.PublicKey? = nil
 
     enum ConnectionState: String, Codable, Equatable {
         case disconnected
@@ -29,6 +32,45 @@ struct MeshNode: Identifiable, Equatable, Codable {
 
     static func id(from uuid: UUID) -> UUID {
         return uuid
+    }
+}
+
+// P0-FIX: 手动实现MeshNode的Codable
+extension MeshNode: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case id, name, lastSeen, rssi, connectionState, supportedMedia, address, publicKeyData
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(lastSeen, forKey: .lastSeen)
+        try container.encode(rssi, forKey: .rssi)
+        try container.encode(connectionState, forKey: .connectionState)
+        try container.encode(supportedMedia, forKey: .supportedMedia)
+        try container.encode(address, forKey: .address)
+        if let pk = publicKey {
+            try container.encode(pk.rawRepresentation, forKey: .publicKeyData)
+        }
+    }
+}
+
+extension MeshNode: Decodable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        lastSeen = try container.decode(Date.self, forKey: .lastSeen)
+        rssi = try container.decode(Int.self, forKey: .rssi)
+        connectionState = try container.decode(ConnectionState.self, forKey: .connectionState)
+        supportedMedia = try container.decode(Set<TransportMedium>.self, forKey: .supportedMedia)
+        address = try container.decode(String.self, forKey: .address)
+        if let pkData = try? container.decode(Data.self, forKey: .publicKeyData) {
+            publicKey = try? P256.Signing.PublicKey(rawRepresentation: pkData)
+        } else {
+            publicKey = nil
+        }
     }
 }
 

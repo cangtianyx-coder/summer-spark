@@ -62,7 +62,11 @@ final class BluetoothService: NSObject {
 
     func startCentral() {
         guard !isCentralStarted else { return }
-        centralManager = CBCentralManager(delegate: self, queue: bluetoothQueue)
+        // P0-FIX: 添加后台状态恢复配置
+        let options: [String: Any] = [
+            CBCentralManagerOptionRestoreIdentifierKey: "com.summerspark.mesh.central"
+        ]
+        centralManager = CBCentralManager(delegate: self, queue: bluetoothQueue, options: options)
         isCentralStarted = true
     }
 

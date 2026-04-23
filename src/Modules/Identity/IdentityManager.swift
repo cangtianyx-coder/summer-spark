@@ -215,6 +215,63 @@ final class IdentityManager {
         let hash = SHA256.hash(data: publicKeyData)
         return hash.map { String(format: "%02x", $0) }.joined()
     }
+    
+    // P0-FIX: 获取CA公钥用于验证证书
+    /// Get CA public key for certificate verification
+    /// In a mesh network, each node acts as its own CA for simplicity
+    /// In production, this could be a designated CA node's public key
+    func getCAPublicKey() -> P256.Signing.PublicKey? {
+        // 方案1: 使用本地公钥作为CA（自签名模式）
+        return getPublicKey()
+        
+        // 方案2: 从网络获取指定CA节点的公钥（生产环境）
+        // if let caNodeId = caNodeId, let caPublicKey = MeshService.shared.getPublicKey(for: caNodeId) {
+        //     return caPublicKey
+        // }
+        // return nil
+    }
+    
+    /// Get public key for a specific user ID (for group key encryption)
+    func getPublicKey(for uid: String) -> P256.Signing.PublicKey? {
+        // 从MeshService获取该用户的公钥
+        if let nodeId = UUID(uuidString: uid),
+           let publicKey = MeshService.shared.getPublicKey(for: nodeId) {
+            return publicKey
+        }
+        // 如果是本地用户，返回本地公钥
+        if uid == self.uid {
+            return getPublicKey()
+        }
+        return nil
+    }
+    
+    // P0-FIX: 获取用于密钥协商的私钥
+    /// Get private key for key agreement
+    func getPrivateKeyForAgreement() -> P256.KeyAgreement.PrivateKey? {
+        // 从Keychain获取私钥数据
+        guard let privateKeyData = try? KeychainHelper.shared.load(
+            service: "com.summerspark.identity",
+            account: "privateKey"
+        ) else {
+            return nil
+        }
+        // 解析为密钥协商私钥
+        return try? P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+    }
+    
+    // P0-FIX: 获取用于签名的私钥
+    /// Get private key for signing
+    func getPrivateKeyForSigning() -> P256.Signing.PrivateKey? {
+        // 从Keychain获取私钥数据
+        guard let privateKeyData = try? KeychainHelper.shared.load(
+            service: "com.summerspark.identity",
+            account: "privateKey"
+        ) else {
+            return nil
+        }
+        // 解析为签名私钥
+        return try? P256.Signing.PrivateKey(rawRepresentation: privateKeyData)
+    }
 
     // MARK: - Serialization
 

@@ -69,14 +69,24 @@ enum SummerSparkApp {
             forTaskWithIdentifier: "com.summerspark.refresh",
             using: nil
         ) { task in
-            handleBackgroundRefresh(task: task as! BGAppRefreshTask)
+            // P0-FIX: 安全类型转换
+            guard let refreshTask = task as? BGAppRefreshTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            handleBackgroundRefresh(task: refreshTask)
         }
         
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.summerspark.sync",
             using: nil
         ) { task in
-            handleBackgroundSync(task: task as! BGProcessingTask)
+            // P0-FIX: 安全类型转换
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            handleBackgroundSync(task: processingTask)
         }
         
         // Mesh路由维护后台任务
@@ -84,7 +94,12 @@ enum SummerSparkApp {
             forTaskWithIdentifier: "com.summerspark.mesh-routing",
             using: nil
         ) { task in
-            handleMeshRoutingTask(task: task as! BGProcessingTask)
+            // P0-FIX: 安全类型转换
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            handleMeshRoutingTask(task: processingTask)
         }
         
         Logger.shared.info("[SummerSpark] Background modes configured")

@@ -85,6 +85,8 @@ enum AppConstants {
         static let tokenRefreshInterval: TimeInterval = 3600
         static let sessionTimeout: TimeInterval = 86400
         static let maxFailedAttempts = 5
+        // P0-FIX: 最低信任评分用于伤员标记
+        static let minimumTrustScoreForVictimMarking: Double = 0.3
     }
 
     // Timing
@@ -105,6 +107,9 @@ enum AppConstants {
         static let maxListItemTitleLength = 100
     }
 }
+
+// P0-FIX: 添加Constants别名以便于访问
+typealias Constants = AppConstants
 
 // MARK: - Notification Names
 

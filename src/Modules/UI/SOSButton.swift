@@ -9,6 +9,8 @@ struct SOSButton: View {
     @State private var isShowingConfirmation = false
     @State private var selectedEmergencyType: EmergencyType = .other
     @State private var selectedSeverity: Severity = .high
+    @State private var showErrorAlert = false  // P0-FIX: 错误提示状态
+    @State private var errorMessage = ""       // P0-FIX: 错误消息
     
     private let pressDuration: CGFloat = 3.0  // 长按3秒触发
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
@@ -73,10 +75,15 @@ struct SOSButton: View {
             }
             
             // 提示文字
-            Text("长按3秒发送紧急求救")
+            Text("sos_button_hint".localized)
                 .font(.system(size: 14))
                 .foregroundColor(.secondary)
         }
+        // P0-FIX: 无障碍支持
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("sos_button_label".localized)
+        .accessibilityHint("sos_button_hint_accessibility".localized)
+        .accessibilityValue(isPressed ? "sos_pressing".localized : "sos_not_pressed".localized)
         .sheet(isPresented: $isShowingConfirmation) {
             SOSConfirmationView(
                 emergencyType: $selectedEmergencyType,
@@ -99,6 +106,9 @@ struct SOSButton: View {
     
     private func sendSOS() {
         guard let location = LocationManager.shared.currentLocation else {
+            // P0-FIX: 显示错误提示而不是静默失败
+            errorMessage = "sos_error_no_location".localized
+            showErrorAlert = true
             Logger.shared.warn("SOSButton: No location available for SOS")
             return
         }

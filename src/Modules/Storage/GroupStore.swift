@@ -372,11 +372,39 @@ final class GroupStore {
     func encryptGroupKeyForMember(groupId: String, targetUid: String) -> Data? {
         guard let group = groups[groupId],
               let groupKey = group.groupKey else { return nil }
-
-        // Find member's public key from IdentityManager
-        // This would typically involve looking up the member's public key
-        // For now, return the raw group key (in real app, encrypt with member's public key)
-        return groupKey
+        
+        // P0-FIX: 使用成员公钥加密群组密钥
+        // 从MeshService或IdentityManager获取成员公钥
+        guard let memberPublicKey = MeshService.shared.getPublicKey(for: UUID(uuidString: targetUid) ?? UUID()) ??
+                                     IdentityManager.shared.getPublicKey(for: targetUid) else {
+            Logger.shared.warn("GroupStore: Public key not found for member \(targetUid)")
+            return nil
+        }
+        
+        // 使用CryptoEngine加密群组密钥
+        // 需要将P256.Signing.PublicKey转换为P256.KeyAgreement.PublicKey
+        guard let agreementPublicKey = try? P256.KeyAgreement.PublicKey(rawRepresentation: memberPublicKey.rawRepresentation) else {
+            Logger.shared.error("GroupStore: Failed to convert public key for \(targetUid)")
+            return nil
+        }
+        
+        // 使用本地私钥进行加密
+        guard let localSigningKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+            Logger.shared.error("GroupStore: Local signing key not available")
+            return nil
+        }
+        
+        do {
+            let encryptedKey = try CryptoEngine.shared.encryptAndSign(
+                plaintext: groupKey,
+                recipientPublicKey: agreementPublicKey,
+                senderSigningKey: localSigningKey
+            )
+            return encryptedKey
+        } catch {
+            Logger.shared.error("GroupStore: Failed to encrypt group key for \(targetUid): \(error)")
+            return nil
+        }
     }
 
     // MARK: - Helper Methods
