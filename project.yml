@@ -28,6 +28,9 @@ targets:
       - path: src
         excludes:
           - "**/.DS_Store"
+    resources:
+      - path: src/Resources
+        buildPhase: resources
     settings:
       base:
         INFOPLIST_FILE: src/App/Info.plist
@@ -38,6 +41,7 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: YES
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: configs/SummerSpark.entitlements
+        KNOWN_MODULE_IMPORTS: SwiftUI Combine
     entitlements:
       path: configs/SummerSpark.entitlements
       properties:

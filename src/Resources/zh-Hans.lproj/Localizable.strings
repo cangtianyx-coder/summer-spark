@@ -1,0 +1,42 @@
+/* 简体中文本地化字符串 */
+
+/* App Name */
+"app_name" = "夏日萤火";
+
+/* Tab Bar */
+"tab_home" = "首页";
+"tab_discover" = "发现";
+"tab_profile" = "我的";
+"tab_settings" = "设置";
+
+/* Buttons */
+"btn_start" = "开始";
+"btn_stop" = "停止";
+"btn_connect" = "连接";
+"btn_disconnect" = "断开";
+
+/* Messages */
+"msg_connecting" = "连接中...";
+"msg_connected" = "已连接";
+"msg_disconnected" = "已断开";
+"msg_no_network" = "无网络";
+"msg_offline_mode" = "离线模式";
+
+/* Titles */
+"title_voice_call" = "语音通话";
+"title_map" = "地图";
+"title_location" = "位置";
+"title_credits" = "积分";
+
+/* Settings */
+"settings_language" = "语言";
+"settings_chinese" = "中文";
+"settings_english" = "英文";
+"settings_about" = "关于";
+"settings_privacy" = "隐私政策";
+"settings_version" = "版本";
+"settings_current_language" = "当前语言";
+
+/* Language Selection */
+"language_select_title" = "选择语言";
+"language_restart_hint" = "语言更改将在重启后生效";

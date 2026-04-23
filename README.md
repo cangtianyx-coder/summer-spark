@@ -1,12 +1,14 @@
-# 夏日萤火 / A-Single-Spark
+# 夏日萤火 / Summer Spark
 
-**去中心化离线 Mesh 自组网通讯 App**
+**去中心化离线 Mesh 自组网通讯 App / Decentralized Offline Mesh Networking App**
 
 ---
 
-## 项目简介
+## [中文版]
 
-夏日萤火（A-Single-Spark）是一款基于 iPhone 构建的**去中心化离线 Mesh 自组织网络**通讯应用。无需互联网即可实现语音通话、地图导航、位置共享，适用于户外探险、灾害应急等无网络场景。
+### 项目简介
+
+夏日萤火（Summer Spark）是一款基于 iPhone 构建的**去中心化离线 Mesh 自组织网络**通讯应用。无需互联网即可实现语音通话、地图导航、位置共享，适用于户外探险、灾害应急等无网络场景。
 
 ### 核心特性
 
@@ -16,44 +18,30 @@
 - **离线地图**：支持预下载地图瓦片，无网也可导航
 - **积分激励**：中继转发贡献可获得积分，优先路由
 
----
-
-## 项目结构
+### 项目结构
 
 ```
 summer-spark/
 ├── docs/               # 项目文档
 │   ├── 00-PROJECT-CHARTER.md      # 项目章程
 │   ├── 01-ARCH/                  # 架构文档
-│   │   ├── ARCH_System_Overview.md
-│   │   ├── ARCH_Module_Diagram.md
-│   │   └── ARCH_Tech_Stack.md
 │   ├── 10-SEC/                   # 安全审计
 │   └── 99-FINAL/                 # 最终交付
-│       ├── FINAL_Installation_Guide.md  # 安装调试指南
-│       └── FINAL_Quick_Start.md        # 快速上手
 ├── src/                # 源代码
 │   ├── App/            # 应用入口
 │   ├── Modules/        # 功能模块
-│   │   ├── Identity/   # 身份体系（UID/公私钥）
-│   │   ├── Mesh/      # Mesh 网络（蓝牙/WiFi P2P）
-│   │   ├── Crypto/    # 端到端加密
-│   │   ├── Voice/     # 语音通话
-│   │   ├── Map/       # 离线地图
-│   │   ├── Points/    # 积分激励
-│   │   └── Storage/   # 本地存储
-│   └── Shared/        # 跨模块共享
-│       ├── Models/     # 数据模型
-│       ├── Protocols/ # 接口协议
-│       └── Utils/     # 工具函数
-└── configs/           # 配置文件
-    ├── Info.plist
-    └── SummerSpark.entitlements
+│   │   ├── Identity/   # 身份体系
+│   │   ├── Mesh/       # Mesh 网络
+│   │   ├── Crypto/     # 端到端加密
+│   │   ├── Voice/      # 语音通话
+│   │   ├── Map/        # 离线地图
+│   │   ├── Points/     # 积分激励
+│   │   └── Storage/    # 本地存储
+│   └── Shared/         # 跨模块共享
+└── configs/            # 配置文件
 ```
 
----
-
-## 模块说明
+### 模块说明
 
 | 模块 | 职责 |
 |------|------|
@@ -65,9 +53,7 @@ summer-spark/
 | **Points** | 积分生成、中继激励、路由权重调度 |
 | **Storage** | SQLite 数据库、加密缓存、隐私数据保护 |
 
----
-
-## 环境要求
+### 环境要求
 
 | 项目 | 要求 |
 |------|------|
@@ -76,73 +62,170 @@ summer-spark/
 | 设备 | iPhone（蓝牙 + WiFi） |
 | 测试设备 | 至少 2 台（Mesh 需多设备验证） |
 
----
-
-## 快速开始
-
-### 1. 编译运行
+### 快速开始
 
 ```bash
 cd ~/summer-spark
-open summer-spark.xcodeproj   # 或 .xcworkspace
+open SummerSpark.xcodeproj
 ```
 
 在 Xcode 中选择目标 iPhone，点击 ▶️ 运行。
 
-### 2. 安装调试
-
-详细步骤见：[FINAL_Installation_Guide.md](./docs/99-FINAL/FINAL_Installation_Guide.md)
-
-### 3. 快速上手
-
-详细操作见：[FINAL_Quick_Start.md](./docs/99-FINAL/FINAL_Quick_Start.md)
-
----
-
-## 技术栈
+### 技术栈
 
 | 层级 | 技术 |
 |------|------|
-| UI | SwiftUI（声明式）+ UIKit（降级） |
-| 通信 | MultipeerConnectivity（蓝牙/WiFi P2P） |
+| UI | SwiftUI + UIKit |
+| 通信 | CoreBluetooth + Network.framework |
 | 加密 | ECDSA P-256 + AES-256-GCM |
-| 存储 | SQLite.swift + Keychain |
-| 语音 | CallKit + PushKit + Opus |
-| 地图 | Mapbox / 自研 Metal 渲染 |
-| 并发 | Swift Concurrency（async/await） |
+| 存储 | SQLite + Keychain |
+| 语音 | AVAudioEngine + Opus |
+| 地图 | Mapbox iOS SDK |
+| 并发 | Swift Concurrency |
 
----
-
-## 安全原则
+### 安全原则
 
 - 私钥**永不离开** Secure Enclave
 - 所有消息**必须验签**后才处理
 - 敏感数据**不上日志**
 - 传输数据**不暴露明文**
 
----
-
-## 文档索引
-
-| 文档 | 说明 |
-|------|------|
-| [项目章程](./docs/00-PROJECT-CHARTER.md) | 项目目标、团队、阶段规划 |
-| [系统架构](./docs/01-ARCH/ARCH_System_Overview.md) | 模块边界、调用关系、状态机 |
-| [技术栈](./docs/01-ARCH/ARCH_Tech_Stack.md) | 框架选型、第三方库、后台配置 |
-| [安全指南](./docs/10-SEC/SEC_Security_Guidelines.md) | 安全要求、加密规范 |
-| [UX 设计](./docs/09-UX/UX_Design_Guidelines.md) | 界面规范、交互设计 |
-| [安装指南](./docs/99-FINAL/FINAL_Installation_Guide.md) | 环境配置、真机调试步骤 |
-| [快速上手](./docs/99-FINAL/FINAL_Quick_Start.md) | 首次使用操作说明 |
-
----
-
-## 版本历史
+### 版本历史
 
 | 版本 | 阶段 | 说明 |
 |------|------|------|
 | V1.0 | MVP | 核心骨架：身份体系 + Mesh 单跳 + 基础语音 + 离线地图 |
+| V2.0 | 增强 | 面对面建群、群组语音、完整积分体系 |
+| V3.0 | 完整 | 自动路径寻址、多跳稳定路由、地图包中继共享 |
 
 ---
 
-*夏日萤火 / A-Single-Spark*
-*版本 V1.0 | 2026-04-22*
+## [English Version]
+
+### Project Overview
+
+Summer Spark is a **decentralized offline Mesh networking** communication app built for iPhone. It enables voice calls, map navigation, and location sharing without internet connectivity, ideal for outdoor adventures, disaster response, and other offline scenarios.
+
+### Core Features
+
+- **Offline Communication**: Entirely relies on Bluetooth/WiFi P2P, no internet required
+- **Mesh Networking**: Multi-device auto-discovery, multi-hop relay forwarding
+- **End-to-End Encryption**: All communications use ECDSA P-256 + AES-256-GCM encryption
+- **Offline Maps**: Pre-download map tiles for navigation without network
+- **Credit Incentive**: Earn credits through relay contributions for priority routing
+
+### Project Structure
+
+```
+summer-spark/
+├── docs/               # Documentation
+│   ├── 00-PROJECT-CHARTER.md      # Project charter
+│   ├── 01-ARCH/                  # Architecture docs
+│   ├── 10-SEC/                   # Security audit
+│   └── 99-FINAL/                 # Final delivery
+├── src/                # Source code
+│   ├── App/            # App entry
+│   ├── Modules/        # Feature modules
+│   │   ├── Identity/   # Identity system
+│   │   ├── Mesh/       # Mesh network
+│   │   ├── Crypto/     # E2E encryption
+│   │   ├── Voice/      # Voice calls
+│   │   ├── Map/        # Offline maps
+│   │   ├── Points/     # Credit system
+│   │   └── Storage/    # Local storage
+│   └── Shared/         # Cross-module shared
+└── configs/            # Configuration files
+```
+
+### Module Description
+
+| Module | Responsibility |
+|--------|----------------|
+| **Identity** | Device unique identity (UID), key pairs, Keychain management |
+| **Mesh** | Bluetooth/WiFi discovery, multi-hop routing, node connection |
+| **Crypto** | E2E encryption, message signing/verification, anti-forgery |
+| **Voice** | PTT voice calls, audio codec, background calls |
+| **Map** | Offline map loading, contour rendering, route planning |
+| **Points** | Credit generation, relay incentives, routing priority |
+| **Storage** | SQLite database, encrypted cache, privacy protection |
+
+### Requirements
+
+| Item | Requirement |
+|------|-------------|
+| Xcode | 15.0+ |
+| iOS | 16.0+ |
+| Device | iPhone (Bluetooth + WiFi) |
+| Test Devices | At least 2 (Mesh requires multi-device verification) |
+
+### Quick Start
+
+```bash
+cd ~/summer-spark
+open SummerSpark.xcodeproj
+```
+
+Select target iPhone in Xcode, click ▶️ to run.
+
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| UI | SwiftUI + UIKit |
+| Communication | CoreBluetooth + Network.framework |
+| Encryption | ECDSA P-256 + AES-256-GCM |
+| Storage | SQLite + Keychain |
+| Voice | AVAudioEngine + Opus |
+| Maps | Mapbox iOS SDK |
+| Concurrency | Swift Concurrency |
+
+### Security Principles
+
+- Private keys **never leave** Secure Enclave
+- All messages **must be verified** before processing
+- Sensitive data **never logged**
+- Transmitted data **never exposed in plaintext**
+
+### Security Audit Results
+
+After three rounds of security audits, 21 issues were identified and fixed:
+
+| Round | P0 (Critical) | P1 (Important) | P2 (Moderate) | Total |
+|-------|---------------|----------------|---------------|-------|
+| Round 1 | 2 | 4 | 2 | 8 |
+| Round 2 | 1 | 3 | 2 | 6 |
+| Round 3 | 1 | 3 | 3 | 7 |
+| **Total** | **4** | **10** | **7** | **21** |
+
+Key security improvements:
+- **Encryption**: Per-message unique salt, verify-then-decrypt pattern
+- **Protocol**: Replay attack protection, route validation
+- **Privacy**: Device token masking, BLE anonymous broadcast
+- **Data**: Keychain storage, file protection, SQL injection prevention
+- **Concurrency**: Array bounds fix, Timer leak fix, @MainActor annotations
+
+### Version History
+
+| Version | Stage | Description |
+|---------|-------|-------------|
+| V1.0 | MVP | Core skeleton: Identity + Single-hop Mesh + Basic Voice + Offline Maps |
+| V2.0 | Enhanced | Face-to-face groups, group voice, complete credit system |
+| V3.0 | Complete | Auto path-finding, stable multi-hop routing, map relay sharing |
+
+---
+
+### Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Project Charter](./docs/00-PROJECT-CHARTER.md) | Project goals, team, phase planning |
+| [System Architecture](./docs/01-ARCH/ARCH_System_Overview.md) | Module boundaries, call relations, state machines |
+| [Tech Stack](./docs/01-ARCH/ARCH_Tech_Stack.md) | Framework selection, dependencies, background config |
+| [Security Guidelines](./docs/10-SEC/SEC_Security_Guidelines.md) | Security requirements, encryption specs |
+| [Installation Guide](./docs/99-FINAL/FINAL_Installation_Guide.md) | Environment setup, device debugging steps |
+| [Quick Start](./docs/99-FINAL/FINAL_Quick_Start.md) | First-time usage instructions |
+
+---
+
+*夏日萤火 / Summer Spark*
+*Version V3.0 | 2026-04-23*

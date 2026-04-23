@@ -11,26 +11,33 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct ContentView: View {
     @State private var selectedIndex: Int = 0
+    @ObservedObject private var languageManager = LanguageManager.shared
     
     var body: some View {
         TabView(selection: $selectedIndex) {
             HomeView()
                 .tabItem {
-                    Label("首页", systemImage: "house")
+                    Label("tab_home".localized, systemImage: "house")
                 }
                 .tag(0)
             
             DiscoverView()
                 .tabItem {
-                    Label("发现", systemImage: "magnifyingglass")
+                    Label("tab_discover".localized, systemImage: "magnifyingglass")
                 }
                 .tag(1)
             
             ProfileView()
                 .tabItem {
-                    Label("我的", systemImage: "person")
+                    Label("tab_profile".localized, systemImage: "person")
                 }
                 .tag(2)
+            
+            SettingsView()
+                .tabItem {
+                    Label("tab_settings".localized, systemImage: "gear")
+                }
+                .tag(3)
         }
         .accentColor(.blue)
     }
@@ -43,9 +50,15 @@ struct ContentView: View {
 struct HomeView: View {
     var body: some View {
         NavigationView {
-            Text("首页")
-                .font(.largeTitle)
-                .navigationTitle("首页")
+            VStack(spacing: 20) {
+                Text("tab_home".localized)
+                    .font(.largeTitle)
+                
+                Text("app_name".localized)
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+            .navigationTitle("tab_home".localized)
         }
     }
 }
@@ -55,9 +68,15 @@ struct HomeView: View {
 struct DiscoverView: View {
     var body: some View {
         NavigationView {
-            Text("发现")
-                .font(.largeTitle)
-                .navigationTitle("发现")
+            VStack(spacing: 20) {
+                Text("tab_discover".localized)
+                    .font(.largeTitle)
+                
+                Text("title_map".localized)
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+            .navigationTitle("tab_discover".localized)
         }
     }
 }
@@ -67,9 +86,15 @@ struct DiscoverView: View {
 struct ProfileView: View {
     var body: some View {
         NavigationView {
-            Text("我的")
-                .font(.largeTitle)
-                .navigationTitle("我的")
+            VStack(spacing: 20) {
+                Text("tab_profile".localized)
+                    .font(.largeTitle)
+                
+                Text("title_credits".localized)
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+            .navigationTitle("tab_profile".localized)
         }
     }
 }

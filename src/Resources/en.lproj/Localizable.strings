@@ -1,0 +1,42 @@
+/* English Localizable Strings */
+
+/* App Name */
+"app_name" = "Summer Spark";
+
+/* Tab Bar */
+"tab_home" = "Home";
+"tab_discover" = "Discover";
+"tab_profile" = "Profile";
+"tab_settings" = "Settings";
+
+/* Buttons */
+"btn_start" = "Start";
+"btn_stop" = "Stop";
+"btn_connect" = "Connect";
+"btn_disconnect" = "Disconnect";
+
+/* Messages */
+"msg_connecting" = "Connecting...";
+"msg_connected" = "Connected";
+"msg_disconnected" = "Disconnected";
+"msg_no_network" = "No Network";
+"msg_offline_mode" = "Offline Mode";
+
+/* Titles */
+"title_voice_call" = "Voice Call";
+"title_map" = "Map";
+"title_location" = "Location";
+"title_credits" = "Credits";
+
+/* Settings */
+"settings_language" = "Language";
+"settings_chinese" = "Chinese";
+"settings_english" = "English";
+"settings_about" = "About";
+"settings_privacy" = "Privacy Policy";
+"settings_version" = "Version";
+"settings_current_language" = "Current Language";
+
+/* Language Selection */
+"language_select_title" = "Select Language";
+"language_restart_hint" = "Language change will take effect after restart";
