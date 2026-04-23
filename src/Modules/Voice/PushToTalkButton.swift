@@ -1,11 +1,13 @@
 import UIKit
 
+@MainActor
 protocol PushToTalkButtonDelegate: AnyObject {
     func pushToTalkButtonDidBegin(_ button: PushToTalkButton)
     func pushToTalkButtonDidEnd(_ button: PushToTalkButton)
     func pushToTalkButton(_ button: PushToTalkButton, didUpdateLevel level: Float)
 }
 
+@MainActor
 final class PushToTalkButton: UIView {
 
     weak var delegate: PushToTalkButtonDelegate?

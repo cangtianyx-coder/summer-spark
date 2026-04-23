@@ -479,20 +479,25 @@ final class CreditQoSController {
         routes: [(routeId: String, bandwidth: Double, latency: TimeInterval, stability: Double)],
         permissionLevel: QoSPermissionLevel
     ) -> (routeId: String, bandwidth: Double, latency: TimeInterval, stability: Double) {
+        // 空数组检查，防止越界崩溃
+        guard let firstRoute = routes.first else {
+            return (routeId: "default", bandwidth: 0, latency: Double.infinity, stability: 0)
+        }
+        
         // 根据权限级别使用不同的选择策略
         switch permissionLevel {
         case .premium:
             // Premium：选择最低延迟
-            return routes.min { $0.latency < $1.latency } ?? routes[0]
+            return routes.min { $0.latency < $1.latency } ?? firstRoute
         case .priority:
             // Priority：平衡稳定性和延迟
-            return routes.max { ($0.stability / ($0.latency + 1)) < ($1.stability / ($1.latency + 1)) } ?? routes[0]
+            return routes.max { ($0.stability / ($0.latency + 1)) < ($1.stability / ($1.latency + 1)) } ?? firstRoute
         case .basic:
             // Basic：优先稳定性
-            return routes.max { $0.stability < $1.stability } ?? routes[0]
+            return routes.max { $0.stability < $1.stability } ?? firstRoute
         case .restricted:
             // Restricted：只选最稳定的
-            return routes.max { $0.stability < $1.stability } ?? routes[0]
+            return routes.max { $0.stability < $1.stability } ?? firstRoute
         }
     }
 

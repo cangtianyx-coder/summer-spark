@@ -121,6 +121,7 @@ final class CreditSyncManager {
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self)
         sqlite3_close(db)
     }
 

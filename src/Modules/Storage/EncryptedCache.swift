@@ -97,7 +97,7 @@ final class EncryptedCache {
 
     // MARK: - Initialization
 
-    init(keyProvider: EncryptionKeyProvider, config: Config = Config()) {
+    init(keyProvider: EncryptionKeyProvider, config: Config = Config()) throws {
         self.keyProvider = keyProvider
         self.config = config
 
@@ -105,7 +105,7 @@ final class EncryptedCache {
             self.persistencePath = customDir.appendingPathComponent("EncryptedCache", isDirectory: true)
         } else {
             guard let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
-                fatalError("EncryptedCache: Failed to get caches directory")
+                throw EncryptedCacheError.notInitialized
             }
             self.persistencePath = caches.appendingPathComponent("EncryptedCache", isDirectory: true)
         }
@@ -459,7 +459,7 @@ final class EncryptedCache {
             do {
                 try set(key, data: data)
             } catch {
-                Logger.shared.error("Failed to cache \(key): \(error)")
+                Logger.shared.error("Failed to cache \(Self.sanitizeKey(key)): \(error)")
             }
         }
     }
@@ -510,6 +510,19 @@ final class EncryptedCache {
             for key in expiredKeys {
                 self.performRemove(key: key)
             }
+        }
+    }
+    
+    // MARK: - Private Helpers
+    
+    private static func sanitizeKey(_ key: String) -> String {
+        if key.count > 8 {
+            let prefix = String(key.prefix(4))
+            let suffix = String(key.suffix(4))
+            return "\(prefix)****\(suffix)"
+        } else {
+            let prefix = String(key.prefix(2))
+            return "\(prefix)****"
         }
     }
 }

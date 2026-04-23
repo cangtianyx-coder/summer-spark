@@ -39,6 +39,11 @@ public class AdaptiveBeaconController: NSObject {
         super.init()
     }
     
+    deinit {
+        broadcastTimer?.invalidate()
+        broadcastTimer = nil
+    }
+    
     // MARK: - Broadcasting Control
     
     /// Start beacon broadcasting

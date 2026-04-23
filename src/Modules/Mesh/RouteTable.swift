@@ -48,6 +48,7 @@ enum RouteValidationError: Error, LocalizedError {
     }
 }
 
+@MainActor
 protocol RouteTableDelegate: AnyObject {
     func routeTable(_ table: RouteTable, didUpdateRoutes routes: [RouteEntry])
 }
@@ -281,17 +282,15 @@ final class RouteTable {
     }
     
     func enableRoute(at index: Int) {
-        guard index < routes.count else { return }
-        var route = routes[index]
-        route = RouteEntry(destination: route.destination, subnetMask: route.subnetMask, gateway: route.gateway, interface: route.interface, metric: route.metric, isEnabled: true)
-        updateRoute(at: index, with: route)
+        guard let route = routes[safe: index] else { return }
+        let updatedRoute = RouteEntry(destination: route.destination, subnetMask: route.subnetMask, gateway: route.gateway, interface: route.interface, metric: route.metric, isEnabled: true)
+        updateRoute(at: index, with: updatedRoute)
     }
     
     func disableRoute(at index: Int) {
-        guard index < routes.count else { return }
-        var route = routes[index]
-        route = RouteEntry(destination: route.destination, subnetMask: route.subnetMask, gateway: route.gateway, interface: route.interface, metric: route.metric, isEnabled: false)
-        updateRoute(at: index, with: route)
+        guard let route = routes[safe: index] else { return }
+        let updatedRoute = RouteEntry(destination: route.destination, subnetMask: route.subnetMask, gateway: route.gateway, interface: route.interface, metric: route.metric, isEnabled: false)
+        updateRoute(at: index, with: updatedRoute)
     }
     
     func findBestRoute(for destination: String) -> RouteEntry? {

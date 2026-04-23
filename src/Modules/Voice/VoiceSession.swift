@@ -72,6 +72,11 @@ final class VoiceSession {
     private var receivedAudioBuffers: [String: Data] = [:]
 
     private init() {}
+    
+    deinit {
+        stopAudioLevelMonitoring()
+        teardownAudioEngine()
+    }
 
     // MARK: - Session Lifecycle
 

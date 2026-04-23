@@ -41,6 +41,11 @@ final class MapRelayService: MapRelayServiceProtocol {
         self.integrityVerifier = TileIntegrityVerifier()
     }
     
+    deinit {
+        announcementTimers.values.forEach { $0.invalidate() }
+        announcementTimers.removeAll()
+    }
+    
     // MARK: - Relay Control
     
     func startRelaying() {

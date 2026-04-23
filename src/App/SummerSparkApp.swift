@@ -183,6 +183,7 @@ enum SummerSparkApp {
 
 // MARK: - AppDelegate（传统生命周期支持）
 @available(iOS 13.0, *)
+@MainActor
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static var shared: AppDelegate {

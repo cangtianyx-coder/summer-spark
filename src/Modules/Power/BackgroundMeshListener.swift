@@ -34,6 +34,12 @@ public class BackgroundMeshListener: NSObject, BackgroundMeshListenerProtocol {
         super.init()
     }
     
+    deinit {
+        scanTimer?.invalidate()
+        scanTimer = nil
+        centralManager?.stopScan()
+    }
+    
     public var isListening: Bool {
         listenerLock.lock()
         defer { listenerLock.unlock() }

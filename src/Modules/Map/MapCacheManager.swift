@@ -1,6 +1,17 @@
 import Foundation
 import SQLite3
 
+enum MapCacheManagerError: Error, LocalizedError {
+    case cacheDirectoryNotAvailable
+    
+    var errorDescription: String? {
+        switch self {
+        case .cacheDirectoryNotAvailable:
+            return "MapCacheManager: Failed to get caches directory"
+        }
+    }
+}
+
 final class MapCacheManager {
 
     static let shared = MapCacheManager()
@@ -51,7 +62,15 @@ final class MapCacheManager {
 
     private init() {
         guard let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
-            fatalError("MapCacheManager: Failed to get caches directory")
+            // Fallback to temporary directory if caches directory is not available
+            Logger.shared.error("MapCacheManager: Failed to get caches directory, using temporary directory")
+            cacheDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("MapCache", isDirectory: true)
+            dbPath = cacheDirectory.appendingPathComponent("cache_metadata.sqlite")
+            try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+            openDatabase()
+            loadMetadata()
+            startPreloadTimer()
+            return
         }
         cacheDirectory = caches.appendingPathComponent("MapCache", isDirectory: true)
         dbPath = cacheDirectory.appendingPathComponent("cache_metadata.sqlite")

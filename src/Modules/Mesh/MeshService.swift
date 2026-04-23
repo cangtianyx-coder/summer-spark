@@ -26,6 +26,10 @@ final class MeshService {
         self.bluetoothService = BluetoothService()
         setupBluetoothCallbacks()
     }
+    
+    deinit {
+        stopNodeExpirationMonitor()
+    }
 
     // MARK: - Public API
 

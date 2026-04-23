@@ -147,6 +147,12 @@ final class LocationManager: NSObject {
         setupLocationManager()
     }
     
+    deinit {
+        stopSharingTimer()
+        clLocationManager.stopUpdatingLocation()
+        clLocationManager.stopUpdatingHeading()
+    }
+    
     // MARK: - Public API
     
     /// 启动位置服务

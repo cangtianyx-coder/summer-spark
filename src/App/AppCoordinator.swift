@@ -18,6 +18,7 @@ extension Coordinator {
 }
 
 // MARK: - 应用根协调器
+@MainActor
 final class AppCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -105,6 +106,7 @@ final class AppCoordinator: Coordinator {
 }
 
 // MARK: - 首页协调器
+@MainActor
 final class HomeCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -126,6 +128,7 @@ final class HomeCoordinator: Coordinator {
 }
 
 // MARK: - 发现协调器
+@MainActor
 final class DiscoverCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -147,6 +150,7 @@ final class DiscoverCoordinator: Coordinator {
 }
 
 // MARK: - 个人中心协调器
+@MainActor
 final class ProfileCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -168,6 +172,7 @@ final class ProfileCoordinator: Coordinator {
 }
 
 // MARK: - 登录协调器
+@MainActor
 final class LoginCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -192,6 +197,7 @@ final class LoginCoordinator: Coordinator {
 }
 
 // MARK: - 引导页协调器
+@MainActor
 final class OnboardingCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     var navigationController: UINavigationController
@@ -216,21 +222,27 @@ final class OnboardingCoordinator: Coordinator {
 }
 
 // MARK: - 占位视图控制器（需替换为实际实现）
+@MainActor
 class HomeViewController: UIViewController {
     weak var coordinator: HomeCoordinator?
 }
+@MainActor
 class DiscoverViewController: UIViewController {
     weak var coordinator: DiscoverCoordinator?
 }
+@MainActor
 class ProfileViewController: UIViewController {
     weak var coordinator: ProfileCoordinator?
 }
+@MainActor
 class LoginViewController: UIViewController {
     weak var coordinator: LoginCoordinator?
 }
+@MainActor
 class OnboardingViewController: UIViewController {
     weak var coordinator: OnboardingCoordinator?
 }
+@MainActor
 class DetailViewController: UIViewController {
     init(id: String) { super.init(nibName: nil, bundle: nil) }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
