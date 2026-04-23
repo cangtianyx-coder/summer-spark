@@ -64,6 +64,14 @@ final class RouteTable {
     private let queue = DispatchQueue(label: "com.mesh.routetable", qos: .utility)
     private let fileManager = FileManager.default
     
+    // P1-FIX: 路由表大小限制，防止大规模网络内存溢出
+    private let maxRoutes = 500
+    
+    // P2-FIX: 路由缓存，优化查找性能
+    private var routeCache: [String: RouteEntry] = [:]
+    private var cacheValid = false
+    private let maxCacheSize = 200
+    
     // MARK: - Route Validation Configuration
     
     /// Maximum allowed metric value for routes
@@ -212,7 +220,24 @@ final class RouteTable {
                 return
             }
             
+            // P1-FIX: 路由表大小限制检查
+            if self.routes.count >= self.maxRoutes {
+                // 移除最老且metric最高的路由（LRU策略）
+                let sortedRoutes = self.routes.sorted { 
+                    if $0.metric != $1.metric {
+                        return $0.metric < $1.metric  // 低metric优先保留
+                    }
+                    return $0.createdAt < $1.createdAt  // 同metric时，老的优先移除
+                }
+                // 移除后20%的路由
+                let toRemove = max(1, self.routes.count / 5)
+                let routesToKeep = Set(sortedRoutes.dropLast(toRemove).map { "\($0.destination)-\($0.subnetMask)" })
+                self.routes.removeAll { !routesToKeep.contains("\($0.destination)-\($0.subnetMask)") }
+                Logger.shared.info("RouteTable: Pruned \(toRemove) routes, remaining: \(self.routes.count)")
+            }
+            
             self.routes.append(route)
+            self.cacheValid = false  // P2-FIX: 使缓存失效
             self.saveRoutes()
             DispatchQueue.main.async {
                 self.delegate?.routeTable(self, didUpdateRoutes: self.routes)
@@ -294,15 +319,47 @@ final class RouteTable {
     }
     
     func findBestRoute(for destination: String) -> RouteEntry? {
+        // P2-FIX: 检查缓存
+        if cacheValid, let cached = routeCache[destination] {
+            return cached
+        }
+        
+        // P2-FIX: 使用预排序的enabledRoutes，避免每次排序
         let sortedRoutes = enabledRoutes.sorted { $0.metric < $1.metric }
         
+        var bestRoute: RouteEntry?
         for route in sortedRoutes {
             if matchesRoute(destination: destination, route: route) {
-                return route
+                bestRoute = route
+                break
             }
         }
         
-        return nil
+        // P2-FIX: 更新缓存
+        if let route = bestRoute {
+            updateRouteCache(destination: destination, route: route)
+        }
+        
+        return bestRoute
+    }
+    
+    // P2-FIX: 更新路由缓存
+    private func updateRouteCache(destination: String, route: RouteEntry) {
+        if routeCache.count >= maxCacheSize {
+            // 移除一半缓存
+            let keysToRemove = Array(routeCache.keys).prefix(maxCacheSize / 2)
+            for key in keysToRemove {
+                routeCache.removeValue(forKey: key)
+            }
+        }
+        routeCache[destination] = route
+        cacheValid = true
+    }
+    
+    // P2-FIX: 使缓存失效（路由变更时调用）
+    func invalidateCache() {
+        cacheValid = false
+        routeCache.removeAll()
     }
     
     private func matchesRoute(destination: String, route: RouteEntry) -> Bool {

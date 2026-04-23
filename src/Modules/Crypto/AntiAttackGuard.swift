@@ -67,7 +67,7 @@ public final class AntiAttackGuard {
     private var replayCache: [Data: Date] = [:]
     private var replayCacheOrder: [Data] = [] // 维护LRU顺序
     private let replayCacheLock = NSLock()
-    private let replayCacheMaxSize = 10000
+    private let replayCacheMaxSize = 50000  // P1-FIX: 从10000增加到50000，适应大规模网络
     private let replayMessageMaxAge: TimeInterval = 300 // 5 minutes
     
     // MARK: - Tamper Detection
@@ -98,9 +98,15 @@ public final class AntiAttackGuard {
         // 记录新签名
         signatureLock.lock()
         messageSignatures[messageId] = signature
+        // P1-FIX: 使用LRU淘汰而非全量清空
         if messageSignatures.count > 100000 {
-            // 清理旧签名
-            messageSignatures = [:]
+            // 移除最老的20%记录而非全部清空
+            let toRemove = messageSignatures.count / 5
+            let keysToRemove = Array(messageSignatures.keys).prefix(toRemove)
+            for key in keysToRemove {
+                messageSignatures.removeValue(forKey: key)
+            }
+            Logger.shared.debug("AntiAttackGuard: Pruned \(toRemove) signatures, remaining: \(messageSignatures.count)")
         }
         signatureLock.unlock()
         

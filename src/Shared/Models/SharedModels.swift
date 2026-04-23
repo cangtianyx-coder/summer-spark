@@ -122,9 +122,10 @@ struct MeshMessage: Codable {
     let payload: Data
     let timestamp: Date
     let nonce: Data
-    let ttl: Int
+    var ttl: Int  // P1-FIX: 改为var以支持转发时递减
     var messageType: MeshMessageType
     let priority: MessagePriority
+    var hopCount: Int = 0  // P1-FIX: 添加跳数计数，防止广播风暴
 
     init(source: UUID, destination: UUID? = nil, payload: Data, ttl: Int = 64, messageType: MeshMessageType = .broadcast, priority: MessagePriority = .normal) {
         self.id = UUID()
@@ -139,6 +140,26 @@ struct MeshMessage: Codable {
         self.ttl = ttl
         self.messageType = messageType
         self.priority = priority
+    }
+    
+    // P1-FIX: 检查消息是否应该继续转发
+    mutating func decrementTTL() -> Bool {
+        hopCount += 1
+        ttl = max(0, ttl - 1)
+        return ttl > 0
+    }
+    
+    // P1-FIX: 创建转发副本
+    func forwardingCopy() -> MeshMessage? {
+        guard ttl > 1 else { return nil }
+        return MeshMessage(
+            source: sourceNodeId,
+            destination: destinationNodeId,
+            payload: payload,
+            ttl: ttl - 1,
+            messageType: messageType,
+            priority: priority
+        )
     }
 }
 

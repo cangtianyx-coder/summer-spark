@@ -18,11 +18,19 @@ final class MeshService {
     private let bluetoothService: BluetoothService
     private let meshQueue = DispatchQueue(label: "com.mesh.service", qos: .userInitiated)
     private var nodeExpirationTimer: Timer?
-    private let nodeExpirationInterval: TimeInterval = 30.0
+    private let nodeExpirationInterval: TimeInterval = 60.0  // P1-FIX: 从30秒增加到60秒
     
     // 消息优先级队列
     private var messageQueue: [(message: MeshMessage, medium: MeshNode.TransportMedium?)] = []
-    private let maxQueueSize = 100
+    private let maxQueueSize = 200  // P2-FIX: 从100增加到200
+    
+    // P1-FIX: 消息去重缓存 - 防止广播风暴
+    private var forwardedMessageIds: Set<UUID> = []
+    private let maxForwardedCacheSize = 1000
+    private var forwardedCacheCleanTimer: Timer?
+    
+    // P2-FIX: 发现节点容量限制
+    private let maxDiscoveredNodes = 150  // 限制最大发现节点数
 
     // MARK: - Initialization
 
@@ -45,6 +53,7 @@ final class MeshService {
             self.bluetoothService.startCentral()
             self.bluetoothService.startPeripheral()
             self.startNodeExpirationMonitor()
+            self.startForwardedCacheCleanTimer()  // P1-FIX: 启动去重缓存清理
         }
     }
 
@@ -54,13 +63,63 @@ final class MeshService {
             self.isRunning = false
             self.bluetoothService.stop()
             self.stopNodeExpirationMonitor()
+            self.stopForwardedCacheCleanTimer()  // P1-FIX: 停止去重缓存清理
             self.discoveredNodes.removeAll()
+            self.forwardedMessageIds.removeAll()  // P1-FIX: 清理去重缓存
+        }
+    }
+    
+    // P1-FIX: 启动去重缓存清理定时器
+    private func startForwardedCacheCleanTimer() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.forwardedCacheCleanTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+                self?.cleanForwardedCache()
+            }
+        }
+    }
+    
+    private func stopForwardedCacheCleanTimer() {
+        forwardedCacheCleanTimer?.invalidate()
+        forwardedCacheCleanTimer = nil
+    }
+    
+    // P1-FIX: 清理去重缓存，防止内存无限增长
+    private func cleanForwardedCache() {
+        meshQueue.async { [weak self] in
+            guard let self = self else { return }
+            if self.forwardedMessageIds.count > self.maxForwardedCacheSize {
+                // Set是无序的，随机移除一半元素
+                let toRemove = self.forwardedMessageIds.count / 2
+                var removed = 0
+                for id in self.forwardedMessageIds {
+                    if removed >= toRemove { break }
+                    self.forwardedMessageIds.remove(id)
+                    removed += 1
+                }
+                Logger.shared.debug("MeshService: Cleaned forwarded cache, remaining: \(self.forwardedMessageIds.count)")
+            }
         }
     }
 
     func sendMessage(_ message: MeshMessage, via medium: MeshNode.TransportMedium? = nil) {
         meshQueue.async { [weak self] in
             guard let self = self else { return }
+            
+            // P1-FIX: 广播抑制 - 检查是否已转发过此消息
+            if self.forwardedMessageIds.contains(message.id) {
+                Logger.shared.debug("MeshService: Dropping duplicate message \(message.id)")
+                return
+            }
+            
+            // P1-FIX: TTL检查 - 如果TTL耗尽则不再转发
+            if message.ttl <= 0 {
+                Logger.shared.debug("MeshService: Dropping message with exhausted TTL")
+                return
+            }
+            
+            // P1-FIX: 记录已转发消息
+            self.forwardedMessageIds.insert(message.id)
             
             // 将消息加入队列
             self.enqueueMessage(message, medium: medium)
@@ -155,16 +214,37 @@ final class MeshService {
             self.removeExpiredNodes()
             
             // 2. 优化路由表
-            // 保留信号最强的节点
+            // P2-FIX: 提高阈值从10到50，适应大规模网络
             let connectedNodes = self.discoveredNodes.values.filter { $0.connectionState == .connected }
-            if connectedNodes.count > 10 {
+            if connectedNodes.count > 50 {
                 let sortedNodes = connectedNodes.sorted { $0.rssi > $1.rssi }
-                let nodesToKeep = Set(sortedNodes.prefix(10).map { $0.id })
+                let nodesToKeep = Set(sortedNodes.prefix(50).map { $0.id })
                 self.discoveredNodes = self.discoveredNodes.filter { nodesToKeep.contains($0.key) }
+            }
+            
+            // P2-FIX: 发现节点容量限制
+            if self.discoveredNodes.count > self.maxDiscoveredNodes {
+                // 按信号强度和活跃度排序，保留最优节点
+                let sortedNodes = self.discoveredNodes.values.sorted { node1, node2 in
+                    let score1 = self.calculateNodeRetentionScore(node1)
+                    let score2 = self.calculateNodeRetentionScore(node2)
+                    return score1 > score2
+                }
+                let nodesToKeep = Set(sortedNodes.prefix(self.maxDiscoveredNodes).map { $0.id })
+                self.discoveredNodes = self.discoveredNodes.filter { nodesToKeep.contains($0.key) }
+                Logger.shared.info("MeshService: Reduced discovered nodes to \(self.maxDiscoveredNodes)")
             }
             
             Logger.shared.info("MeshService: Route maintenance completed, nodes: \(self.discoveredNodes.count)")
         }
+    }
+    
+    // P2-FIX: 计算节点保留评分
+    private func calculateNodeRetentionScore(_ node: MeshNode) -> Double {
+        let rssiScore = Double(max(0, min(100, node.rssi + 100))) / 100.0
+        let ageScore = max(0, 1.0 - node.lastSeen.timeIntervalSinceNow / 300.0)  // 5分钟内活跃
+        let connectionScore = node.connectionState == .connected ? 1.0 : 0.5
+        return rssiScore * 0.4 + ageScore * 0.3 + connectionScore * 0.3
     }
 
     // MARK: - Route Selection
@@ -241,6 +321,20 @@ final class MeshService {
             supportedMedia: [.bluetoothLE],
             address: address
         )
+
+        // P2-FIX: 发现节点容量限制检查
+        if discoveredNodes.count >= maxDiscoveredNodes && discoveredNodes[nodeId] == nil {
+            // 新节点且已满，检查是否比现有最差节点更好
+            let worstNode = discoveredNodes.values.min { calculateNodeRetentionScore($0) < calculateNodeRetentionScore($1) }
+            if let worst = worstNode, calculateNodeRetentionScore(node) > calculateNodeRetentionScore(worst) {
+                // 新节点更好，替换最差节点
+                discoveredNodes.removeValue(forKey: worst.id)
+                Logger.shared.debug("MeshService: Replaced node \(worst.id) with better node \(nodeId)")
+            } else {
+                // 新节点不够好，忽略
+                return
+            }
+        }
 
         discoveredNodes[nodeId] = node
         DispatchQueue.main.async { [weak self] in
