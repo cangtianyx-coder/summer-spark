@@ -62,6 +62,12 @@
 		F15C503FD8439AB4D255C9A7 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */; };
 		F314111CA97BBF5E61770606 /* CreditCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A37E29F4500C621178D32A0 /* CreditCalculator.swift */; };
 		F88215840F03CD3F9CC39E69 /* AppMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */; };
+		CF80089960214311AB016039 /* UsernameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34C3BC50397F485A8FC1C96E /* UsernameValidator.swift */; };
+		6A3FC2FF5565420C841A6CBC /* GroupVoiceMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB294A38A5F4DF0AA43CCC9 /* GroupVoiceMixer.swift */; };
+		7A608D5CEDC14D36BCBED7E0 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FFF7C2633DE40CB9FF25F28 /* LocationManager.swift */; };
+		833087D201CB4CDAAD0AA32F /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9AE69C6A55407387A5E85E /* TrackRecorder.swift */; };
+		DE3709D37B1244D8B246B783 /* CoordinateTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CEB2FD907345908671CB26 /* CoordinateTransformer.swift */; };
+		EC4867889BB542A4AB45B06D /* ContourRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B071E93AB144D40BABDD86D /* ContourRenderer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -122,6 +128,12 @@
 		D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshMessageType.swift; sourceTree = "<group>"; };
 		DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProtocols.swift; sourceTree = "<group>"; };
 		EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntiAttackGuard.swift; sourceTree = "<group>"; };
+		34C3BC50397F485A8FC1C96E /* UsernameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Identity/UsernameValidator.swift; sourceTree = "<group>"; };
+		EFB294A38A5F4DF0AA43CCC9 /* GroupVoiceMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Voice/GroupVoiceMixer.swift; sourceTree = "<group>"; };
+		2FFF7C2633DE40CB9FF25F28 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Location/LocationManager.swift; sourceTree = "<group>"; };
+		EC9AE69C6A55407387A5E85E /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Location/TrackRecorder.swift; sourceTree = "<group>"; };
+		17CEB2FD907345908671CB26 /* CoordinateTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Shared/Utils/CoordinateTransformer.swift; sourceTree = "<group>"; };
+		8B071E93AB144D40BABDD86D /* ContourRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Map/ContourRenderer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -349,6 +361,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF80089960214311AB016039 /* UsernameValidator.swift in Sources */,
+				6A3FC2FF5565420C841A6CBC /* GroupVoiceMixer.swift in Sources */,
+				7A608D5CEDC14D36BCBED7E0 /* LocationManager.swift in Sources */,
+				833087D201CB4CDAAD0AA32F /* TrackRecorder.swift in Sources */,
+				DE3709D37B1244D8B246B783 /* CoordinateTransformer.swift in Sources */,
+				EC4867889BB542A4AB45B06D /* ContourRenderer.swift in Sources */,
 				AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */,
 				11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */,
 				F88215840F03CD3F9CC39E69 /* AppMode.swift in Sources */,

@@ -44,6 +44,10 @@ enum MeshMessageType: String, Codable, CaseIterable {
     case groupLeave = "group.leave"
     case groupMemberUpdate = "group.member.update"
     case groupKeyDistribution = "group.key.distribute"
+    
+    // Username check messages
+    case usernameCheck = "username.check"
+    case usernameCheckResponse = "username.check.response"
 
     // MARK: - Message Category
 
@@ -65,6 +69,8 @@ enum MeshMessageType: String, Codable, CaseIterable {
             return .system
         case .groupCreate, .groupJoin, .groupLeave, .groupMemberUpdate, .groupKeyDistribution:
             return .group
+        case .usernameCheck, .usernameCheckResponse:
+            return .system
         }
     }
 
@@ -93,6 +99,8 @@ enum MeshMessageType: String, Codable, CaseIterable {
             return .low
         case .ping, .ack, .nodeDiscovery, .routeUpdate, .groupMemberUpdate, .groupKeyDistribution, .creditTransfer, .groupJoin:
             return .background
+        case .usernameCheck, .usernameCheckResponse:
+            return .normal
         }
     }
 

@@ -80,11 +80,51 @@ final class IdentityManager {
     }
 
     // MARK: - Username
-
-    /// Update username
+    
+    /// 验证并设置用户名（带格式验证）
+    /// - Parameter name: 新用户名
+    /// - Returns: 验证结果
+    @discardableResult
+    func validateAndSetUsername(_ name: String) -> UsernameValidationResult {
+        let result = UsernameValidator.shared.validateFormat(name)
+        guard result.isValid else {
+            return result
+        }
+        
+        username = name
+        UserDefaults.standard.set(name, forKey: "identity.username")
+        return .valid
+    }
+    
+    /// 设置用户名（旧接口，保留兼容）
     func setUsername(_ name: String) {
         username = name
         UserDefaults.standard.set(name, forKey: "identity.username")
+    }
+    
+    /// 检查用户名在Mesh网络中是否可用
+    /// - Parameters:
+    ///   - name: 待检查的用户名
+    ///   - completion: 结果回调
+    func checkUsernameAvailability(
+        _ name: String,
+        completion: @escaping (UsernameConflictResult) -> Void
+    ) {
+        UsernameValidator.shared.checkAvailability(name, completion: completion)
+    }
+    
+    /// 获取默认用户名（萤火用户_XXXX）
+    var defaultUsername: String {
+        let uidPrefix = uid?.prefix(4) ?? "0000"
+        return "萤火用户_\(uidPrefix)"
+    }
+    
+    /// 确保用户名已设置（未设置则使用默认值）
+    func ensureUsernameSet() {
+        if username == nil || username!.isEmpty {
+            username = defaultUsername
+            UserDefaults.standard.set(username, forKey: "identity.username")
+        }
     }
 
     // MARK: - Key Access
