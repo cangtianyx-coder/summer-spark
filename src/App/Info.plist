@@ -136,6 +136,15 @@
         <string>audio</string>
         <string>bluetooth-central</string>
         <string>bluetooth-peripheral</string>
+        <string>processing</string>
+    </array>
+    
+    <!-- 后台任务标识符 -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.summerspark.refresh</string>
+        <string>com.summerspark.sync</string>
+        <string>com.summerspark.mesh-routing</string>
     </array>
 
 </dict>

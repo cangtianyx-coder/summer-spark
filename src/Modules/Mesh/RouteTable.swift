@@ -146,7 +146,7 @@ final class RouteTable {
             let data = try encoder.encode(routes)
             try data.write(to: fileURL, options: .atomic)
         } catch {
-            print("RouteTable: Failed to save routes - \(error)")
+            Logger.shared.error("RouteTable: Failed to save routes - \(error)")
         }
     }
     
@@ -159,7 +159,7 @@ final class RouteTable {
             decoder.dateDecodingStrategy = .iso8601
             routes = try decoder.decode([RouteEntry].self, from: data)
         } catch {
-            print("RouteTable: Failed to load routes - \(error)")
+            Logger.shared.error("RouteTable: Failed to load routes - \(error)")
             routes = []
         }
     }

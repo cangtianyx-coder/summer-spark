@@ -121,7 +121,7 @@ final class IdentityManager {
     
     /// 确保用户名已设置（未设置则使用默认值）
     func ensureUsernameSet() {
-        if username == nil || username!.isEmpty {
+        if username == nil || username?.isEmpty == true {
             username = defaultUsername
             UserDefaults.standard.set(username, forKey: "identity.username")
         }

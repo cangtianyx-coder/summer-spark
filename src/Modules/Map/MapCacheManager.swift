@@ -50,7 +50,9 @@ final class MapCacheManager {
     // MARK: - Initialization
 
     private init() {
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        guard let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            fatalError("MapCacheManager: Failed to get caches directory")
+        }
         cacheDirectory = caches.appendingPathComponent("MapCache", isDirectory: true)
         dbPath = cacheDirectory.appendingPathComponent("cache_metadata.sqlite")
 
@@ -69,7 +71,7 @@ final class MapCacheManager {
 
     private func openDatabase() {
         if sqlite3_open(dbPath.path, &db) != SQLITE_OK {
-            print("MapCacheManager: Failed to open database at \(dbPath.path)")
+            Logger.shared.error("MapCacheManager: Failed to open database at \(dbPath.path)")
             db = nil
             return
         }

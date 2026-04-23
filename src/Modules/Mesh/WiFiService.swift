@@ -66,12 +66,12 @@ final class WiFiService {
     private func handleListenerState(_ state: NWListener.State) {
         switch state {
         case .ready:
-            print("WiFiService: Listener ready on port \(port)")
+            Logger.shared.info("WiFiService: Listener ready on port \(port)")
         case .failed(let error):
-            print("WiFiService: Listener failed with error: \(error)")
+            Logger.shared.error("WiFiService: Listener failed with error: \(error)")
             delegate?.wifiService(self, didEncounterError: .listenerFailed)
         case .cancelled:
-            print("WiFiService: Listener cancelled")
+            Logger.shared.debug("WiFiService: Listener cancelled")
         default:
             break
         }
@@ -92,7 +92,7 @@ final class WiFiService {
         case .ready:
             receiveData(on: connection)
         case .failed(let error):
-            print("WiFiService: Connection failed - \(error)")
+            Logger.shared.error("WiFiService: Connection failed - \(error)")
             removeConnection(connection)
         case .cancelled:
             removeConnection(connection)
@@ -111,7 +111,7 @@ final class WiFiService {
             }
             
             if let error = error {
-                print("WiFiService: Receive error - \(error)")
+                Logger.shared.error("WiFiService: Receive error - \(error)")
                 return
             }
             
@@ -142,7 +142,7 @@ final class WiFiService {
         for connection in connections {
             connection.send(content: data, completion: .contentProcessed { error in
                 if let error = error {
-                    print("WiFiService: Broadcast error - \(error)")
+                    Logger.shared.error("WiFiService: Broadcast error - \(error)")
                 }
             })
         }

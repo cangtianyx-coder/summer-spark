@@ -160,6 +160,10 @@ final class LocationManager: NSObject {
             
             // 开始更新位置
             DispatchQueue.main.async {
+                // 先请求WhenInUse权限
+                self.clLocationManager.requestWhenInUseAuthorization()
+                // 然后请求Always权限（如果需要后台位置）
+                self.clLocationManager.requestAlwaysAuthorization()
                 self.clLocationManager.startUpdatingLocation()
                 self.clLocationManager.startUpdatingHeading()
             }
@@ -273,6 +277,18 @@ final class LocationManager: NSObject {
         bearing = (bearing + 360.0).truncatingRemainder(dividingBy: 360.0)
         
         return bearing
+    }
+    
+    /// 清理缓存（内存警告时调用）
+    func clearCache() {
+        locationQueue.async { [weak self] in
+            guard let self = self else { return }
+            // 清理轨迹点缓存（保留最近100个点）
+            if self.trackPoints.count > 100 {
+                self.trackPoints = Array(self.trackPoints.suffix(100))
+            }
+            Logger.shared.info("LocationManager: Cache cleared")
+        }
     }
     
     // MARK: - Private Methods

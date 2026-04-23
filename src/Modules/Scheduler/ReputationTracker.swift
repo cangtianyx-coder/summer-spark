@@ -408,7 +408,7 @@ final class ReputationTracker {
 
         let now = Date()
         let periodStart = Calendar.current.startOfDay(for: now)
-        let periodEnd = Calendar.current.date(byAdding: .day, value: 1, to: periodStart)!
+        let periodEnd = Calendar.current.date(byAdding: .day, value: 1, to: periodStart) ?? periodStart.addingTimeInterval(86400)
 
         if contributionRecords[nodeId] == nil {
             contributionRecords[nodeId] = []
@@ -463,7 +463,7 @@ final class ReputationTracker {
         }
 
         // 保留最近30天的记录
-        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: now)!
+        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: now) ?? now.addingTimeInterval(-30 * 86400)
         contributionRecords[nodeId]?.removeAll { $0.periodStart < thirtyDaysAgo }
     }
 
@@ -712,7 +712,7 @@ final class ReputationTracker {
         contributionRecordsLock.lock()
         defer { contributionRecordsLock.unlock() }
 
-        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date().addingTimeInterval(-Double(days) * 86400)
 
         return contributionRecords[nodeId]?.filter { $0.periodStart >= cutoffDate } ?? []
     }

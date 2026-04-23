@@ -39,7 +39,7 @@ final class SecureEnclaveManager {
         var error: Unmanaged<CFError>?
         guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
             if let err = error?.takeRetainedValue() {
-                print("Key creation error: \(err)")
+                Logger.shared.error("Key creation error: \(err)")
             }
             throw SecureEnclaveError.keyCreationFailed
         }

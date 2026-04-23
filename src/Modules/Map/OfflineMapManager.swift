@@ -120,7 +120,9 @@ final class OfflineMapManager: NSObject {
     // MARK: - Initialization
     
     override init() {
-        let documents = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        guard let documents = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            fatalError("OfflineMapManager: Failed to get documents directory")
+        }
         self.documentsPath = documents.appendingPathComponent("OfflineMaps", isDirectory: true)
         
         super.init()
@@ -379,7 +381,10 @@ final class OfflineMapManager: NSObject {
     
     private func buildTileURL(for tile: TileCoordinate, mapInfo: OfflineMapInfo) -> URL {
         let baseURL = "https://tiles.example.com/\(mapInfo.mapType.rawValue)"
-        return URL(string: "\(baseURL)/\(tile.zoom)/\(tile.x)/\(tile.y).png")!
+        guard let url = URL(string: "\(baseURL)/\(tile.zoom)/\(tile.x)/\(tile.y).png") else {
+            fatalError("OfflineMapManager: Invalid tile URL constructed")
+        }
+        return url
     }
     
     private func handleTileDownloadCompletion(tile: TileCoordinate, mapId: String, data: Data?, response: URLResponse?, error: Error?) {
@@ -664,6 +669,24 @@ final class OfflineMapManager: NSObject {
     private var availableOfflineMaps: [OfflineMapInfo] {
         return currentMapInfo.values.filter { mapInfo in
             activeDownloads[mapInfo.mapId] == .completed
+        }
+    }
+    
+    // MARK: - Cache Management
+    
+    /// 清理缓存（内存警告时调用）
+    func clearCache() {
+        downloadQueue.async { [weak self] in
+            guard let self = self else { return }
+            // 清理暂停的下载任务
+            for (mapId, state) in self.activeDownloads {
+                if state.isPaused {
+                    self.suspendedTileBuffers.removeValue(forKey: mapId)
+                }
+            }
+            // 清理已完成的下载任务数据
+            self.downloadTasks = self.downloadTasks.filter { $0.value.state.isActive }
+            Logger.shared.info("OfflineMapManager: Cache cleared")
         }
     }
 }

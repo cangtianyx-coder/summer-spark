@@ -283,7 +283,8 @@ final class AudioCodec {
             return nil
         }
 
-        guard let pcmBuffer = AVAudioPCMBuffer(pcmFormat: audioStreamFormat(for: format), frameCapacity: frameCount) else {
+        guard let audioFormat = audioStreamFormat(for: format),
+              let pcmBuffer = AVAudioPCMBuffer(pcmFormat: audioFormat, frameCapacity: frameCount) else {
             return nil
         }
 
@@ -323,13 +324,13 @@ final class AudioCodec {
         return pcmData
     }
 
-    private func audioStreamFormat(for format: AudioFormat) -> AVAudioFormat {
+    private func audioStreamFormat(for format: AudioFormat) -> AVAudioFormat? {
         return AVAudioFormat(
             commonFormat: format.isFloat ? .pcmFormatFloat32 : .pcmFormatInt16,
             sampleRate: format.sampleRate,
             channels: AVAudioChannelCount(format.channelCount),
             interleaved: false
-        )!
+        )
     }
 
     // MARK: - Opus Specific Configuration

@@ -63,7 +63,8 @@ final class CryptoEngine {
 
     // MARK: - Combined Operations: Encrypt + Sign
 
-    /// Encrypt data with AES-256-GCM and sign the plaintext with ECDSA
+    /// Encrypt data with AES-256-GCM and sign the ciphertext with ECDSA
+    /// Security: Signature covers ciphertext to enable verify-then-decrypt (prevents DoS attacks)
     /// Returns: [ephemeralPubKey(65) || nonce(12) || ciphertext || tag(16) || signature(64)]
     func encryptAndSign(
         plaintext: Data,
@@ -77,10 +78,13 @@ final class CryptoEngine {
         // Derive shared secret using ECDH
         let sharedSecret = try ephemeralKey.sharedSecretFromKeyAgreement(with: recipientPublicKey)
 
-        // Derive AES key from shared secret using HKDF
+        // Derive per-message salt from ephemeral public key (unique per message)
+        let perMessageSalt = SHA256.hash(data: ephemeralPublicKeyData)
+
+        // Derive AES key from shared secret using HKDF with per-message salt
         let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
             using: SHA256.self,
-            salt: "E2E-AES-256-GCM".data(using: .utf8)!,
+            salt: Data(perMessageSalt),
             sharedInfo: Data(),
             outputByteCount: 32
         )
@@ -88,8 +92,8 @@ final class CryptoEngine {
         // Encrypt plaintext with AES-256-GCM
         let encryptedData = try encryptAESGCM(data: plaintext, symmetricKey: symmetricKey)
 
-        // Sign the plaintext
-        let signature = sign(data: plaintext, privateKey: senderSigningKey)
+        // Sign the ciphertext (not plaintext) - enables verify-then-decrypt
+        let signature = sign(data: encryptedData, privateKey: senderSigningKey)
 
         // Assemble: [ephemeralPubKey(65) || encryptedData || signature(64)]
         var result = Data()
@@ -101,6 +105,7 @@ final class CryptoEngine {
     }
 
     /// Decrypt data and verify ECDSA signature
+    /// Security: Verify signature BEFORE decryption to prevent DoS attacks with garbage data
     /// Input: [ephemeralPubKey(65) || nonce(12) || ciphertext || tag(16) || signature(64)]
     func decryptAndVerify(
         encryptedPackage: Data,
@@ -119,6 +124,12 @@ final class CryptoEngine {
         let signature = encryptedPackage.suffix(64)
         let encryptedData = encryptedPackage.dropFirst(65).dropLast(64)
 
+        // SECURITY: Verify signature on ciphertext BEFORE decryption
+        // This prevents DoS attacks where attacker sends garbage data to consume decryption resources
+        guard verify(signature: Data(signature), data: Data(encryptedData), publicKey: senderPublicKey) else {
+            throw CryptoEngineError.signatureVerificationFailed
+        }
+
         // Reconstruct ephemeral public key
         guard let ephemeralPubKey = try? P256.KeyAgreement.PublicKey(rawRepresentation: ephemeralPubKeyData) else {
             throw CryptoEngineError.invalidPublicKey
@@ -127,21 +138,19 @@ final class CryptoEngine {
         // Derive shared secret via ECDH
         let sharedSecret = try recipientKeyAgreementKey.sharedSecretFromKeyAgreement(with: ephemeralPubKey)
 
-        // Derive AES key
+        // Derive per-message salt from ephemeral public key (must match sender's derivation)
+        let perMessageSalt = SHA256.hash(data: ephemeralPubKeyData)
+
+        // Derive AES key with per-message salt
         let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
             using: SHA256.self,
-            salt: "E2E-AES-256-GCM".data(using: .utf8)!,
+            salt: Data(perMessageSalt),
             sharedInfo: Data(),
             outputByteCount: 32
         )
 
-        // Decrypt
+        // Decrypt (only after signature verification passed)
         let plaintext = try decryptAESGCM(encryptedData: Data(encryptedData), symmetricKey: symmetricKey)
-
-        // Verify signature on plaintext
-        guard verify(signature: Data(signature), data: plaintext, publicKey: senderPublicKey) else {
-            throw CryptoEngineError.signatureVerificationFailed
-        }
 
         return plaintext
     }

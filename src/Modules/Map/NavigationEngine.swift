@@ -78,7 +78,7 @@ class NavigationEngine: NSObject {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("Failed to setup audio session: \(error)")
+            Logger.shared.error("Failed to setup audio session: \(error)")
         }
     }
 
@@ -153,7 +153,7 @@ class NavigationEngine: NSObject {
 
         // Check if reached destination
         if currentPathIndex >= route.path.count - 1 {
-            let destination = route.path.last!
+            guard let destination = route.path.last else { return }
             let distance = calculateDistance(from: coordinate, to: destination)
             if distance < 10.0 {
                 completeNavigation()
@@ -180,11 +180,10 @@ class NavigationEngine: NSObject {
 
     private func reachedWaypoint(at index: Int) {
         currentPathIndex = index + 1
-        if currentPathIndex < currentRoute!.path.count {
-            let nextCoord = currentRoute!.path[currentPathIndex]
-            announce("Passed waypoint. Continue to next destination.")
-            notify("Next waypoint reached. Recalculating route...", priority: .low)
-        }
+        guard let route = currentRoute, currentPathIndex < route.path.count else { return }
+        let nextCoord = route.path[currentPathIndex]
+        announce("Passed waypoint. Continue to next destination.")
+        notify("Next waypoint reached. Recalculating route...", priority: .low)
     }
 
     // MARK: - Voice Announcement

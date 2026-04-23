@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// AntiAttackGuard - 防攻击模块
 /// 提供身份伪造检测、篡改检测、恶意节点处理、黑名单和DoS防护功能
@@ -61,6 +62,13 @@ public final class AntiAttackGuard {
         var lastReportTime: Date
         var violationCount: Int
     }
+    
+    // MARK: - Replay Attack Protection
+    private var replayCache: [Data: Date] = [:]
+    private var replayCacheOrder: [Data] = [] // 维护LRU顺序
+    private let replayCacheLock = NSLock()
+    private let replayCacheMaxSize = 10000
+    private let replayMessageMaxAge: TimeInterval = 300 // 5 minutes
     
     // MARK: - Tamper Detection
     
@@ -140,6 +148,70 @@ public final class AntiAttackGuard {
         public let reason: String?
     }
     
+    // MARK: - Replay Attack Protection
+    
+    /// 检测重放攻击
+    /// - Parameters:
+    ///   - nonce: 消息的随机数
+    ///   - timestamp: 消息的时间戳
+    ///   - nodeId: 发送节点ID（用于记录违规）
+    /// - Returns: 检测结果
+    public func replayAttackCheck(nonce: Data, timestamp: Date, nodeId: String) -> ReplayCheckResult {
+        let now = Date()
+        
+        // 检查消息是否过期（超过5分钟）
+        let messageAge = now.timeIntervalSince(timestamp)
+        if messageAge > replayMessageMaxAge {
+            recordViolation(nodeId: nodeId, type: .replayAttack)
+            return ReplayCheckResult(
+                isReplay: true,
+                reason: "消息已过期，时间差: \(Int(messageAge))秒"
+            )
+        }
+        
+        // 检查消息时间是否在未来（时钟漂移检测）
+        if timestamp > now.addingTimeInterval(60) { // 允许60秒的时钟漂移
+            recordViolation(nodeId: nodeId, type: .replayAttack)
+            return ReplayCheckResult(
+                isReplay: true,
+                reason: "消息时间戳异常（未来时间）"
+            )
+        }
+        
+        replayCacheLock.lock()
+        defer { replayCacheLock.unlock() }
+        
+        // 检查nonce是否已存在（重复消息）
+        if replayCache[nonce] != nil {
+            recordViolation(nodeId: nodeId, type: .replayAttack)
+            return ReplayCheckResult(
+                isReplay: true,
+                reason: "检测到重复的nonce，可能的重放攻击"
+            )
+        }
+        
+        // 添加到缓存
+        replayCache[nonce] = timestamp
+        replayCacheOrder.append(nonce)
+        
+        // LRU清理：如果缓存超过最大大小，移除最老的条目
+        while replayCache.count > replayCacheMaxSize {
+            if let oldestKey = replayCacheOrder.first {
+                replayCacheOrder.removeFirst()
+                replayCache.removeValue(forKey: oldestKey)
+            } else {
+                break
+            }
+        }
+        
+        return ReplayCheckResult(isReplay: false, reason: nil)
+    }
+    
+    public struct ReplayCheckResult {
+        public let isReplay: Bool
+        public let reason: String?
+    }
+    
     /// 处理恶意节点
     public func handleMaliciousNode(nodeId: String, evidence: String) -> HandlingAction {
         reputationLock.lock()
@@ -171,6 +243,7 @@ public final class AntiAttackGuard {
         case identityForgery
         case dosAttack
         case malicious
+        case replayAttack
     }
     
     private func recordViolation(nodeId: String, type: ViolationType) {
@@ -313,6 +386,21 @@ public final class AntiAttackGuard {
             rep.lastReportTime > now.addingTimeInterval(-86400 * 7) // 保留7天内活跃
         }
         reputationLock.unlock()
+        
+        // 清理过期重放攻击缓存
+        replayCacheLock.lock()
+        let replayCutoff = now.addingTimeInterval(-replayMessageMaxAge)
+        var keysToRemove: [Data] = []
+        for (nonce, timestamp) in replayCache {
+            if timestamp < replayCutoff {
+                keysToRemove.append(nonce)
+            }
+        }
+        for key in keysToRemove {
+            replayCache.removeValue(forKey: key)
+            replayCacheOrder.removeAll { $0 == key }
+        }
+        replayCacheLock.unlock()
     }
     
     /// 获取节点信誉分数

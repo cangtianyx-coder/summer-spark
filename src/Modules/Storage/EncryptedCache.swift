@@ -104,7 +104,9 @@ final class EncryptedCache {
         if let customDir = config.cacheDirectory {
             self.persistencePath = customDir.appendingPathComponent("EncryptedCache", isDirectory: true)
         } else {
-            let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            guard let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+                fatalError("EncryptedCache: Failed to get caches directory")
+            }
             self.persistencePath = caches.appendingPathComponent("EncryptedCache", isDirectory: true)
         }
 
@@ -131,7 +133,7 @@ final class EncryptedCache {
             do {
                 try self.performSet(key: key, data: data)
             } catch {
-                print("EncryptedCache set error: \(error)")
+                Logger.shared.error("EncryptedCache set error: \(error)")
             }
         }
     }
@@ -320,7 +322,7 @@ final class EncryptedCache {
             let data = try JSONEncoder().encode(entry)
             try data.write(to: filePath)
         } catch {
-            print("Failed to persist cache entry: \(error)")
+            Logger.shared.error("Failed to persist cache entry: \(error)")
         }
     }
 
@@ -356,7 +358,7 @@ final class EncryptedCache {
                     return (e1?.lastAccessedAt ?? Date.distantPast) < (e2?.lastAccessedAt ?? Date.distantPast)
                 }
             } catch {
-                print("Failed to load cache from disk: \(error)")
+                Logger.shared.error("Failed to load cache from disk: \(error)")
             }
         }
     }
@@ -416,7 +418,7 @@ final class EncryptedCache {
             do {
                 try set(key, data: data)
             } catch {
-                print("Failed to cache \(key): \(error)")
+                Logger.shared.error("Failed to cache \(key): \(error)")
             }
         }
     }

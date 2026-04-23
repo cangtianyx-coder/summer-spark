@@ -431,6 +431,16 @@ final class MapService {
             }
         }
     }
+    
+    /// 清理缓存（内存警告时调用）
+    func clearCache() {
+        mapQueue.async { [weak self] in
+            guard let self = self else { return }
+            // 清理未完成的离线地图下载任务
+            self.offlineManager.clearCache()
+            Logger.shared.info("MapService: Cache cleared")
+        }
+    }
 }
 
 // MARK: - OfflineMapManagerDelegate

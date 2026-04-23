@@ -221,7 +221,7 @@ final class DatabaseManager {
 
         if let cfg = config { self.config = cfg }
 
-        let appSupport = config?.applicationSupportDirectory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let appSupport = config?.applicationSupportDirectory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
         let dbDir = appSupport.appendingPathComponent("Database", isDirectory: true)
 
         do {

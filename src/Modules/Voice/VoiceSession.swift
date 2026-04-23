@@ -159,7 +159,7 @@ final class VoiceSession {
         do {
             try audioEngine.start()
         } catch {
-            print("VoiceSession: Failed to start audio engine - \(error)")
+            Logger.shared.error("VoiceSession: Failed to start audio engine - \(error)")
         }
     }
 
@@ -174,7 +174,7 @@ final class VoiceSession {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         } catch {
-            print("VoiceSession: Failed to deactivate audio session - \(error)")
+            Logger.shared.error("VoiceSession: Failed to deactivate audio session - \(error)")
         }
     }
 

@@ -56,7 +56,7 @@ enum SummerSparkApp {
         // 安全模块
         AntiAttackGuard.shared.enable()
         
-        print("[SummerSpark] All modules initialized")
+        Logger.shared.info("[SummerSpark] All modules initialized")
     }
     
     // MARK: - 后台模式配置
@@ -79,7 +79,15 @@ enum SummerSparkApp {
             handleBackgroundSync(task: task as! BGProcessingTask)
         }
         
-        print("[SummerSpark] Background modes configured")
+        // Mesh路由维护后台任务
+        BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: "com.summerspark.mesh-routing",
+            using: nil
+        ) { task in
+            handleMeshRoutingTask(task: task as! BGProcessingTask)
+        }
+        
+        Logger.shared.info("[SummerSpark] Background modes configured")
     }
     
     // MARK: - 后台任务处理
@@ -122,7 +130,7 @@ enum SummerSparkApp {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
-            print("[SummerSpark] Could not schedule app refresh: \(error)")
+            Logger.shared.error("[SummerSpark] Could not schedule app refresh: \(error)")
         }
     }
     
@@ -135,7 +143,40 @@ enum SummerSparkApp {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
-            print("[SummerSpark] Could not schedule background sync: \(error)")
+            Logger.shared.error("[SummerSpark] Could not schedule background sync: \(error)")
+        }
+    }
+    
+    private static func handleMeshRoutingTask(task: BGProcessingTask) {
+        scheduleMeshRoutingTask()
+        
+        // 创建Mesh路由维护操作
+        let operation = BlockOperation {
+            // 执行Mesh路由维护
+            MeshService.shared.performRouteMaintenance()
+        }
+        
+        task.expirationHandler = {
+            operation.cancel()
+        }
+        
+        operation.completionBlock = {
+            task.setTaskCompleted(success: !operation.isCancelled)
+        }
+        
+        OperationQueue.main.addOperation(operation)
+    }
+    
+    private static func scheduleMeshRoutingTask() {
+        let request = BGProcessingTaskRequest(identifier: "com.summerspark.mesh-routing")
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // 15分钟后
+        request.requiresNetworkConnectivity = false
+        request.requiresExternalPower = false
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            Logger.shared.error("[SummerSpark] Could not schedule mesh routing task: \(error)")
         }
     }
 }
@@ -176,13 +217,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 清理废弃的场景
     }
     
+    // MARK: - 内存警告处理
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        Logger.shared.warn("[AppDelegate] Received memory warning, clearing caches...")
+        
+        // 清理各模块缓存
+        LocationManager.shared.clearCache()
+        MeshService.shared.clearCache()
+        MapService.shared.clearCache()
+        MapCacheManager.shared.clearCache()
+        OfflineMapManager.shared.clearCache()
+        
+        Logger.shared.info("[AppDelegate] Memory warning handled")
+    }
+    
     // MARK: - 远程通知注册
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print("[SummerSpark] Device Token: \(token)")
+        Logger.shared.info("[SummerSpark] Device Token: \(token)")
         // 将 token 发送到服务器
         IdentityManager.shared.updatePushToken(token)
     }
@@ -191,7 +246,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("[SummerSpark] Failed to register for remote notifications: \(error)")
+        Logger.shared.error("[SummerSpark] Failed to register for remote notifications: \(error)")
     }
     
     // MARK: - 后台获取

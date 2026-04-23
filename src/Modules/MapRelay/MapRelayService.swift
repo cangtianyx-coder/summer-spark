@@ -299,7 +299,7 @@ final class MapRelayService: MapRelayServiceProtocol {
     // MARK: - Logging
     
     private func log(_ message: String) {
-        print("[MapRelayService] \(message)")
+        Logger.shared.debug("[MapRelayService] \(message)")
     }
 }
 

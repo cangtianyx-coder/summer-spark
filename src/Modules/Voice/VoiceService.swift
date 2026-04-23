@@ -528,7 +528,7 @@ final class VoiceService {
             try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth, .mixWithOthers])
             try session.setActive(true)
         } catch {
-            print("Failed to setup audio session: \(error)")
+            Logger.shared.error("Failed to setup audio session: \(error)")
         }
     }
 

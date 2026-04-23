@@ -68,6 +68,41 @@ final class MeshService {
     func discoveredNodes(ofType medium: MeshNode.TransportMedium) -> [MeshNode] {
         return discoveredNodes.values.filter { $0.supportedMedia.contains(medium) }
     }
+    
+    /// 清理缓存（内存警告时调用）
+    func clearCache() {
+        meshQueue.async { [weak self] in
+            guard let self = self else { return }
+            // 清理过期的节点缓存
+            let now = Date()
+            let threshold = self.nodeExpirationInterval * 2
+            self.discoveredNodes = self.discoveredNodes.filter { 
+                $0.value.lastSeen.distance(to: now) <= threshold 
+            }
+            Logger.shared.info("MeshService: Cache cleared, active nodes: \(self.discoveredNodes.count)")
+        }
+    }
+    
+    /// 执行路由维护（后台任务）
+    func performRouteMaintenance() {
+        meshQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // 1. 清理过期节点
+            self.removeExpiredNodes()
+            
+            // 2. 优化路由表
+            // 保留信号最强的节点
+            let connectedNodes = self.discoveredNodes.values.filter { $0.connectionState == .connected }
+            if connectedNodes.count > 10 {
+                let sortedNodes = connectedNodes.sorted { $0.rssi > $1.rssi }
+                let nodesToKeep = Set(sortedNodes.prefix(10).map { $0.id })
+                self.discoveredNodes = self.discoveredNodes.filter { nodesToKeep.contains($0.key) }
+            }
+            
+            Logger.shared.info("MeshService: Route maintenance completed, nodes: \(self.discoveredNodes.count)")
+        }
+    }
 
     // MARK: - Route Selection
 
@@ -85,11 +120,14 @@ final class MeshService {
             )
         }
 
-        let bestNode = candidates.max { a, b in
-            let scoreA = calculateRouteScore(for: a)
-            let scoreB = calculateRouteScore(for: b)
-            return scoreA < scoreB
-        }!
+        guard let bestNode = candidates.max(by: { calculateRouteScore(for: $0) < calculateRouteScore(for: $1) }) else {
+            return RoutingDecision(
+                preferredMedium: .bluetoothLE,
+                estimatedLatency: Double.infinity,
+                hopCount: 0,
+                reliability: 0.0
+            )
+        }
 
         let selectedMedium: MeshNode.TransportMedium = bestNode.supportedMedia.contains(.bluetoothLE) ? .bluetoothLE : .wifi
 
@@ -193,6 +231,18 @@ final class MeshService {
         guard let message = try? JSONDecoder().decode(MeshMessage.self, from: data) else { return }
         let nodeId = MeshNode.id(from: peripheral.identifier)
         guard var node = discoveredNodes[nodeId] else { return }
+        
+        // 重放攻击检测
+        let replayCheck = AntiAttackGuard.shared.replayAttackCheck(
+            nonce: message.nonce,
+            timestamp: message.timestamp,
+            nodeId: nodeId.uuidString
+        )
+        
+        if replayCheck.isReplay {
+            // 检测到重放攻击，拒绝消息
+            return
+        }
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

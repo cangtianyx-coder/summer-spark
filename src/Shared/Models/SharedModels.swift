@@ -56,6 +56,7 @@ struct MeshMessage: Codable {
     let destinationNodeId: UUID?
     let payload: Data
     let timestamp: Date
+    let nonce: Data
     let ttl: Int
     var messageType: MeshMessageType
 
@@ -65,6 +66,10 @@ struct MeshMessage: Codable {
         self.destinationNodeId = destination
         self.payload = payload
         self.timestamp = Date()
+        // Generate 16-byte random nonce for replay attack protection
+        var randomBytes = Data(count: 16)
+        _ = randomBytes.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+        self.nonce = randomBytes
         self.ttl = ttl
         self.messageType = messageType
     }

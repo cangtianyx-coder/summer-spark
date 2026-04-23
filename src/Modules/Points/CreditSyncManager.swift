@@ -131,7 +131,10 @@ final class CreditSyncManager {
             guard let self = self else { return }
 
             let fileManager = FileManager.default
-            let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+                Logger.shared.error("CreditSyncManager: Failed to get application support directory")
+                return
+            }
             let dbDir = appSupport.appendingPathComponent("CreditSync")
 
             try? fileManager.createDirectory(at: dbDir, withIntermediateDirectories: true)
@@ -140,7 +143,7 @@ final class CreditSyncManager {
 
             if sqlite3_open(dbPath, &self.db) != SQLITE_OK {
                 let errMsg = String(cString: sqlite3_errmsg(self.db))
-                print("CreditSyncManager: Failed to open database - \(errMsg)")
+                Logger.shared.error("CreditSyncManager: Failed to open database - \(errMsg)")
                 return
             }
 
@@ -215,7 +218,7 @@ final class CreditSyncManager {
         if sqlite3_exec(db, sql, nil, nil, &errMsg) != SQLITE_OK {
             if let err = errMsg {
                 let msg = String(cString: err)
-                print("CreditSyncManager SQL Error: \(msg)")
+                Logger.shared.error("CreditSyncManager SQL Error: \(msg)")
                 sqlite3_free(errMsg)
             }
         }
@@ -417,7 +420,7 @@ final class CreditSyncManager {
                 success = sqlite3_step(stmt) == SQLITE_DONE
                 if !success {
                     let errMsg = String(cString: sqlite3_errmsg(db))
-                    print("CreditSyncManager: persistTransaction failed - \(errMsg)")
+                    Logger.shared.error("CreditSyncManager: persistTransaction failed - \(errMsg)")
                 }
             }
             sqlite3_finalize(stmt)
@@ -669,7 +672,7 @@ final class CreditSyncManager {
 
             MeshService.shared.sendMessage(message)
         } catch {
-            print("CreditSyncManager: Failed to respond to balance query - \(error)")
+            Logger.shared.error("CreditSyncManager: Failed to respond to balance query - \(error)")
         }
     }
 
