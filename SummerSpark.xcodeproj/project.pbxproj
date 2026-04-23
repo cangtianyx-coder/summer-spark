@@ -7,28 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		873A0DA7F4A9438DA4319D82606C7EDF /* MeshRelayProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */; };
-		A035E63E369141B1B902DBFDF0442109 /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */; };
-		A89F7282F1B8409E88F5FF5AD7B7FCD1 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */; };
-		682CF6C4503248F5990468DE65367924 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */; };
-		7F4B4F39546A4DDEBBBAC60C0B3FD502 /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDEC7A411B04BCCA976392A7AE5A040 /* PowerSaveManager.swift */; };
-		3096FE094E2845A58941DF8473550EE9 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC163D38EE4F1A897E96B3110A6986 /* BackgroundMeshListener.swift */; };
-		2687BF05200B482F890819D737660F56 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045DE93EB36E4E1AAD008D1B0D87AB01 /* AdaptiveBeaconController.swift */; };
 		01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */; };
 		02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */; };
 		040228378FBF4B2DDBAF4D7F /* ConnectivitySwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */; };
 		099FC1FB3F67C3042AE4733F /* MapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0F4B790BD5565FD9190A85 /* MapService.swift */; };
 		10A24121848C294E4E3C6F78 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE110374026BF49593FD9127 /* Constants.swift */; };
 		11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */; };
+		2731978DCC79D9EC6EB4B4DF /* AutoUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A35FA9C4F0591F65B71386 /* AutoUpdater.swift */; };
 		2E94C57C30B7A8078CB7A33C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FDF5407F01033E27431A530B /* Localizable.strings */; };
 		355A9F4FD75B8CCC48F7BC01 /* CreditEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */; };
 		4B963173EC0E7AF592CDE526 /* MeshMessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */; };
 		4F8DF55227A1D7FBC5ACFAD5 /* SummerSparkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FD4DF938D24B67263656AB /* SummerSparkApp.swift */; };
 		4FE951BF91CD1A50F067523E /* WiFiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96088AB8CBF8CF5C566AE498 /* WiFiService.swift */; };
+		502E9A34F0E7AC66D35D6D6C /* UpdateViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8922E34B8F86686768840279 /* UpdateViews.swift */; };
 		51686D15F594655F2FD76DF7 /* PathPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E273769AFF26E02A4E6F020 /* PathPlanner.swift */; };
 		5260B1AE8A0AA91FC1132DE4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C870FCBEF85581B599E4CA3B /* ContentView.swift */; };
 		54C6544773252F7BF245850C /* OfflineMapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442A105684A6E24BD0436954 /* OfflineMapManager.swift */; };
 		638869712B31398A694AD581 /* SecureEnclaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */; };
+		682CF6C4503248F5990468DE65367924 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */; };
 		6A3FC2FF5565420C841A6CBC /* GroupVoiceMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB294A38A5F4DF0AA43CCC9 /* GroupVoiceMixer.swift */; };
 		6C14383CCD851BAE5A3FA23B /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A163FBF71E2B35BC085492E /* BluetoothService.swift */; };
 		6C57A434F6D1A42AB501E9FB /* ServiceProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */; };
@@ -36,14 +32,17 @@
 		7A608D5CEDC14D36BCBED7E0 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FFF7C2633DE40CB9FF25F28 /* LocationManager.swift */; };
 		811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */; };
 		833087D201CB4CDAAD0AA32F /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9AE69C6A55407387A5E85E /* TrackRecorder.swift */; };
+		873A0DA7F4A9438DA4319D82606C7EDF /* MeshRelayProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */; };
 		8B9A024B9BE1BEB36D22FE91 /* MapCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7866E4614D06A00AF14EADEF /* MapCacheManager.swift */; };
 		98EC2AD1B90A04E44A96FBA4 /* AudioCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */; };
 		990A902F409FA0F9738D960B /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C5AFF2162A771F4B5763629 /* Logger.swift */; };
 		9A4995F51F314935D77BCAC0 /* RouteTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F328CF87E70ECA105B7F9F9 /* RouteTable.swift */; };
 		9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2596A86288D658D5502C81 /* UIDGenerator.swift */; };
+		A035E63E369141B1B902DBFDF0442109 /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */; };
 		A149B9C3BE71F9D611FFFB3F /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF29DBAFEE0DE0839892640 /* LanguageManager.swift */; };
 		A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */; };
 		A38E720C7911497ECA20916A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDBA060EB076DFA292D381F /* Extensions.swift */; };
+		A89F7282F1B8409E88F5FF5AD7B7FCD1 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */; };
 		AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */; };
 		B7AE4148E76D221BB5007294 /* SharedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7C8C4B6BE895F7BD154C42 /* SharedModels.swift */; };
 		BE687545F0336567C59AFC57 /* IdentityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C933A2BD61217AACDF75292 /* IdentityManager.swift */; };
@@ -64,19 +63,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Shared/Protocols/MeshRelayProtocols.swift; sourceTree = "<group>"; };
-		EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/PowerSaveManager.swift; sourceTree = "<group>"; };
-		561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/BackgroundMeshListener.swift; sourceTree = "<group>"; };
-		BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/AdaptiveBeaconController.swift; sourceTree = "<group>"; };
-		7BDEC7A411B04BCCA976392A7AE5A040 /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/PowerSaveManager.swift; sourceTree = "<group>"; };
-		04BC163D38EE4F1A897E96B3110A6986 /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/BackgroundMeshListener.swift; sourceTree = "<group>"; };
-		045DE93EB36E4E1AAD008D1B0D87AB01 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/AdaptiveBeaconController.swift; sourceTree = "<group>"; };
 		0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedCache.swift; sourceTree = "<group>"; };
 		11FD4DF938D24B67263656AB /* SummerSparkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerSparkApp.swift; sourceTree = "<group>"; };
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
 		17CEB2FD907345908671CB26 /* CoordinateTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Shared/Utils/CoordinateTransformer.swift; sourceTree = "<group>"; };
 		1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
+		2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Shared/Protocols/MeshRelayProtocols.swift; sourceTree = "<group>"; };
 		2A93AFEE76567ED8352F5E3A /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
 		2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEngine.swift; sourceTree = "<group>"; };
 		2E0F4B790BD5565FD9190A85 /* MapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapService.swift; sourceTree = "<group>"; };
@@ -89,13 +82,16 @@
 		442A105684A6E24BD0436954 /* OfflineMapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapManager.swift; sourceTree = "<group>"; };
 		4A37E29F4500C621178D32A0 /* CreditCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCalculator.swift; sourceTree = "<group>"; };
 		4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
+		561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/BackgroundMeshListener.swift; sourceTree = "<group>"; };
 		573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoEngine.swift; sourceTree = "<group>"; };
+		59A35FA9C4F0591F65B71386 /* AutoUpdater.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AutoUpdater.swift; path = Updater/AutoUpdater.swift; sourceTree = "<group>"; };
 		5A163FBF71E2B35BC085492E /* BluetoothService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothService.swift; sourceTree = "<group>"; };
 		5C933A2BD61217AACDF75292 /* IdentityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityManager.swift; sourceTree = "<group>"; };
 		606714DDCB3C8AFE0CD203FC /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		721E45379F7B8B8CB7F9708E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7866E4614D06A00AF14EADEF /* MapCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCacheManager.swift; sourceTree = "<group>"; };
 		7E273769AFF26E02A4E6F020 /* PathPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathPlanner.swift; sourceTree = "<group>"; };
+		8922E34B8F86686768840279 /* UpdateViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UpdateViews.swift; path = Updater/UpdateViews.swift; sourceTree = "<group>"; };
 		8B071E93AB144D40BABDD86D /* ContourRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Map/ContourRenderer.swift; sourceTree = "<group>"; };
 		8D6BC2852851878B44107929 /* EncryptedPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedPackage.swift; sourceTree = "<group>"; };
 		91AF6B5C32FE411915B453FC /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = Resources/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -109,6 +105,7 @@
 		B0D999311B7B835CB217D069 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMode.swift; sourceTree = "<group>"; };
 		B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCodec.swift; sourceTree = "<group>"; };
+		BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/AdaptiveBeaconController.swift; sourceTree = "<group>"; };
 		BEED88770AEACDE39B2798B6 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushToTalkButton.swift; sourceTree = "<group>"; };
 		C870FCBEF85581B599E4CA3B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -121,6 +118,7 @@
 		EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntiAttackGuard.swift; sourceTree = "<group>"; };
 		EEF29DBAFEE0DE0839892640 /* LanguageManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		EFB294A38A5F4DF0AA43CCC9 /* GroupVoiceMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Voice/GroupVoiceMixer.swift; sourceTree = "<group>"; };
+		EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/PowerSaveManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -278,8 +276,18 @@
 				C69D0D1220552CF680035136 /* Points */,
 				646F5D543371AC328B7B08A3 /* Storage */,
 				EAC0E59F05F1FE2B71F0B97A /* Voice */,
+				E408526F363873FFE81D8BB4 /* Updater */,
 			);
 			path = Modules;
+			sourceTree = "<group>";
+		};
+		E408526F363873FFE81D8BB4 /* Updater */ = {
+			isa = PBXGroup;
+			children = (
+				59A35FA9C4F0591F65B71386 /* AutoUpdater.swift */,
+				8922E34B8F86686768840279 /* UpdateViews.swift */,
+			);
+			name = Updater;
 			sourceTree = "<group>";
 		};
 		EAC0E59F05F1FE2B71F0B97A /* Voice */ = {
@@ -421,6 +429,8 @@
 				A89F7282F1B8409E88F5FF5AD7B7FCD1 /* BackgroundMeshListener.swift in Sources */,
 				682CF6C4503248F5990468DE65367924 /* AdaptiveBeaconController.swift in Sources */,
 				873A0DA7F4A9438DA4319D82606C7EDF /* MeshRelayProtocols.swift in Sources */,
+				2731978DCC79D9EC6EB4B4DF /* AutoUpdater.swift in Sources */,
+				502E9A34F0E7AC66D35D6D6C /* UpdateViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

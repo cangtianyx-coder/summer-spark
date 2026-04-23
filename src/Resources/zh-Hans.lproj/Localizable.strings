@@ -40,3 +40,23 @@
 /* Language Selection */
 "language_select_title" = "选择语言";
 "language_restart_hint" = "语言更改将在重启后生效";
+
+/* Auto Update */
+"update_available" = "有新版本";
+"critical_update" = "重要更新";
+"version" = "版本";
+"released" = "发布于";
+"view_release_notes" = "查看更新说明";
+"update_now" = "立即更新";
+"skip_this_version" = "跳过此版本";
+"remind_later" = "稍后提醒";
+"release_notes" = "更新说明";
+"critical" = "重要";
+"close" = "关闭";
+"current_version" = "当前版本";
+"check_for_update" = "检查更新";
+"last_checked" = "上次检查";
+"auto_check_update" = "自动检查更新";
+"no_update_available" = "已是最新版本";
+"ok" = "确定";
+"update_settings" = "更新设置";

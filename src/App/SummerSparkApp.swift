@@ -56,6 +56,9 @@ enum SummerSparkApp {
         // 安全模块
         AntiAttackGuard.shared.enable()
         
+        // 自动更新模块
+        AutoUpdater.shared.startAutoCheck()
+        
         Logger.shared.info("[SummerSpark] All modules initialized")
     }
     

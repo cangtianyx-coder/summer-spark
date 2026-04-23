@@ -40,3 +40,23 @@
 /* Language Selection */
 "language_select_title" = "Select Language";
 "language_restart_hint" = "Language change will take effect after restart";
+
+/* Auto Update */
+"update_available" = "Update Available";
+"critical_update" = "Critical Update";
+"version" = "Version";
+"released" = "Released";
+"view_release_notes" = "View Release Notes";
+"update_now" = "Update Now";
+"skip_this_version" = "Skip This Version";
+"remind_later" = "Remind Me Later";
+"release_notes" = "Release Notes";
+"critical" = "Critical";
+"close" = "Close";
+"current_version" = "Current Version";
+"check_for_update" = "Check for Update";
+"last_checked" = "Last Checked";
+"auto_check_update" = "Auto Check for Updates";
+"no_update_available" = "You're up to date!";
+"ok" = "OK";
+"update_settings" = "Update Settings";

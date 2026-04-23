@@ -46,6 +46,15 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     
+                    // 更新检查
+                    NavigationLink(destination: UpdateCheckView()) {
+                        HStack {
+                            Image(systemName: "arrow.down.circle")
+                                .foregroundColor(.blue)
+                            Text("update_settings".localized)
+                        }
+                    }
+                    
                     // 隐私政策
                     NavigationLink(destination: PrivacyPolicyView()) {
                         Text("settings_privacy".localized)
