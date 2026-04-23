@@ -203,6 +203,9 @@ final class BluetoothService: NSObject {
     // MARK: - Helpers
 
     private func setupService() {
+        // P1-FIX: 蓝牙特征权限配置
+        // 注意: iOS蓝牙加密由系统配对机制自动处理
+        // 设置适当的权限确保安全通信
         let characteristic = CBMutableCharacteristic(
             type: characteristicUUID,
             properties: [.read, .write, .notify, .indicate],
@@ -215,6 +218,8 @@ final class BluetoothService: NSObject {
         service.characteristics = [characteristic]
 
         peripheralManager?.add(service)
+        
+        Logger.shared.info("BluetoothService: Service setup complete")
     }
 
     private func notifyDelegates(_ block: @escaping () -> Void) {

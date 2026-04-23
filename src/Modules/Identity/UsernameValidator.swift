@@ -223,9 +223,9 @@ final class UsernameValidator {
             guard let callbacks = pendingChecks[username] else { return }
             pendingChecks.removeValue(forKey: username)
             
-            // 超时视为可用
+            // P2-FIX: 超时返回错误状态而非可用，让用户重试
             for callback in callbacks {
-                callback(.available)
+                callback(.error("检查超时，请重试"))
             }
         }
     }

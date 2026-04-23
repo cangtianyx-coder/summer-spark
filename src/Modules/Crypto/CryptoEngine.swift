@@ -81,11 +81,14 @@ final class CryptoEngine {
         // Derive per-message salt from ephemeral public key (unique per message)
         let perMessageSalt = SHA256.hash(data: ephemeralPublicKeyData)
 
+        // P2-FIX: 添加应用上下文信息防止跨应用密钥重用
+        let appContext = "com.summerspark.v1.keyagreement".data(using: .utf8) ?? Data()
+        
         // Derive AES key from shared secret using HKDF with per-message salt
         let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
             using: SHA256.self,
             salt: Data(perMessageSalt),
-            sharedInfo: Data(),
+            sharedInfo: appContext,
             outputByteCount: 32
         )
 

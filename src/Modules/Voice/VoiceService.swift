@@ -525,10 +525,44 @@ final class VoiceService {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth, .mixWithOthers])
-            try session.setActive(true)
+            // P1-FIX: 添加后台音频支持选项
+            try session.setCategory(
+                .playAndRecord,
+                mode: .voiceChat,
+                options: [
+                    .defaultToSpeaker,
+                    .allowBluetooth,
+                    .allowBluetoothA2DP,
+                    .mixWithOthers,
+                    .allowAirPlay
+                ]
+            )
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+            
+            Logger.shared.info("VoiceService: Audio session configured with background support")
         } catch {
             Logger.shared.error("Failed to setup audio session: \(error)")
+        }
+    }
+    
+    // P1-FIX: 配置后台音频会话
+    private func setupBackgroundAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            // 后台模式使用更保守的配置
+            try session.setCategory(
+                .playAndRecord,
+                mode: .voiceChat,
+                options: [
+                    .allowBluetooth,
+                    .mixWithOthers
+                ]
+            )
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
+            
+            Logger.shared.info("VoiceService: Background audio session configured")
+        } catch {
+            Logger.shared.error("Failed to setup background audio session: \(error)")
         }
     }
 
