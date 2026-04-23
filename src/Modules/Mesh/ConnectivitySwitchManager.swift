@@ -46,6 +46,13 @@ final class ConnectivitySwitchManager {
     private let routeTable = RouteTable.shared
     private var wifiService: WiFiService?
     
+    // P2-FIX: 网络分区检测
+    private var reachableNodes: Set<String> = []
+    private var unreachableRegions: Set<String> = []
+    private var lastPartitionCheck: Date = Date()
+    private let partitionCheckInterval: TimeInterval = 30.0
+    private var partitionDetected = false
+    
     private init() {
         setupInitialStatuses()
     }
@@ -247,6 +254,52 @@ final class ConnectivitySwitchManager {
             .filter { mediumStatuses[$0] == true }
             .sorted { $0.priority < $1.priority }
         return available.first ?? currentMedium
+    }
+    
+    // MARK: - P2-FIX: 网络分区检测
+    
+    /// 检测网络分区
+    public func checkNetworkPartition(connectedNodes: [String]) {
+        let now = Date()
+        guard now.timeIntervalSince(lastPartitionCheck) >= partitionCheckInterval else { return }
+        lastPartitionCheck = now
+        
+        // 更新可达节点集合
+        reachableNodes = Set(connectedNodes)
+        
+        // 检测分区：如果可达节点数突然减少超过50%，可能发生分区
+        let previousCount = reachableNodes.count
+        let currentCount = connectedNodes.count
+        
+        if previousCount > 0 && currentCount < previousCount / 2 {
+            partitionDetected = true
+            Logger.shared.warn("ConnectivitySwitchManager: Network partition detected! Nodes: \(previousCount) -> \(currentCount)")
+            
+            // 标记不可达区域
+            let unreachable = reachableNodes.subtracting(Set(connectedNodes))
+            unreachableRegions = unreachable
+            
+            // 通知代理
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.switchManager(self, didEncounterError: ConnectivityError.noMediumAvailable)
+            }
+        } else if partitionDetected && currentCount >= previousCount {
+            // 分区恢复
+            partitionDetected = false
+            unreachableRegions.removeAll()
+            Logger.shared.info("ConnectivitySwitchManager: Network partition recovered")
+        }
+    }
+    
+    /// 检查节点是否在不可达区域
+    public func isNodeInUnreachableRegion(_ nodeId: String) -> Bool {
+        return unreachableRegions.contains(nodeId)
+    }
+    
+    /// 获取当前分区状态
+    public func getPartitionStatus() -> (detected: Bool, unreachableCount: Int) {
+        return (partitionDetected, unreachableRegions.count)
     }
 }
 

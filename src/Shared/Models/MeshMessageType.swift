@@ -103,6 +103,30 @@ enum MeshMessageType: String, Codable, CaseIterable {
             return .normal
         }
     }
+    
+    // P2-FIX: 路由更新速率限制标记
+    var isRateLimited: Bool {
+        switch self {
+        case .routeUpdate, .nodeAnnouncement, .nodeDiscovery:
+            return true  // 这些消息需要速率限制
+        default:
+            return false
+        }
+    }
+    
+    // P2-FIX: 推荐的速率限制间隔
+    var rateLimitInterval: TimeInterval {
+        switch self {
+        case .routeUpdate:
+            return 5.0  // 路由更新最多每5秒一次
+        case .nodeAnnouncement:
+            return 10.0  // 节点公告最多每10秒一次
+        case .nodeDiscovery:
+            return 15.0  // 节点发现最多每15秒一次
+        default:
+            return 0.0
+        }
+    }
 
     enum MessagePriority: Int, Comparable {
         case background = 0

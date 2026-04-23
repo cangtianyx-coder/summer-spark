@@ -16,8 +16,19 @@ enum AppConstants {
         static let connectionTimeout: TimeInterval = 10.0
         static let maxRetryAttempts = 3
         static let packetSize = 512
-        static let maxTTL = 64
+        static let maxTTL = 128  // P2-FIX: 从64增加到128，支持更大规模网络
         static let discoveryBroadcastRadius: Double = 100.0 // meters
+        
+        // P2-FIX: 动态TTL配置
+        static let minTTL = 32
+        static let emergencyTTL = 255  // 紧急消息使用最大TTL
+        static func adaptiveTTL(for nodeCount: Int) -> Int {
+            // 根据网络规模动态调整TTL
+            if nodeCount <= 10 { return 32 }
+            if nodeCount <= 50 { return 64 }
+            if nodeCount <= 100 { return 96 }
+            return 128
+        }
     }
 
     // Bluetooth

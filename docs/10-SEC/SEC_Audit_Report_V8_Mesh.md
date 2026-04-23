@@ -206,4 +206,53 @@
 
 ---
 
+## 修复状态 (2026-04-24)
+
+### 已修复问题
+
+| 问题ID | 优先级 | 修复内容 | 文件 |
+|--------|--------|----------|------|
+| MESH-006 | P1 | TTL递减逻辑，添加decrementTTL()和forwardingCopy() | SharedModels.swift |
+| MESH-007 | P1 | 消息去重机制，forwardedMessageIds缓存 | MeshService.swift |
+| MESH-021 | P1 | 广播抑制机制，sendMessage检查重复和TTL | MeshService.swift |
+| MESH-002 | P1 | 路由表大小限制maxRoutes=500，LRU淘汰 | RouteTable.swift |
+| MESH-003 | P2 | 发现节点容量限制maxDiscoveredNodes=150 | MeshService.swift |
+| MESH-012 | P1 | 节点过期时间30s→60s | MeshService.swift |
+| MESH-016 | P1 | 重放缓存10000→50000 | AntiAttackGuard.swift |
+| MESH-017 | P1 | 签名缓存LRU淘汰替代全量清空 | AntiAttackGuard.swift |
+| MESH-004 | P2 | 节点清理阈值10→50 | MeshService.swift |
+| MESH-005 | P2 | 路由查找缓存机制 | RouteTable.swift |
+| MESH-009 | P2 | 消息队列100→200 | MeshService.swift |
+
+### 待修复问题
+
+| 问题ID | 优先级 | 问题描述 | 建议 |
+|--------|--------|----------|------|
+| MESH-001 | P1 | 路由查找算法O(n) | 实现哈希表或前缀树 |
+| MESH-008 | P1 | 消息队列排序O(n log n) | 使用优先级堆 |
+| MESH-011 | P1 | 链路质量表无限制 | 添加最大邻居数限制 |
+| MESH-022 | P1 | WiFi广播无拥塞控制 | 实现拥塞感知广播 |
+| MESH-010 | P2 | TTL默认值64可能不足 | 动态调整TTL |
+| MESH-013 | P2 | 蓝牙扫描无节流 | 自适应扫描间隔 |
+| MESH-014 | P2 | 路由选择缺乏端到端评估 | 多跳路径质量评估 |
+| MESH-015 | P2 | 缺乏网络分区检测 | 实现分区检测机制 |
+| MESH-018 | P2 | 探测频率过高 | 自适应探测频率 |
+| MESH-019 | P2 | QoS节点状态无限制 | 添加最大节点状态限制 |
+| MESH-020 | P2 | QoS路由无清理机制 | 定期清理过期预约 |
+| MESH-023 | P2 | 路由更新无速率限制 | 实现速率限制 |
+
+### 修复统计
+
+- **已修复**: 11个问题 (P1: 7, P2: 4)
+- **待修复**: 12个问题 (P1: 4, P2: 8)
+- **修复率**: 48%
+
+### 编译状态
+
+- **编译结果**: SUCCESS
+- **Commit**: c718bad
+
+---
+
 *审计完成时间: 2026-04-24*
+*修复提交时间: 2026-04-24*

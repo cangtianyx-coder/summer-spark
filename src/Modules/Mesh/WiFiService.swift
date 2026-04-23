@@ -238,13 +238,56 @@ final class WiFiService {
         })
     }
     
+    // P1-FIX: 拥塞控制状态
+    private var congestionLevel: Double = 0.0  // 0.0-1.0
+    private var recentBroadcastCount: Int = 0
+    private var lastCongestionCheck: Date = Date()
+    private let congestionThreshold: Double = 0.7
+    private let maxBroadcastsPerSecond: Int = 50
+    
     func broadcast(data: Data) {
+        // P1-FIX: 拥塞感知广播
+        updateCongestionLevel()
+        
+        if congestionLevel > congestionThreshold {
+            // 拥塞时降级：随机丢弃部分广播或延迟
+            let dropProbability = (congestionLevel - congestionThreshold) / (1.0 - congestionThreshold)
+            if Double.random(in: 0...1) < dropProbability {
+                Logger.shared.warn("WiFiService: Dropping broadcast due to congestion (level=\(congestionLevel))")
+                return
+            }
+        }
+        
+        // 速率限制检查
+        if recentBroadcastCount >= maxBroadcastsPerSecond {
+            Logger.shared.warn("WiFiService: Broadcast rate limited (\(recentBroadcastCount)/s)")
+            return
+        }
+        
+        recentBroadcastCount += 1
+        
         for connection in connections {
             connection.send(content: data, completion: .contentProcessed { error in
                 if let error = error {
                     Logger.shared.error("WiFiService: Broadcast error - \(error)")
                 }
             })
+        }
+    }
+    
+    // P1-FIX: 更新拥塞级别
+    private func updateCongestionLevel() {
+        let now = Date()
+        let elapsed = now.timeIntervalSince(lastCongestionCheck)
+        
+        if elapsed >= 1.0 {
+            // 每秒重置计数
+            recentBroadcastCount = 0
+            lastCongestionCheck = now
+            
+            // 基于连接数和队列深度估算拥塞
+            let connectionFactor = min(1.0, Double(connections.count) / 20.0)
+            congestionLevel = connectionFactor * 0.8 + congestionLevel * 0.2  // 平滑
         }
     }
     

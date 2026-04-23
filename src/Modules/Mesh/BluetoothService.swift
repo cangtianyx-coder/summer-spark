@@ -25,6 +25,13 @@ final class BluetoothService: NSObject {
 
     private var isCentralStarted = false
     private var isPeripheralStarted = false
+    
+    // P2-FIX: 自适应扫描节流控制
+    private var scanThrottleInterval: TimeInterval = 2.0
+    private var lastScanTime: Date = Date()
+    private var discoveredNodeCount: Int = 0
+    private let maxScanInterval: TimeInterval = 10.0  // 节点多时降低扫描频率
+    private let minScanInterval: TimeInterval = 1.0   // 节点少时提高扫描频率
 
     // MARK: - Privacy Configuration
 
@@ -80,12 +87,32 @@ final class BluetoothService: NSObject {
 
     func startScanning(for serviceUUIDs: [CBUUID]? = nil) {
         guard let central = centralManager, central.state == .poweredOn else { return }
+        
+        // P2-FIX: 自适应扫描节流
+        let now = Date()
+        let elapsed = now.timeIntervalSince(lastScanTime)
+        
+        // 根据已发现节点数动态调整扫描间隔
+        scanThrottleInterval = min(maxScanInterval, 
+            max(minScanInterval, Double(discoveredNodeCount) / 10.0))
+        
+        if elapsed < scanThrottleInterval {
+            Logger.shared.debug("BluetoothService: Scan throttled, waiting \(scanThrottleInterval - elapsed)s")
+            return
+        }
+        
+        lastScanTime = now
 
         let options: [String: Any] = [
             CBCentralManagerScanOptionAllowDuplicatesKey: false
         ]
 
         central.scanForPeripherals(withServices: serviceUUIDs, options: options)
+    }
+    
+    // P2-FIX: 更新已发现节点计数（供外部调用）
+    func updateDiscoveredNodeCount(_ count: Int) {
+        discoveredNodeCount = count
     }
 
     func stopScanning() {

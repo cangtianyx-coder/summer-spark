@@ -12,8 +12,14 @@ public class QoSRouter {
     private var bandwidthReservations: [String: BandwidthReservation] = [:]
     private var congestionState: [String: CongestionLevel] = [:]
     
-    private let routerLock = NSLock()
+    // P2-FIX: QoS路由和预约清理机制
+    private var lastCleanupTime: Date = Date()
+    private let cleanupInterval: TimeInterval = 300.0  // 5分钟清理一次
+    private let reservationTimeout: TimeInterval = 600.0  // 10分钟预约超时
+    private let maxReservations = 500
     
+    private let routerLock = NSLock()
+
     public weak var delegate: QoSRouterDelegate?
     
     public init(stabilityMonitor: RouteStabilityMonitor) {
@@ -173,6 +179,44 @@ public class QoSRouter {
         
         if level == .severe || level == .critical {
             delegate?.qosRouter(self, didDetectCongestion: nodeId, level: level)
+        }
+        
+        // P2-FIX: 定期清理过期预约
+        cleanupExpiredReservationsIfNeeded()
+    }
+    
+    // P2-FIX: 清理过期预约
+    private func cleanupExpiredReservationsIfNeeded() {
+        let now = Date()
+        guard now.timeIntervalSince(lastCleanupTime) >= cleanupInterval else { return }
+        
+        routerLock.lock()
+        defer { routerLock.unlock() }
+        
+        lastCleanupTime = now
+        
+        // 清理过期预约
+        let expiredKeys = bandwidthReservations.filter {
+            now.timeIntervalSince($0.value.createdAt) > reservationTimeout
+        }.keys
+        
+        for key in expiredKeys {
+            bandwidthReservations.removeValue(forKey: key)
+        }
+        
+        // 如果预约数仍然过多，移除最老的
+        if bandwidthReservations.count > maxReservations {
+            let sortedReservations = bandwidthReservations.sorted { 
+                $0.value.createdAt < $1.value.createdAt 
+            }
+            let toRemove = sortedReservations.prefix(bandwidthReservations.count - maxReservations)
+            for (key, _) in toRemove {
+                bandwidthReservations.removeValue(forKey: key)
+            }
+        }
+        
+        if !expiredKeys.isEmpty {
+            Logger.shared.debug("QoSRouter: Cleaned up \(expiredKeys.count) expired reservations")
         }
     }
     

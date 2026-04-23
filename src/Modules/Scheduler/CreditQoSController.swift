@@ -212,6 +212,10 @@ final class CreditQoSController {
 
     private var nodeStates: [String: NodeQoSState] = [:]
     private let nodeStatesLock = NSLock()
+    
+    // P2-FIX: 节点状态数量限制
+    private let maxNodeStates = 200
+    private var lastNodeStateCleanup: Date = Date()
 
     private var creditFreezeRecords: [CreditFreezeRecord] = []
     private let freezeRecordsLock = NSLock()
@@ -292,9 +296,30 @@ final class CreditQoSController {
         defer { nodeStatesLock.unlock() }
 
         if nodeStates[nodeId] == nil {
+            // P2-FIX: 节点状态数量限制检查
+            if nodeStates.count >= maxNodeStates {
+                // 移除最不活跃的节点
+                cleanupInactiveNodeStates()
+            }
+            
             var state = NodeQoSState(nodeId: nodeId, permissionLevel: initialPermission)
             state.updatePermission(initialPermission)
             nodeStates[nodeId] = state
+        }
+    }
+    
+    // P2-FIX: 清理不活跃的节点状态
+    private func cleanupInactiveNodeStates() {
+        let now = Date()
+        // 移除超过1小时未更新的节点
+        let threshold: TimeInterval = 3600
+        let toRemove = nodeStates.filter { 
+            now.timeIntervalSince($0.value.lastTokenRefillTime) > threshold 
+        }.keys
+        
+        for nodeId in toRemove.prefix(maxNodeStates / 4) {
+            nodeStates.removeValue(forKey: nodeId)
+            Logger.shared.debug("CreditQoSController: Removed inactive node state for \(nodeId)")
         }
     }
 

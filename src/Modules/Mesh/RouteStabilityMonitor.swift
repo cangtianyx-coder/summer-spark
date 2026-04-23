@@ -34,6 +34,16 @@ public class RouteStabilityMonitor {
     private var probeSequence = 0
     private var monitoringActive = false
     
+    // P1-FIX: 链路质量表大小限制，防止大规模网络内存溢出
+    private let maxNeighbors = 100
+    private let maxProbeHistoryPerNeighbor = 10
+    
+    // P2-FIX: 自适应探测间隔，稳定时降低频率
+    private var adaptiveProbeInterval: TimeInterval = 5.0
+    private let minProbeInterval: TimeInterval = 2.0
+    private let maxProbeInterval: TimeInterval = 30.0
+    private var consecutiveStableProbes: Int = 0
+    
     private let probeInterval: TimeInterval = 5.0 // seconds
     private let historyWindowSize = 10
     private let degradationThreshold: Double = 0.3
@@ -220,6 +230,19 @@ public class RouteStabilityMonitor {
     /// Record a direct neighbor observation
     public func recordNeighbor(_ nodeId: String, rssi: Double, timestamp: Date = Date()) {
         tableLock.lock()
+        
+        // P1-FIX: 邻居数量限制检查
+        if linkQualityTable.count >= maxNeighbors && linkQualityTable[nodeId] == nil {
+            // 新邻居且已满，移除信号最差的邻居
+            let worstNeighbor = linkQualityTable.min { 
+                $0.value.signalStrength < $1.value.signalStrength 
+            }
+            if let worst = worstNeighbor {
+                linkQualityTable.removeValue(forKey: worst.key)
+                probeHistory.removeValue(forKey: worst.key)
+                Logger.shared.debug("RouteStabilityMonitor: Removed worst neighbor \(worst.key)")
+            }
+        }
         
         // Create or update link quality with basic info
         if var quality = linkQualityTable[nodeId] {
