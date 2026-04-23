@@ -117,6 +117,41 @@ final class EncryptedCache {
     private func setupCacheDirectory() {
         guard let path = persistencePath else { return }
         try? fileManager.createDirectory(at: path, withIntermediateDirectories: true)
+        
+        // 设置缓存目录的文件保护级别
+        setFileProtectionLevel()
+    }
+    
+    /// 设置缓存目录的文件保护级别
+    /// 使用 completeUnlessOpen：文件打开时可读写，关闭后需解锁设备才能访问
+    private func setFileProtectionLevel() {
+        guard let cachePath = persistencePath else { return }
+        
+        do {
+            // 设置缓存目录保护级别
+            try fileManager.setAttributes(
+                [.protectionKey: FileProtectionType.completeUnlessOpen],
+                ofItemAtPath: cachePath.path
+            )
+            
+            // 为目录中所有现有文件设置保护级别
+            let files = try fileManager.contentsOfDirectory(
+                at: cachePath,
+                includingPropertiesForKeys: nil,
+                options: .skipsHiddenFiles
+            )
+            
+            for file in files {
+                try fileManager.setAttributes(
+                    [.protectionKey: FileProtectionType.completeUnlessOpen],
+                    ofItemAtPath: file.path
+                )
+            }
+            
+            Logger.shared.info("缓存目录文件保护级别已设置为 completeUnlessOpen")
+        } catch {
+            Logger.shared.error("设置缓存目录文件保护级别失败: \(error)")
+        }
     }
 
     // MARK: - Public Interface
@@ -321,6 +356,12 @@ final class EncryptedCache {
         do {
             let data = try JSONEncoder().encode(entry)
             try data.write(to: filePath)
+            
+            // 设置新写入文件的文件保护级别
+            try fileManager.setAttributes(
+                [.protectionKey: FileProtectionType.completeUnlessOpen],
+                ofItemAtPath: filePath.path
+            )
         } catch {
             Logger.shared.error("Failed to persist cache entry: \(error)")
         }

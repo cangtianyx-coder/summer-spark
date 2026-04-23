@@ -24,9 +24,24 @@ final class IdentityManager {
 
     /// Load existing identity from Keychain or create a new one
     private func loadOrCreateIdentity() {
-        // Load UID and username from UserDefaults (non-sensitive)
-        uid = UserDefaults.standard.string(forKey: "identity.uid")
-        username = UserDefaults.standard.string(forKey: "identity.username")
+        // Load UID and username from Keychain (secure storage)
+        do {
+            if let uidData = try? KeychainHelper.shared.load(
+                service: KeychainKeys.service,
+                account: KeychainKeys.uid
+            ) {
+                uid = String(data: uidData, encoding: .utf8)
+            }
+        }
+        
+        do {
+            if let usernameData = try? KeychainHelper.shared.load(
+                service: KeychainKeys.service,
+                account: KeychainKeys.username
+            ) {
+                username = String(data: usernameData, encoding: .utf8)
+            }
+        }
 
         // Load private key from Keychain (secure storage)
         do {
@@ -65,9 +80,22 @@ final class IdentityManager {
     // MARK: - Persistence
 
     private func saveIdentity() {
-        // UID and username (non-sensitive) in UserDefaults
-        UserDefaults.standard.set(uid, forKey: "identity.uid")
-        UserDefaults.standard.set(username, forKey: "identity.username")
+        // UID and username (sensitive) in Keychain for secure storage
+        if let uid = uid, let uidData = uid.data(using: .utf8) {
+            try? KeychainHelper.shared.save(
+                data: uidData,
+                service: KeychainKeys.service,
+                account: KeychainKeys.uid
+            )
+        }
+        
+        if let username = username, let usernameData = username.data(using: .utf8) {
+            try? KeychainHelper.shared.save(
+                data: usernameData,
+                service: KeychainKeys.service,
+                account: KeychainKeys.username
+            )
+        }
 
         // Private key (sensitive) in Keychain with device-only accessibility
         if let privateKey = signingPrivateKey {
@@ -92,14 +120,28 @@ final class IdentityManager {
         }
         
         username = name
-        UserDefaults.standard.set(name, forKey: "identity.username")
+        // 使用Keychain安全存储
+        if let usernameData = name.data(using: .utf8) {
+            try? KeychainHelper.shared.save(
+                data: usernameData,
+                service: KeychainKeys.service,
+                account: KeychainKeys.username
+            )
+        }
         return .valid
     }
     
     /// 设置用户名（旧接口，保留兼容）
     func setUsername(_ name: String) {
         username = name
-        UserDefaults.standard.set(name, forKey: "identity.username")
+        // 使用Keychain安全存储
+        if let usernameData = name.data(using: .utf8) {
+            try? KeychainHelper.shared.save(
+                data: usernameData,
+                service: KeychainKeys.service,
+                account: KeychainKeys.username
+            )
+        }
     }
     
     /// 检查用户名在Mesh网络中是否可用
@@ -123,7 +165,14 @@ final class IdentityManager {
     func ensureUsernameSet() {
         if username == nil || username?.isEmpty == true {
             username = defaultUsername
-            UserDefaults.standard.set(username, forKey: "identity.username")
+            // 使用Keychain安全存储
+            if let usernameData = username?.data(using: .utf8) {
+                try? KeychainHelper.shared.save(
+                    data: usernameData,
+                    service: KeychainKeys.service,
+                    account: KeychainKeys.username
+                )
+            }
         }
     }
 
@@ -197,9 +246,19 @@ final class IdentityManager {
 
     /// Clear all identity data and regenerate
     func resetIdentity() {
-        UserDefaults.standard.removeObject(forKey: "identity.uid")
-        UserDefaults.standard.removeObject(forKey: "identity.username")
-        UserDefaults.standard.removeObject(forKey: "identity.privateKey")
+        // 清理Keychain中的所有身份数据
+        try? KeychainHelper.shared.delete(
+            service: KeychainKeys.service,
+            account: KeychainKeys.uid
+        )
+        try? KeychainHelper.shared.delete(
+            service: KeychainKeys.service,
+            account: KeychainKeys.username
+        )
+        try? KeychainHelper.shared.delete(
+            service: KeychainKeys.service,
+            account: KeychainKeys.privateKey
+        )
 
         uid = nil
         username = nil

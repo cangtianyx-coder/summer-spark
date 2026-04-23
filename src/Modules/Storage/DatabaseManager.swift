@@ -94,6 +94,21 @@ struct Migration {
 final class DatabaseManager {
     static let shared = DatabaseManager()
 
+    // MARK: - Table Name Whitelist (SQL Injection Protection)
+
+    /// Valid table names for SQL operations - prevents SQL injection via table name
+    private static let validTableNames: Set<String> = [
+        "nodes", "sessions", "messages", "credentials", "audit_log",
+        "credits", "routes", "tracks", "map_tiles", "groups"
+    ]
+
+    /// Validate table name against whitelist to prevent SQL injection
+    /// - Parameter name: Table name to validate
+    /// - Returns: true if table name is valid, false otherwise
+    private func validateTableName(_ name: String) -> Bool {
+        return Self.validTableNames.contains(name)
+    }
+
 
     
     // MARK: - Delegate
@@ -273,6 +288,52 @@ final class DatabaseManager {
 
         // Create all tables
         createAllTables()
+        
+        // 设置文件保护级别 - 设备锁定时文件不可访问
+        setFileProtectionLevel()
+    }
+    
+    /// 设置数据库文件的文件保护级别
+    /// 使用 completeUnlessOpen：文件打开时可读写，关闭后需解锁设备才能访问
+    private func setFileProtectionLevel() {
+        guard let dbPath = databasePath else { return }
+        
+        do {
+            // 设置数据库文件保护级别
+            try FileManager.default.setAttributes(
+                [.protectionKey: FileProtectionType.completeUnlessOpen],
+                ofItemAtPath: dbPath.path
+            )
+            
+            // 设置WAL日志文件保护级别（如果存在）
+            let walPath = dbPath.path + "-wal"
+            if FileManager.default.fileExists(atPath: walPath) {
+                try FileManager.default.setAttributes(
+                    [.protectionKey: FileProtectionType.completeUnlessOpen],
+                    ofItemAtPath: walPath
+                )
+            }
+            
+            // 设置SHM共享内存文件保护级别（如果存在）
+            let shmPath = dbPath.path + "-shm"
+            if FileManager.default.fileExists(atPath: shmPath) {
+                try FileManager.default.setAttributes(
+                    [.protectionKey: FileProtectionType.completeUnlessOpen],
+                    ofItemAtPath: shmPath
+                )
+            }
+            
+            // 设置数据库目录的保护级别
+            let dbDir = dbPath.deletingLastPathComponent()
+            try FileManager.default.setAttributes(
+                [.protectionKey: FileProtectionType.completeUnlessOpen],
+                ofItemAtPath: dbDir.path
+            )
+            
+            Logger.shared.info("数据库文件保护级别已设置为 completeUnlessOpen")
+        } catch {
+            Logger.shared.error("设置数据库文件保护级别失败: \(error)")
+        }
     }
 
     // MARK: - Thread-safe Database Access
@@ -331,6 +392,12 @@ final class DatabaseManager {
     }
 
     func tableExists(_ name: String) -> Bool {
+        // SQL注入防护：验证表名
+        guard validateTableName(name) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(name)'")
+            return false
+        }
+
         var exists = false
         dbQueue.sync { [weak self] in
             guard let self = self, let db = self.db else { return }
@@ -426,6 +493,12 @@ final class DatabaseManager {
         guard !values.isEmpty else { return }
         guard isInitialized else { throw DatabaseError.notInitialized }
 
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.executeFailed("无效表名")
+        }
+
         let columns = values.keys.joined(separator: ", ")
         let placeholders = values.keys.map { _ in "?" }.joined(separator: ", ")
         let sql = "INSERT OR REPLACE INTO \(table) (\(columns)) VALUES (\(placeholders));"
@@ -461,6 +534,12 @@ final class DatabaseManager {
 
     func query(table: String, columns: [String]? = nil, where condition: String? = nil, orderBy: String? = nil, limit: Int? = nil) throws -> [[String: Any]] {
         guard isInitialized else { throw DatabaseError.notInitialized }
+
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.queryFailed("无效表名")
+        }
 
         let cols = (columns ?? ["*"]).joined(separator: ", ")
         var sql = "SELECT \(cols) FROM \(table)"
@@ -519,6 +598,12 @@ final class DatabaseManager {
     func update(table: String, values: [String: Any], where condition: String) throws -> Int {
         guard isInitialized else { throw DatabaseError.notInitialized }
 
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.executeFailed("无效表名")
+        }
+
         let setParts = values.keys.map { "\($0) = ?" }.joined(separator: ", ")
         let sql = "UPDATE \(table) SET \(setParts) WHERE \(condition);"
 
@@ -553,6 +638,12 @@ final class DatabaseManager {
 
     func delete(table: String, where condition: String) throws -> Int {
         guard isInitialized else { throw DatabaseError.notInitialized }
+
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.executeFailed("无效表名")
+        }
 
         let sql = "DELETE FROM \(table) WHERE \(condition);"
 
@@ -640,6 +731,12 @@ final class DatabaseManager {
     }
 
     func clearTable(_ table: String) {
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            return
+        }
+
         dbQueue.async { [weak self] in
             guard let self = self, let db = self.db else { return }
             let sql = "DELETE FROM \(table);"
@@ -648,6 +745,12 @@ final class DatabaseManager {
     }
 
     func getTableInfo(_ table: String) -> [String] {
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            return []
+        }
+
         var columns: [String] = []
 
         dbQueue.sync { [weak self] in
@@ -670,6 +773,12 @@ final class DatabaseManager {
     }
 
     func getRowCount(table: String) -> Int {
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            return 0
+        }
+
         var count = 0
 
         dbQueue.sync { [weak self] in

@@ -181,6 +181,8 @@ enum KeychainKeys {
     static let service = "com.summerspark.keychain"
     static let encryptionKey = "encryption.key"
     static let privateKey = "identity.privateKey"
+    static let uid = "identity.uid"
+    static let username = "identity.username"
     static let sessionToken = "session.token"
     static let databaseKey = "database.key"
 }

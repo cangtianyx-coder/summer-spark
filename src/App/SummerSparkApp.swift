@@ -237,7 +237,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        Logger.shared.info("[SummerSpark] Device Token: \(token)")
+        // 脱敏处理：仅记录token前4位和后4位，防止敏感信息泄露
+        let maskedToken = String(token.prefix(4)) + "****" + String(token.suffix(4))
+        Logger.shared.info("[SummerSpark] Device Token: \(maskedToken)")
         // 将 token 发送到服务器
         IdentityManager.shared.updatePushToken(token)
     }

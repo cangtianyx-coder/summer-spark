@@ -26,6 +26,18 @@ final class BluetoothService: NSObject {
     private var isCentralStarted = false
     private var isPeripheralStarted = false
 
+    // MARK: - Privacy Configuration
+
+    /// Controls whether the device name is broadcast in Bluetooth advertisements.
+    /// When false (default), uses an anonymous identifier to protect user privacy.
+    /// Users can enable this in settings if they want to broadcast their device name.
+    var enableNameBroadcast: Bool = false
+
+    /// Anonymous identifier used when enableNameBroadcast is false
+    private var anonymousIdentifier: String {
+        return "Mesh-\(UIDevice.current.identifierForVendor?.uuidString.prefix(8) ?? "Node")"
+    }
+
     // MARK: - Callbacks (Alternative to delegate)
 
     var onDiscoveredPeripheral: ((CBPeripheral, [String: Any], NSNumber) -> Void)?
@@ -127,8 +139,16 @@ final class BluetoothService: NSObject {
             CBAdvertisementDataServiceUUIDsKey: [serviceUUID]
         ]
 
-        if let name = localName {
-            advertisementData[CBAdvertisementDataLocalNameKey] = name
+        // Privacy protection: Only broadcast name if explicitly enabled
+        // Default behavior uses anonymous identifier to protect user privacy
+        if enableNameBroadcast {
+            // User has opted in to broadcast their device name
+            if let name = localName {
+                advertisementData[CBAdvertisementDataLocalNameKey] = name
+            }
+        } else {
+            // Use anonymous identifier by default for privacy protection
+            advertisementData[CBAdvertisementDataLocalNameKey] = anonymousIdentifier
         }
 
         peripheral.startAdvertising(advertisementData)
@@ -335,6 +355,8 @@ extension BluetoothService: CBPeripheralManagerDelegate {
 
         if peripheral.state == .poweredOn {
             setupService()
+            // Privacy: startAdvertising now handles name privacy internally
+            // Pass device name but it will only be used if enableNameBroadcast is true
             startAdvertising(localName: UIDevice.current.name)
         }
     }
