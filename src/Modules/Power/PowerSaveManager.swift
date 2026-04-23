@@ -189,16 +189,52 @@ public class PowerSaveManager {
             return true
             
         case .lowPower:
+            // P1-FIX: 低电量模式下允许紧急操作
             return operation != .fullMeshScan && operation != .bulkTransfer
             
         case .background:
+            // P1-FIX: 后台模式下允许紧急消息和最小信标
             return operation == .minimalBeacon || operation == .emergencyMessage
             
         case .hibernation:
+            // P1-FIX: 即使在休眠模式下也必须允许紧急消息（SOS）
+            // 这是关键的安全保障
             return operation == .emergencyMessage
         }
     }
     
+    // P1-FIX: 低电量SOS保障 - 检查是否可以发送SOS
+    /// Check if SOS can be sent in current power state
+    /// Returns true even in hibernation mode (critical safety guarantee)
+    public func canSendSOS() -> Bool {
+        // SOS在任何状态下都必须可用，这是生命安全保障
+        return true
+    }
+    
+    // P1-FIX: 获取SOS可用电量阈值
+    /// Get minimum battery level required for SOS
+    /// Even at 1% battery, SOS must be available
+    public var sosMinimumBatteryLevel: Double {
+        return 0.01  // 1% - SOS在极低电量下仍可用
+    }
+    
+    // P1-FIX: 检查当前电量是否足够发送SOS
+    public func hasSufficientBatteryForSOS() -> Bool {
+        return batteryLevel >= sosMinimumBatteryLevel
+    }
+    
+    // P1-FIX: 进入紧急模式（优先保障SOS功能）
+    /// Enter emergency mode - prioritizes SOS functionality
+    public func enterEmergencyMode() {
+        // 即使在休眠模式也恢复最低限度的网络功能
+        if currentState == .hibernation {
+            transitionTo(.background)
+        }
+        
+        // 确保紧急消息功能可用
+        Logger.shared.info("PowerSaveManager: Entered emergency mode for SOS")
+    }
+
     // MARK: - Statistics
     
     /// Get power statistics

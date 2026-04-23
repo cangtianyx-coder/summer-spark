@@ -400,9 +400,39 @@ final class LocationManager: NSObject {
     private func requestAuthorization() {
         let status = clLocationManager.authorizationStatus
         
-        if status == .notDetermined {
+        switch status {
+        case .notDetermined:
             clLocationManager.requestAlwaysAuthorization()
+        case .restricted, .denied:
+            // P1-FIX: 权限被拒绝，通知用户
+            Logger.shared.warn("LocationManager: Location permission denied/restricted")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.locationManager(self, didFailWithError: LocationError.permissionDenied)
+            }
+        case .authorizedWhenInUse:
+            // P1-FIX: 只有前台权限，请求后台权限
+            Logger.shared.info("LocationManager: Have 'When In Use' permission, requesting 'Always'")
+            clLocationManager.requestAlwaysAuthorization()
+        case .authorizedAlways:
+            // 已有完整权限
+            Logger.shared.info("LocationManager: Have 'Always' permission")
+            break
+        @unknown default:
+            break
         }
+    }
+    
+    // P1-FIX: 检查是否有足够的权限进行后台定位
+    func hasBackgroundLocationPermission() -> Bool {
+        let status = clLocationManager.authorizationStatus
+        return status == .authorizedAlways
+    }
+    
+    // P1-FIX: 检查是否有任何位置权限
+    func hasLocationPermission() -> Bool {
+        let status = clLocationManager.authorizationStatus
+        return status == .authorizedWhenInUse || status == .authorizedAlways
     }
     
     private func updateLocationSettings() {
@@ -585,6 +615,27 @@ extension LocationManager: CLLocationManagerDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.delegate?.locationManager(self, didExitRegion: region)
+        }
+    }
+}
+
+// P1-FIX: 位置错误类型
+enum LocationError: Error, LocalizedError {
+    case permissionDenied
+    case permissionRestricted
+    case locationUnavailable
+    case timeout
+    
+    var errorDescription: String? {
+        switch self {
+        case .permissionDenied:
+            return "location_error_permission_denied".localized
+        case .permissionRestricted:
+            return "location_error_permission_restricted".localized
+        case .locationUnavailable:
+            return "location_error_unavailable".localized
+        case .timeout:
+            return "location_error_timeout".localized
         }
     }
 }
