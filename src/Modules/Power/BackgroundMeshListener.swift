@@ -35,8 +35,11 @@ public class BackgroundMeshListener: NSObject, BackgroundMeshListenerProtocol {
     }
     
     deinit {
-        scanTimer?.invalidate()
-        scanTimer = nil
+        // Timer必须在创建它的线程（主线程）上invalidate
+        DispatchQueue.main.async {
+            self.scanTimer?.invalidate()
+            self.scanTimer = nil
+        }
         centralManager?.stopScan()
     }
     
@@ -70,8 +73,11 @@ public class BackgroundMeshListener: NSObject, BackgroundMeshListenerProtocol {
         isScanning = false
         listenerLock.unlock()
         
-        scanTimer?.invalidate()
-        scanTimer = nil
+        // Timer必须在创建它的线程（主线程）上invalidate
+        DispatchQueue.main.async { [weak self] in
+            self?.scanTimer?.invalidate()
+            self?.scanTimer = nil
+        }
         
         centralManager?.stopScan()
         centralManager = nil

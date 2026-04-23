@@ -89,14 +89,18 @@ class LanguageManager: ObservableObject {
     func setLanguage(_ language: AppLanguage) {
         guard currentLanguage != language else { return }
         
-        currentLanguage = language
-        
-        // 发送语言切换通知
-        NotificationCenter.default.post(
-            name: .languageDidChange,
-            object: nil,
-            userInfo: ["language": language.rawValue]
-        )
+        // 确保@Published属性在主线程修改
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.currentLanguage = language
+            
+            // 发送语言切换通知
+            NotificationCenter.default.post(
+                name: .languageDidChange,
+                object: nil,
+                userInfo: ["language": language.rawValue]
+            )
+        }
     }
     
     /// 获取所有支持的语言

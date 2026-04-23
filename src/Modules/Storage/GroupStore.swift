@@ -1,5 +1,65 @@
 import Foundation
 import CryptoKit
+import Security
+
+// MARK: - GroupKeychainHelper for Secure Storage
+
+/// Keychain辅助类 - 用于安全存储群组密钥
+private class GroupKeychainHelper {
+    static let shared = GroupKeychainHelper()
+    
+    private let service = "com.summerSpark.groupStore"
+    
+    /// 保存数据到Keychain
+    func save(key: String, data: Data) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        ]
+        
+        // 先删除旧数据
+        SecItemDelete(query as CFDictionary)
+        
+        // 添加新数据
+        let status = SecItemAdd(query as CFDictionary, nil)
+        return status == errSecSuccess
+    }
+    
+    /// 从Keychain读取数据
+    func read(key: String) -> Data? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        if status == errSecSuccess {
+            return result as? Data
+        }
+        return nil
+    }
+    
+    /// 从Keychain删除数据
+    func delete(key: String) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        
+        let status = SecItemDelete(query as CFDictionary)
+        return status == errSecSuccess
+    }
+}
+
 final class GroupStore {
     static let shared = GroupStore()
 
@@ -9,6 +69,7 @@ final class GroupStore {
 
     private let groupsKey = "groups.store"
     private let userGroupsKey = "groups.userGroups" // Maps uid -> [groupId]
+    private let groupKeysKeychainPrefix = "group.key." // Keychain中存储组密钥的前缀
 
     // MARK: - Private Properties
 
@@ -30,10 +91,17 @@ final class GroupStore {
     // MARK: - Persistence
 
     private func loadGroups() {
-        // Load groups dictionary
+        // Load groups dictionary (不包含敏感密钥)
         if let data = UserDefaults.standard.data(forKey: groupsKey),
            let decoded = try? JSONDecoder().decode([String: Group].self, from: data) {
             groups = decoded
+            
+            // 从Keychain加载每个组的密钥
+            for (groupId, _) in groups {
+                if let keyData = GroupKeychainHelper.shared.read(key: "\(groupKeysKeychainPrefix)\(groupId)") {
+                    groups[groupId]?.groupKey = keyData
+                }
+            }
         }
 
         // Load user-groups mapping
@@ -44,7 +112,24 @@ final class GroupStore {
     }
 
     private func saveGroups() {
-        if let data = try? JSONEncoder().encode(groups) {
+        // 保存组密钥到Keychain (安全存储)
+        for (groupId, group) in groups {
+            if let keyData = group.groupKey {
+                let success = GroupKeychainHelper.shared.save(key: "\(groupKeysKeychainPrefix)\(groupId)", data: keyData)
+                if !success {
+                    Logger.shared.error("GroupStore: Failed to save group key to Keychain for group \(groupId)")
+                }
+            }
+        }
+        
+        // 保存组信息到UserDefaults (不包含敏感密钥)
+        var groupsWithoutKeys: [String: Group] = [:]
+        for (groupId, var group) in groups {
+            group.groupKey = nil // 清除密钥后再存储到UserDefaults
+            groupsWithoutKeys[groupId] = group
+        }
+        
+        if let data = try? JSONEncoder().encode(groupsWithoutKeys) {
             UserDefaults.standard.set(data, forKey: groupsKey)
         }
 
@@ -103,6 +188,10 @@ final class GroupStore {
         }
 
         groups.removeValue(forKey: groupId)
+        
+        // 从Keychain删除组密钥
+        GroupKeychainHelper.shared.delete(key: "\(groupKeysKeychainPrefix)\(groupId)")
+        
         saveGroups()
 
         return true
@@ -322,6 +411,11 @@ final class GroupStore {
 
     /// Clear all group data
     func clearAllGroups() {
+        // 从Keychain删除所有组密钥
+        for groupId in groups.keys {
+            GroupKeychainHelper.shared.delete(key: "\(groupKeysKeychainPrefix)\(groupId)")
+        }
+        
         groups.removeAll()
         userGroupsMap.removeAll()
         saveGroups()

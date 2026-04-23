@@ -225,12 +225,18 @@ struct OfflineMapProgress: Equatable {
 
 // MARK: - TileCoordinate
 
-struct TileCoordinate: Equatable, Hashable, Codable {
-    let x: Int
-    let y: Int
-    let zoom: Int
+public struct TileCoordinate: Equatable, Hashable, Codable {
+    public let x: Int
+    public let y: Int
+    public let zoom: Int
     
-    var key: String {
+    public init(x: Int, y: Int, zoom: Int) {
+        self.x = x
+        self.y = y
+        self.zoom = zoom
+    }
+    
+    public var key: String {
         return "\(zoom)-\(x)-\(y)"
     }
 }

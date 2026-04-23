@@ -121,7 +121,14 @@ final class OfflineMapManager: NSObject {
     
     override init() {
         guard let documents = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            fatalError("OfflineMapManager: Failed to get documents directory")
+            // 使用临时目录作为后备方案，避免崩溃
+            Logger.shared.error("OfflineMapManager: Failed to get documents directory, using temp directory")
+            self.documentsPath = FileManager.default.temporaryDirectory.appendingPathComponent("OfflineMaps", isDirectory: true)
+            super.init()
+            setupURLSession()
+            createOfflineMapsDirectory()
+            loadPersistedProgress()
+            return
         }
         self.documentsPath = documents.appendingPathComponent("OfflineMaps", isDirectory: true)
         
@@ -352,8 +359,18 @@ final class OfflineMapManager: NSObject {
     private func downloadTile(_ tile: TileCoordinate, for mapId: String) {
         guard let mapInfo = currentMapInfo[mapId] else { return }
         
-        let tileURL = buildTileURL(for: tile, mapInfo: mapInfo)
-        
+        guard let tileURL = buildTileURL(for: tile, mapInfo: mapInfo) else {
+            // URL构建失败，标记为失败
+            handleTileDownloadFailure(tile: tile, mapId: mapId, task: TileDownloadTask(
+                coordinate: tile,
+                url: URL(string: "about:blank")!,
+                state: .downloading,
+                data: nil,
+                bytesDownloaded: 0
+            ), error: NSError(domain: "OfflineMapManager", code: -3, userInfo: [NSLocalizedDescriptionKey: "Invalid tile URL"]))
+            return
+        }
+
         var task = TileDownloadTask(
             coordinate: tile,
             url: tileURL,
@@ -361,28 +378,29 @@ final class OfflineMapManager: NSObject {
             data: nil,
             bytesDownloaded: 0
         )
-        
+
         downloadTasks[tile.key] = task
-        
+
         var request = URLRequest(url: tileURL)
         request.httpMethod = "GET"
-        
+
         if let offset = downloadOffsets[mapId], offset > 0 {
             request.setValue("bytes=\(offset)-", forHTTPHeaderField: "Range")
         }
-        
+
         let downloadTask = urlSession.dataTask(with: request) { [weak self] data, response, error in
             self?.handleTileDownloadCompletion(tile: tile, mapId: mapId, data: data, response: response, error: error)
         }
-        
+
         downloadTasks[tile.key] = task
         downloadTask.resume()
     }
     
-    private func buildTileURL(for tile: TileCoordinate, mapInfo: OfflineMapInfo) -> URL {
+    private func buildTileURL(for tile: TileCoordinate, mapInfo: OfflineMapInfo) -> URL? {
         let baseURL = "https://tiles.example.com/\(mapInfo.mapType.rawValue)"
         guard let url = URL(string: "\(baseURL)/\(tile.zoom)/\(tile.x)/\(tile.y).png") else {
-            fatalError("OfflineMapManager: Invalid tile URL constructed")
+            Logger.shared.error("OfflineMapManager: Invalid tile URL constructed for tile (\(tile.x), \(tile.y), \(tile.zoom))")
+            return nil
         }
         return url
     }

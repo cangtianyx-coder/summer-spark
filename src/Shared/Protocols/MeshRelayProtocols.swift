@@ -1,5 +1,20 @@
 import Foundation
 
+// MARK: - Geo Region
+public struct GeoRegion: Codable {
+    public let minLat: Double
+    public let maxLat: Double
+    public let minLon: Double
+    public let maxLon: Double
+    
+    public init(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double) {
+        self.minLat = minLat
+        self.maxLat = maxLat
+        self.minLon = minLon
+        self.maxLon = maxLon
+    }
+}
+
 // MARK: - Map Relay Service Protocol
 /// Protocol for map package relay over mesh network
 protocol MapRelayServiceProtocol: AnyObject {
@@ -27,6 +42,11 @@ protocol MapRelayServiceProtocol: AnyObject {
     func getRelayStats() -> MapRelayStats
 }
 
+// MARK: - Map Relay Service (placeholder class for protocol)
+public class MapRelayService {
+    public init() {}
+}
+
 // MARK: - Map Relay Delegate
 protocol MapRelayDelegate: AnyObject {
     func mapRelay(_ service: MapRelayService, didReceiveTile tile: TileCoordinate, data: Data, from relayPath: [String])
@@ -36,88 +56,128 @@ protocol MapRelayDelegate: AnyObject {
 }
 
 // MARK: - Map Package
-struct MapPackage: Codable, Identifiable {
-    let id: String
-    let name: String
-    let regionName: String
-    let minZoom: Int
-    let maxZoom: Int
-    let boundingBox: GeoRegion
-    let totalTiles: Int
-    let downloadedTiles: Int
-    let fileSizeBytes: Int64
-    let checksum: String
-    let sourceNodeId: String
-    let createdAt: Date
+public struct MapPackage: Codable, Identifiable {
+    public let id: String
+    public let name: String
+    public let regionName: String
+    public let minZoom: Int
+    public let maxZoom: Int
+    public let boundingBox: GeoRegion
+    public let totalTiles: Int
+    public let downloadedTiles: Int
+    public let fileSizeBytes: Int64
+    public let checksum: String
+    public let sourceNodeId: String
+    public let createdAt: Date
 
-    var downloadProgress: Double {
+    public var downloadProgress: Double {
         guard totalTiles > 0 else { return 0 }
         return Double(downloadedTiles) / Double(totalTiles)
     }
 
-    var isComplete: Bool {
+    public var isComplete: Bool {
         downloadedTiles >= totalTiles
+    }
+    
+    public init(id: String, name: String, regionName: String, minZoom: Int, maxZoom: Int, boundingBox: GeoRegion, totalTiles: Int, downloadedTiles: Int, fileSizeBytes: Int64, checksum: String, sourceNodeId: String, createdAt: Date) {
+        self.id = id
+        self.name = name
+        self.regionName = regionName
+        self.minZoom = minZoom
+        self.maxZoom = maxZoom
+        self.boundingBox = boundingBox
+        self.totalTiles = totalTiles
+        self.downloadedTiles = downloadedTiles
+        self.fileSizeBytes = fileSizeBytes
+        self.checksum = checksum
+        self.sourceNodeId = sourceNodeId
+        self.createdAt = createdAt
     }
 }
 
-// MARK: - Tile Coordinate
-struct TileCoordinate: Hashable, Codable {
-    let x: Int
-    let y: Int
-    let zoom: Int
-
-    var key: String { "\(zoom)/\(x)/\(y)" }
-}
-
 // MARK: - Tile Integrity
-struct TileIntegrity: Codable {
-    let coordinate: TileCoordinate
-    let checksum: String
-    let sizeBytes: Int
-    let signature: Data?
-    let verifiedAt: Date
+public struct TileIntegrity: Codable {
+    public let coordinate: TileCoordinate
+    public let checksum: String
+    public let sizeBytes: Int
+    public let signature: Data?
+    public let verifiedAt: Date
 
-    var isValid: Bool { verifiedAt > Date().addingTimeInterval(-3600) }
+    public var isValid: Bool { verifiedAt > Date().addingTimeInterval(-3600) }
+    
+    public init(coordinate: TileCoordinate, checksum: String, sizeBytes: Int, signature: Data?, verifiedAt: Date) {
+        self.coordinate = coordinate
+        self.checksum = checksum
+        self.sizeBytes = sizeBytes
+        self.signature = signature
+        self.verifiedAt = verifiedAt
+    }
 }
 
 // MARK: - Relay Progress
-struct RelayProgress: Codable {
-    let packageId: String
-    let phase: RelayPhase
-    let tilesRelayed: Int
-    let totalTiles: Int
-    let bytesTransferred: Int64
-    let currentRelays: [String]
+public struct RelayProgress: Codable {
+    public let packageId: String
+    public let phase: RelayPhase
+    public let tilesRelayed: Int
+    public let totalTiles: Int
+    public let bytesTransferred: Int64
+    public let currentRelays: [String]
 
-    enum RelayPhase: String, Codable {
+    public enum RelayPhase: String, Codable {
         case announcing
         case requesting
         case relaying
         case verifying
         case completed
     }
+    
+    public init(packageId: String, phase: RelayPhase, tilesRelayed: Int, totalTiles: Int, bytesTransferred: Int64, currentRelays: [String]) {
+        self.packageId = packageId
+        self.phase = phase
+        self.tilesRelayed = tilesRelayed
+        self.totalTiles = totalTiles
+        self.bytesTransferred = bytesTransferred
+        self.currentRelays = currentRelays
+    }
 }
 
 // MARK: - Map Relay Stats
-struct MapRelayStats: Codable {
-    let totalTilesServed: Int
-    let totalTilesReceived: Int
-    let totalBytesServed: Int64
-    let totalBytesReceived: Int64
-    let activeRelays: Int
-    let cacheHitRate: Double
+public struct MapRelayStats: Codable {
+    public let totalTilesServed: Int
+    public let totalTilesReceived: Int
+    public let totalBytesServed: Int64
+    public let totalBytesReceived: Int64
+    public let activeRelays: Int
+    public let cacheHitRate: Double
+    
+    public init(totalTilesServed: Int, totalTilesReceived: Int, totalBytesServed: Int64, totalBytesReceived: Int64, activeRelays: Int, cacheHitRate: Double) {
+        self.totalTilesServed = totalTilesServed
+        self.totalTilesReceived = totalTilesReceived
+        self.totalBytesServed = totalBytesServed
+        self.totalBytesReceived = totalBytesReceived
+        self.activeRelays = activeRelays
+        self.cacheHitRate = cacheHitRate
+    }
 }
 
 // MARK: - Tile Request
-struct TileRequest: Codable {
-    let requestId: String
-    let tile: TileCoordinate
-    let requesterId: String
-    let timestamp: Date
-    let ttl: Int
+public struct TileRequest: Codable {
+    public let requestId: String
+    public let tile: TileCoordinate
+    public let requesterId: String
+    public let timestamp: Date
+    public let ttl: Int
 
-    var isExpired: Bool {
+    public var isExpired: Bool {
         ttl <= 0 || Date().timeIntervalSince(timestamp) > TimeInterval(ttl * 60)
+    }
+    
+    public init(requestId: String, tile: TileCoordinate, requesterId: String, timestamp: Date, ttl: Int) {
+        self.requestId = requestId
+        self.tile = tile
+        self.requesterId = requesterId
+        self.timestamp = timestamp
+        self.ttl = ttl
     }
 }
 
@@ -141,21 +201,21 @@ protocol MapPackageShareProtocol: AnyObject {
 }
 
 // MARK: - Map Share Session
-struct MapShareSession: Codable, Identifiable {
-    let id: String
-    let packageId: String
-    let peerId: String
-    let direction: ShareDirection
-    let state: ShareState
-    let progress: Double
-    let startedAt: Date
+public struct MapShareSession: Codable, Identifiable {
+    public let id: String
+    public let packageId: String
+    public let peerId: String
+    public let direction: ShareDirection
+    public let state: ShareState
+    public let progress: Double
+    public let startedAt: Date
 
-    enum ShareDirection: String, Codable {
+    public enum ShareDirection: String, Codable {
         case uploading
         case downloading
     }
 
-    enum ShareState: String, Codable {
+    public enum ShareState: String, Codable {
         case negotiating
         case transferring
         case verifying
@@ -163,11 +223,21 @@ struct MapShareSession: Codable, Identifiable {
         case failed
         case cancelled
     }
+    
+    public init(id: String, packageId: String, peerId: String, direction: ShareDirection, state: ShareState, progress: Double, startedAt: Date) {
+        self.id = id
+        self.packageId = packageId
+        self.peerId = peerId
+        self.direction = direction
+        self.state = state
+        self.progress = progress
+        self.startedAt = startedAt
+    }
 }
 
 // MARK: - Background Mesh Listener Protocol
 /// Protocol for background BLE mesh listening
-protocol BackgroundMeshListenerProtocol: AnyObject {
+public protocol BackgroundMeshListenerProtocol: AnyObject {
     var isListening: Bool { get }
 
     /// Start background listening for mesh beacons
@@ -184,16 +254,24 @@ protocol BackgroundMeshListenerProtocol: AnyObject {
 }
 
 // MARK: - Background Listener Config
-struct BackgroundListenerConfig: Codable {
-    let scanInterval: TimeInterval // seconds
-    let scanDuration: TimeInterval // seconds
-    let discoveryWindow: TimeInterval // seconds
-    let adaptivePower: Bool
-    let minimumSignalStrength: Double // dBm
+public struct BackgroundListenerConfig: Codable {
+    public let scanInterval: TimeInterval // seconds
+    public let scanDuration: TimeInterval // seconds
+    public let discoveryWindow: TimeInterval // seconds
+    public let adaptivePower: Bool
+    public let minimumSignalStrength: Double // dBm
+    
+    public init(scanInterval: TimeInterval, scanDuration: TimeInterval, discoveryWindow: TimeInterval, adaptivePower: Bool, minimumSignalStrength: Double) {
+        self.scanInterval = scanInterval
+        self.scanDuration = scanDuration
+        self.discoveryWindow = discoveryWindow
+        self.adaptivePower = adaptivePower
+        self.minimumSignalStrength = minimumSignalStrength
+    }
 }
 
 // MARK: - Power State
-enum PowerState: String, Codable {
+public enum PowerState: String, Codable {
     case active
     case lowPower
     case background
@@ -201,7 +279,7 @@ enum PowerState: String, Codable {
 }
 
 // MARK: - Power Save Delegate
-protocol PowerSaveDelegate: AnyObject {
+public protocol PowerSaveDelegate: AnyObject {
     func powerSaveManager(_ manager: PowerSaveManager, didChangeState state: PowerState)
     func powerSaveManager(_ manager: PowerSaveManager, didUpdateBatteryLevel level: Double)
 }

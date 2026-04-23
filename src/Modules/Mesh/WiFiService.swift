@@ -106,8 +106,10 @@ final class WiFiService {
     
     private func receiveData(on connection: NWConnection) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, isComplete, error in
+            guard let self = self else { return }
+            
             if let data = data, !data.isEmpty {
-                self?.delegate?.wifiService(self!, didReceiveData: data, from: connection.endpoint)
+                self.delegate?.wifiService(self, didReceiveData: data, from: connection.endpoint)
             }
             
             if let error = error {
@@ -118,7 +120,7 @@ final class WiFiService {
             if isComplete {
                 connection.cancel()
             } else {
-                self?.receiveData(on: connection)
+                self.receiveData(on: connection)
             }
         }
     }
@@ -152,8 +154,9 @@ final class WiFiService {
         let connection = NWConnection(to: endpoint, using: .tcp)
         
         connection.stateUpdateHandler = { [weak self] state in
-            self?.connectionState = state
-            self?.delegate?.wifiService(self!, didChangeState: state)
+            guard let self = self else { return }
+            self.connectionState = state
+            self.delegate?.wifiService(self, didChangeState: state)
         }
         
         connection.start(queue: queue)
@@ -163,6 +166,10 @@ final class WiFiService {
     }
     
     deinit {
-        stopListening()
+        // 确保所有连接都被取消
+        connections.forEach { $0.cancel() }
+        connections.removeAll()
+        listener?.cancel()
+        listener = nil
     }
 }

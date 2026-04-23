@@ -541,6 +541,11 @@ final class DatabaseManager {
             throw DatabaseError.queryFailed("无效表名")
         }
 
+        // SQL注入警告：直接拼接WHERE条件存在风险，建议使用querySafe方法
+        if condition != nil {
+            Logger.shared.warn("SQL注入警告：使用字符串拼接WHERE条件可能存在安全风险，建议使用querySafe(table:columns:whereClause:parameters:)方法")
+        }
+
         let cols = (columns ?? ["*"]).joined(separator: ", ")
         var sql = "SELECT \(cols) FROM \(table)"
         if let cond = condition { sql += " WHERE \(cond)" }
@@ -595,6 +600,87 @@ final class DatabaseManager {
         return results
     }
 
+    /// 安全查询方法 - 使用参数化查询防止SQL注入
+    /// - Parameters:
+    ///   - table: 表名（已验证）
+    ///   - columns: 要查询的列名数组，nil表示所有列
+    ///   - whereClause: WHERE条件子句，使用?作为参数占位符（例如: "id = ? AND name = ?"）
+    ///   - parameters: 参数值数组，按顺序替换whereClause中的?占位符
+    ///   - orderBy: 排序条件
+    ///   - limit: 结果数量限制
+    /// - Returns: 查询结果数组
+    func querySafe(table: String, columns: [String]? = nil, whereClause: String? = nil, parameters: [Any]? = nil, orderBy: String? = nil, limit: Int? = nil) throws -> [[String: Any]] {
+        guard isInitialized else { throw DatabaseError.notInitialized }
+
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.queryFailed("无效表名")
+        }
+
+        let cols = (columns ?? ["*"]).joined(separator: ", ")
+        var sql = "SELECT \(cols) FROM \(table)"
+        if let cond = whereClause { sql += " WHERE \(cond)" }
+        if let order = orderBy { sql += " ORDER BY \(order)" }
+        if let lim = limit { sql += " LIMIT \(lim)" }
+        sql += ";"
+
+        var results: [[String: Any]] = []
+        var errorMsg: String?
+
+        dbQueue.sync { [weak self] in
+            guard let self = self, let db = self.db else { return }
+
+            var stmt: OpaquePointer?
+            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+                // 绑定参数
+                if let params = parameters {
+                    var idx: Int32 = 1
+                    for param in params {
+                        bindValue(stmt, idx, param)
+                        idx += 1
+                    }
+                }
+
+                while sqlite3_step(stmt) == SQLITE_ROW {
+                    var row: [String: Any] = [:]
+                    for i in 0..<sqlite3_column_count(stmt) {
+                        let name = String(cString: sqlite3_column_name(stmt, i))
+                        let colIdx = sqlite3_column_type(stmt, i)
+
+                        switch colIdx {
+                        case SQLITE_INTEGER:
+                            row[name] = sqlite3_column_int64(stmt, i)
+                        case SQLITE_FLOAT:
+                            row[name] = sqlite3_column_double(stmt, i)
+                        case SQLITE_TEXT:
+                            if let text = sqlite3_column_text(stmt, i) {
+                                row[name] = String(cString: text)
+                            }
+                        case SQLITE_BLOB:
+                            if let blob = sqlite3_column_blob(stmt, i) {
+                                let size = sqlite3_column_bytes(stmt, i)
+                                row[name] = Data(bytes: blob, count: Int(size))
+                            }
+                        default:
+                            row[name] = nil
+                        }
+                    }
+                    results.append(row)
+                }
+            } else {
+                errorMsg = String(cString: sqlite3_errmsg(db))
+            }
+            sqlite3_finalize(stmt)
+        }
+
+        if let err = errorMsg {
+            throw DatabaseError.queryFailed(err)
+        }
+
+        return results
+    }
+
     func update(table: String, values: [String: Any], where condition: String) throws -> Int {
         guard isInitialized else { throw DatabaseError.notInitialized }
 
@@ -603,6 +689,9 @@ final class DatabaseManager {
             Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
             throw DatabaseError.executeFailed("无效表名")
         }
+
+        // SQL注入警告：直接拼接WHERE条件存在风险，建议使用updateSafe方法
+        Logger.shared.warn("SQL注入警告：使用字符串拼接WHERE条件可能存在安全风险，建议使用updateSafe(table:values:whereClause:parameters:)方法")
 
         let setParts = values.keys.map { "\($0) = ?" }.joined(separator: ", ")
         let sql = "UPDATE \(table) SET \(setParts) WHERE \(condition);"
@@ -636,6 +725,63 @@ final class DatabaseManager {
         return affected
     }
 
+    /// 安全更新方法 - 使用参数化查询防止SQL注入
+    /// - Parameters:
+    ///   - table: 表名（已验证）
+    ///   - values: 要更新的列值字典
+    ///   - whereClause: WHERE条件子句，使用?作为参数占位符
+    ///   - parameters: WHERE条件参数值数组
+    /// - Returns: 受影响的行数
+    func updateSafe(table: String, values: [String: Any], whereClause: String, parameters: [Any]? = nil) throws -> Int {
+        guard isInitialized else { throw DatabaseError.notInitialized }
+
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.executeFailed("无效表名")
+        }
+
+        let setParts = values.keys.map { "\($0) = ?" }.joined(separator: ", ")
+        let sql = "UPDATE \(table) SET \(setParts) WHERE \(whereClause);"
+
+        var affected = 0
+        var errorMsg: String?
+
+        dbQueue.sync { [weak self] in
+            guard let self = self, let db = self.db else { return }
+
+            var stmt: OpaquePointer?
+            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+                // 绑定SET值
+                var idx: Int32 = 1
+                for value in values.values {
+                    bindValue(stmt, idx, value)
+                    idx += 1
+                }
+
+                // 绑定WHERE参数
+                if let params = parameters {
+                    for param in params {
+                        bindValue(stmt, idx, param)
+                        idx += 1
+                    }
+                }
+
+                sqlite3_step(stmt)
+                affected = Int(sqlite3_changes(db))
+            } else {
+                errorMsg = String(cString: sqlite3_errmsg(db))
+            }
+            sqlite3_finalize(stmt)
+        }
+
+        if let err = errorMsg {
+            throw DatabaseError.executeFailed(err)
+        }
+
+        return affected
+    }
+
     func delete(table: String, where condition: String) throws -> Int {
         guard isInitialized else { throw DatabaseError.notInitialized }
 
@@ -644,6 +790,9 @@ final class DatabaseManager {
             Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
             throw DatabaseError.executeFailed("无效表名")
         }
+
+        // SQL注入警告：直接拼接WHERE条件存在风险，建议使用deleteSafe方法
+        Logger.shared.warn("SQL注入警告：使用字符串拼接WHERE条件可能存在安全风险，建议使用deleteSafe(table:whereClause:parameters:)方法")
 
         let sql = "DELETE FROM \(table) WHERE \(condition);"
 
@@ -655,6 +804,55 @@ final class DatabaseManager {
 
             var stmt: OpaquePointer?
             if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+                sqlite3_step(stmt)
+                affected = Int(sqlite3_changes(db))
+            } else {
+                errorMsg = String(cString: sqlite3_errmsg(db))
+            }
+            sqlite3_finalize(stmt)
+        }
+
+        if let err = errorMsg {
+            throw DatabaseError.executeFailed(err)
+        }
+
+        return affected
+    }
+
+    /// 安全删除方法 - 使用参数化查询防止SQL注入
+    /// - Parameters:
+    ///   - table: 表名（已验证）
+    ///   - whereClause: WHERE条件子句，使用?作为参数占位符
+    ///   - parameters: WHERE条件参数值数组
+    /// - Returns: 受影响的行数
+    func deleteSafe(table: String, whereClause: String, parameters: [Any]? = nil) throws -> Int {
+        guard isInitialized else { throw DatabaseError.notInitialized }
+
+        // SQL注入防护：验证表名
+        guard validateTableName(table) else {
+            Logger.shared.error("SQL注入防护：无效表名 '\(table)'")
+            throw DatabaseError.executeFailed("无效表名")
+        }
+
+        let sql = "DELETE FROM \(table) WHERE \(whereClause);"
+
+        var affected = 0
+        var errorMsg: String?
+
+        dbQueue.sync { [weak self] in
+            guard let self = self, let db = self.db else { return }
+
+            var stmt: OpaquePointer?
+            if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK {
+                // 绑定WHERE参数
+                if let params = parameters {
+                    var idx: Int32 = 1
+                    for param in params {
+                        bindValue(stmt, idx, param)
+                        idx += 1
+                    }
+                }
+
                 sqlite3_step(stmt)
                 affected = Int(sqlite3_changes(db))
             } else {

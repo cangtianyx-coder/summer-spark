@@ -8,6 +8,13 @@ import UIKit
 // MARK: - Power Save Manager
 
 public class PowerSaveManager {
+    // MARK: - Singleton
+    
+    public static let shared = PowerSaveManager()
+    private init() {}
+    
+    // MARK: - Properties
+    
     private var currentState: PowerState = .active
     private var previousState: PowerState = .active
     private var batteryLevel: Double = 1.0

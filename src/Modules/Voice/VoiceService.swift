@@ -544,8 +544,10 @@ final class VoiceService {
     }
 
     private func stopCallTimeoutTimer() {
-        callTimeoutTimer?.invalidate()
-        callTimeoutTimer = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.callTimeoutTimer?.invalidate()
+            self?.callTimeoutTimer = nil
+        }
     }
 
     private func handleCallTimeout() {

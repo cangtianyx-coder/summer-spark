@@ -276,4 +276,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 处理 Universal Links 和 Handoff
         return true
     }
+    
+    // MARK: - 后台生命周期
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        PowerSaveManager.shared.handleAppLifecycle(.didEnterBackground)
+        Logger.shared.info("[AppDelegate] Application did enter background")
+    }
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        PowerSaveManager.shared.handleAppLifecycle(.willEnterForeground)
+        Logger.shared.info("[AppDelegate] Application will enter foreground")
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        PowerSaveManager.shared.handleAppLifecycle(.willTerminate)
+        Logger.shared.info("[AppDelegate] Application will terminate")
+    }
 }

@@ -231,11 +231,19 @@ extension AdaptiveBeaconController: CBPeripheralManagerDelegate {
 // MARK: - Supporting Types
 
 public struct BeaconConfiguration {
-    let baseInterval: TimeInterval
-    let minInterval: TimeInterval
-    let maxInterval: TimeInterval
-    let txPower: Int
-    let adaptiveEnabled: Bool
+    public let baseInterval: TimeInterval
+    public let minInterval: TimeInterval
+    public let maxInterval: TimeInterval
+    public let txPower: Int
+    public let adaptiveEnabled: Bool
+    
+    public init(baseInterval: TimeInterval, minInterval: TimeInterval, maxInterval: TimeInterval, txPower: Int, adaptiveEnabled: Bool) {
+        self.baseInterval = baseInterval
+        self.minInterval = minInterval
+        self.maxInterval = maxInterval
+        self.txPower = txPower
+        self.adaptiveEnabled = adaptiveEnabled
+    }
 }
 
 public enum BeaconPower {

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		873A0DA7F4A9438DA4319D82606C7EDF /* MeshRelayProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */; };
+		A035E63E369141B1B902DBFDF0442109 /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */; };
+		A89F7282F1B8409E88F5FF5AD7B7FCD1 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */; };
+		682CF6C4503248F5990468DE65367924 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */; };
+		7F4B4F39546A4DDEBBBAC60C0B3FD502 /* PowerSaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BDEC7A411B04BCCA976392A7AE5A040 /* PowerSaveManager.swift */; };
+		3096FE094E2845A58941DF8473550EE9 /* BackgroundMeshListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04BC163D38EE4F1A897E96B3110A6986 /* BackgroundMeshListener.swift */; };
+		2687BF05200B482F890819D737660F56 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045DE93EB36E4E1AAD008D1B0D87AB01 /* AdaptiveBeaconController.swift */; };
 		01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */; };
 		02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */; };
 		040228378FBF4B2DDBAF4D7F /* ConnectivitySwitchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2938C014534B18E82AC39D /* ConnectivitySwitchManager.swift */; };
@@ -57,6 +64,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2922009CDD334A99801288A0E0BC5BE9 /* MeshRelayProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Shared/Protocols/MeshRelayProtocols.swift; sourceTree = "<group>"; };
+		EFDD134E86D14F01AACC7E655808C33E /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/PowerSaveManager.swift; sourceTree = "<group>"; };
+		561B19A74EA1430984112952C167F22D /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/BackgroundMeshListener.swift; sourceTree = "<group>"; };
+		BA6885835615401299E5281C945C4FF8 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/AdaptiveBeaconController.swift; sourceTree = "<group>"; };
+		7BDEC7A411B04BCCA976392A7AE5A040 /* PowerSaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/PowerSaveManager.swift; sourceTree = "<group>"; };
+		04BC163D38EE4F1A897E96B3110A6986 /* BackgroundMeshListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/BackgroundMeshListener.swift; sourceTree = "<group>"; };
+		045DE93EB36E4E1AAD008D1B0D87AB01 /* AdaptiveBeaconController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = src/Modules/Power/AdaptiveBeaconController.swift; sourceTree = "<group>"; };
 		0CEA0A0E56CCC0CEBC1C9F07 /* EncryptedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedCache.swift; sourceTree = "<group>"; };
 		11FD4DF938D24B67263656AB /* SummerSparkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerSparkApp.swift; sourceTree = "<group>"; };
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
@@ -403,6 +417,10 @@
 				4FE951BF91CD1A50F067523E /* WiFiService.swift in Sources */,
 				A149B9C3BE71F9D611FFFB3F /* LanguageManager.swift in Sources */,
 				FE3EA51F90F3F13D8654D546 /* SettingsView.swift in Sources */,
+				A035E63E369141B1B902DBFDF0442109 /* PowerSaveManager.swift in Sources */,
+				A89F7282F1B8409E88F5FF5AD7B7FCD1 /* BackgroundMeshListener.swift in Sources */,
+				682CF6C4503248F5990468DE65367924 /* AdaptiveBeaconController.swift in Sources */,
+				873A0DA7F4A9438DA4319D82606C7EDF /* MeshRelayProtocols.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
