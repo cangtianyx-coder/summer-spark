@@ -18,6 +18,10 @@ final class MeshService {
     private let meshQueue = DispatchQueue(label: "com.mesh.service", qos: .userInitiated)
     private var nodeExpirationTimer: Timer?
     private let nodeExpirationInterval: TimeInterval = 30.0
+    
+    // 消息优先级队列
+    private var messageQueue: [(message: MeshMessage, medium: MeshNode.TransportMedium?)] = []
+    private let maxQueueSize = 100
 
     // MARK: - Initialization
 
@@ -56,13 +60,67 @@ final class MeshService {
     func sendMessage(_ message: MeshMessage, via medium: MeshNode.TransportMedium? = nil) {
         meshQueue.async { [weak self] in
             guard let self = self else { return }
-
-            let routingDecision = self.selectBestRoute(for: message)
+            
+            // 将消息加入队列
+            self.enqueueMessage(message, medium: medium)
+            
+            // 处理队列中的消息
+            self.processMessageQueue()
+        }
+    }
+    
+    /// 发送紧急消息（高优先级路由）
+    func sendEmergencyMessage(_ message: MeshMessage, via medium: MeshNode.TransportMedium? = nil) {
+        meshQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            Logger.shared.warn("MeshService: Sending emergency message \(message.id)")
+            
+            // 紧急消息直接发送，使用最强信号路径
+            let routingDecision = self.selectBestRoute(for: message, preferStrongestSignal: true)
             let selectedMedium = medium ?? routingDecision.preferredMedium
-
+            
             switch selectedMedium {
             case .bluetoothLE:
                 self.bluetoothService.broadcastMessage(message)
+            case .wifi, .ethernet:
+                break
+            }
+            
+            Logger.shared.info("MeshService: Emergency message sent via \(selectedMedium.rawValue)")
+        }
+    }
+    
+    // MARK: - Message Queue Management
+    
+    private func enqueueMessage(_ message: MeshMessage, medium: MeshNode.TransportMedium?) {
+        // 队列大小限制
+        if messageQueue.count >= maxQueueSize {
+            // 移除最低优先级的消息
+            if let lowestIndex = messageQueue.indices.min(by: { messageQueue[$0].message.priority < messageQueue[$1].message.priority }) {
+                messageQueue.remove(at: lowestIndex)
+                Logger.shared.warn("MeshService: Queue full, dropped low priority message")
+            }
+        }
+        
+        messageQueue.append((message: message, medium: medium))
+        Logger.shared.debug("MeshService: Message queued, priority=\(message.priority.displayName), queue size=\(messageQueue.count)")
+    }
+    
+    private func processMessageQueue() {
+        // 按优先级排序（高优先级在前）
+        messageQueue.sort { $0.message.priority > $1.message.priority }
+        
+        // 处理队列中的消息
+        while !messageQueue.isEmpty {
+            let item = messageQueue.removeFirst()
+            
+            let routingDecision = selectBestRoute(for: item.message)
+            let selectedMedium = item.medium ?? routingDecision.preferredMedium
+            
+            switch selectedMedium {
+            case .bluetoothLE:
+                bluetoothService.broadcastMessage(item.message)
             case .wifi, .ethernet:
                 break
             }
@@ -110,7 +168,7 @@ final class MeshService {
 
     // MARK: - Route Selection
 
-    private func selectBestRoute(for message: MeshMessage) -> RoutingDecision {
+    private func selectBestRoute(for message: MeshMessage, preferStrongestSignal: Bool = false) -> RoutingDecision {
         let candidates = discoveredNodes.values.filter { node in
             node.connectionState == .connected && message.ttl > 0
         }
@@ -124,7 +182,18 @@ final class MeshService {
             )
         }
 
-        guard let bestNode = candidates.max(by: { calculateRouteScore(for: $0) < calculateRouteScore(for: $1) }) else {
+        // 紧急消息优先选择最强信号路径
+        let bestNode: MeshNode?
+        if preferStrongestSignal || message.priority == .emergency {
+            // 选择RSSI最强的节点
+            bestNode = candidates.max(by: { $0.rssi < $1.rssi })
+            Logger.shared.debug("MeshService: Selected strongest signal node for emergency message")
+        } else {
+            // 正常路由选择
+            bestNode = candidates.max(by: { calculateRouteScore(for: $0) < calculateRouteScore(for: $1) })
+        }
+        
+        guard let bestNode = bestNode else {
             return RoutingDecision(
                 preferredMedium: .bluetoothLE,
                 estimatedLatency: Double.infinity,

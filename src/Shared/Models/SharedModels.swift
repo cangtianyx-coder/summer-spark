@@ -48,6 +48,29 @@ struct RoutingDecision: Codable {
     }
 }
 
+// MARK: - MessagePriority
+
+/// 消息优先级
+enum MessagePriority: Int, Codable, Comparable {
+    case low = 1
+    case normal = 2
+    case high = 3
+    case emergency = 4
+    
+    static func < (lhs: MessagePriority, rhs: MessagePriority) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+    
+    var displayName: String {
+        switch self {
+        case .low: return "Low"
+        case .normal: return "Normal"
+        case .high: return "High"
+        case .emergency: return "Emergency"
+        }
+    }
+}
+
 // MARK: - MeshMessage
 
 struct MeshMessage: Codable {
@@ -59,8 +82,9 @@ struct MeshMessage: Codable {
     let nonce: Data
     let ttl: Int
     var messageType: MeshMessageType
+    let priority: MessagePriority
 
-    init(source: UUID, destination: UUID? = nil, payload: Data, ttl: Int = 64, messageType: MeshMessageType = .broadcast) {
+    init(source: UUID, destination: UUID? = nil, payload: Data, ttl: Int = 64, messageType: MeshMessageType = .broadcast, priority: MessagePriority = .normal) {
         self.id = UUID()
         self.sourceNodeId = source
         self.destinationNodeId = destination
@@ -72,6 +96,7 @@ struct MeshMessage: Codable {
         self.nonce = randomBytes
         self.ttl = ttl
         self.messageType = messageType
+        self.priority = priority
     }
 }
 

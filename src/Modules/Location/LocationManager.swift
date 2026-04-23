@@ -138,6 +138,13 @@ final class LocationManager: NSObject {
     /// 位置共享定时器
     private var sharingTimer: Timer?
     
+    /// 位置历史记录（最近10个点）
+    private var locationHistory: [LocationData] = []
+    private let maxHistorySize = 10
+    
+    /// 位置可信度评分
+    private(set) var currentLocationCredibility: Double = 1.0
+    
     // MARK: - Initialization
     
     private override init() {
@@ -297,6 +304,87 @@ final class LocationManager: NSObject {
         }
     }
     
+    // MARK: - Location Validation
+    
+    /// 验证位置有效性
+    /// - Parameter location: 待验证的位置
+    /// - Returns: 验证结果和可信度评分
+    func validateLocation(_ location: LocationData) -> (isValid: Bool, credibility: Double, anomaly: String?) {
+        var credibility = 1.0
+        var anomaly: String? = nil
+        
+        // 1. 检查坐标有效性
+        if !CLLocationCoordinate2DIsValid(location.coordinate) {
+            Logger.shared.warn("LocationManager: Invalid coordinates detected")
+            return (false, 0.0, "Invalid coordinates")
+        }
+        
+        // 2. 检查精度是否合理
+        if location.accuracy < 0 || location.accuracy > 1000 {
+            credibility *= 0.5
+            anomaly = "Poor accuracy: \(location.accuracy)m"
+            Logger.shared.warn("LocationManager: \(anomaly ?? "")")
+        }
+        
+        // 3. 检测位置跳变异常
+        if let lastLocation = locationHistory.last {
+            let distance = lastLocation.clLocation.distance(from: location.clLocation)
+            let timeInterval = abs(location.timestamp.timeIntervalSince(lastLocation.timestamp))
+            
+            // 计算速度 (m/s)
+            let speed = timeInterval > 0 ? distance / timeInterval : 0
+            let speedKmh = speed * 3.6 // 转换为 km/h
+            
+            // 速度超过 300 km/h 视为异常
+            if speedKmh > 300 {
+                credibility *= 0.3
+                anomaly = "Location jump detected: \(String(format: "%.1f", speedKmh)) km/h"
+                Logger.shared.warn("LocationManager: \(anomaly ?? "")")
+            } else if speedKmh > 150 {
+                // 速度超过 150 km/h 降低可信度
+                credibility *= 0.7
+                Logger.shared.debug("LocationManager: High speed detected: \(String(format: "%.1f", speedKmh)) km/h")
+            }
+        }
+        
+        // 4. 检查海拔合理性（如果有的话）
+        if let altitude = location.altitude {
+            if altitude < -500 || altitude > 9000 {
+                credibility *= 0.6
+                anomaly = "Unusual altitude: \(altitude)m"
+                Logger.shared.warn("LocationManager: \(anomaly ?? "")")
+            }
+        }
+        
+        return (true, credibility, anomaly)
+    }
+    
+    /// 检测位置跳变异常
+    /// - Parameter location: 新位置
+    /// - Returns: 是否为异常跳变
+    private func detectLocationJump(_ location: LocationData) -> Bool {
+        guard let lastLocation = locationHistory.last else { return false }
+        
+        let distance = lastLocation.clLocation.distance(from: location.clLocation)
+        let timeInterval = abs(location.timestamp.timeIntervalSince(lastLocation.timestamp))
+        
+        guard timeInterval > 0 else { return false }
+        
+        let speed = distance / timeInterval // m/s
+        let speedKmh = speed * 3.6 // km/h
+        
+        // 速度超过 300 km/h 视为异常跳变
+        return speedKmh > 300
+    }
+    
+    /// 更新位置历史记录
+    private func updateLocationHistory(_ location: LocationData) {
+        locationHistory.append(location)
+        if locationHistory.count > maxHistorySize {
+            locationHistory.removeFirst()
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func setupLocationManager() {
@@ -429,11 +517,30 @@ extension LocationManager: CLLocationManagerDelegate {
         locationQueue.async { [weak self] in
             guard let self = self else { return }
             
-            self.currentLocation = locationData
-            self.addTrackPoint(locationData)
+            // 验证位置有效性
+            let validation = self.validateLocation(locationData)
             
-            DispatchQueue.main.async {
-                self.delegate?.locationManager(self, didUpdateLocation: locationData)
+            // 更新可信度评分
+            self.currentLocationCredibility = validation.credibility
+            
+            // 更新位置历史
+            self.updateLocationHistory(locationData)
+            
+            // 记录验证结果
+            if let anomaly = validation.anomaly {
+                Logger.shared.warn("LocationManager: Location anomaly detected - \(anomaly), credibility=\(String(format: "%.2f", validation.credibility))")
+            }
+            
+            // 只有在位置有效且可信度足够高时才更新
+            if validation.isValid && validation.credibility >= 0.3 {
+                self.currentLocation = locationData
+                self.addTrackPoint(locationData)
+                
+                DispatchQueue.main.async {
+                    self.delegate?.locationManager(self, didUpdateLocation: locationData)
+                }
+            } else {
+                Logger.shared.warn("LocationManager: Location rejected due to low credibility: \(String(format: "%.2f", validation.credibility))")
             }
         }
     }
