@@ -50,40 +50,58 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-derived-
       
-      - name: Build app
+      - name: Build app (unsigned)
         run: |
+          # Clean previous builds
+          rm -rf build/
+          
+          # Build for generic iOS platform (device)
           xcodebuild \
             -project SummerSpark.xcodeproj \
             -scheme SummerSpark \
             -configuration ${{ env.CONFIGURATION }} \
             -derivedDataPath build/DerivedData \
-            -archivePath build/SummerSpark.xcarchive \
-            archive \
-            CODE_SIGN_IDENTITY="-" \
+            -destination 'generic/platform=iOS' \
+            clean build \
+            CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || xcodebuild \
-            -project SummerSpark.xcodeproj \
-            -scheme SummerSpark \
-            -configuration ${{ env.CONFIGURATION }} \
-            -derivedDataPath build/DerivedData \
-            -archivePath build/SummerSpark.xcarchive \
-            archive \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS CODE_SIGNING_ALLOWED=NO' \
+            2>&1 | tee build.log
+          
+          # Check if build succeeded
+          if grep -q "BUILD SUCCEEDED" build.log; then
+            echo "✅ Build succeeded"
+          else
+            echo "❌ Build failed, showing last 100 lines:"
+            tail -100 build.log
+            exit 1
+          fi
       
       - name: Create IPA (ad-hoc, no signing)
         run: |
+          # Debug: show DerivedData structure
+          echo "DerivedData structure:"
+          find build/DerivedData -type d -name "*.app" 2>/dev/null || echo "No .app found yet"
+          
           # Find the .app in DerivedData
           APP_PATH=$(find build/DerivedData -name "SummerSpark.app" -type d | head -1)
           
           if [ -z "$APP_PATH" ]; then
-            echo "Error: SummerSpark.app not found in DerivedData"
+            echo "Searching in Build/Products..."
+            APP_PATH=$(find build -name "SummerSpark.app" -type d | head -1)
+          fi
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: SummerSpark.app not found"
+            echo "Full build directory structure:"
+            find build -type f -name "*.app" -o -type d -name "*.app" 2>/dev/null || true
+            ls -laR build/ 2>/dev/null | head -200
             exit 1
           fi
           
           echo "Found app at: $APP_PATH"
+          ls -la "$APP_PATH"
           
           # Create Payload directory and copy app
           mkdir -p build/Payload
@@ -96,7 +114,7 @@ jobs:
           # Move to root for artifact upload
           mv SummerSpark.ipa ../SummerSpark.ipa
           
-          echo "IPA created successfully"
+          echo "✅ IPA created successfully"
           ls -lh ../SummerSpark.ipa
       
       - name: Upload IPA artifact
