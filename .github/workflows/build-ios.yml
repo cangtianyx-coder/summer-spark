@@ -1,0 +1,136 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: false
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+
+env:
+  SCHEME: SummerSpark
+  WORKSPACE: SummerSpark.xcodeproj
+  CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
+
+jobs:
+  build:
+    name: Build and Export IPA
+    runs-on: macos-14
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Show Xcode version
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+      
+      - name: List project info
+        run: |
+          xcodebuild -list -project SummerSpark.xcodeproj || true
+      
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived-${{ hashFiles('**/*.swift', '**/*.xcodeproj/project.pbxproj') }}
+          restore-keys: |
+            ${{ runner.os }}-derived-
+      
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project SummerSpark.xcodeproj \
+            -scheme SummerSpark \
+            -configuration ${{ env.CONFIGURATION }} \
+            -derivedDataPath build/DerivedData \
+            -archivePath build/SummerSpark.xcarchive \
+            archive \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || xcodebuild \
+            -project SummerSpark.xcodeproj \
+            -scheme SummerSpark \
+            -configuration ${{ env.CONFIGURATION }} \
+            -derivedDataPath build/DerivedData \
+            -archivePath build/SummerSpark.xcarchive \
+            archive \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+      
+      - name: Create IPA (ad-hoc, no signing)
+        run: |
+          # Find the .app in DerivedData
+          APP_PATH=$(find build/DerivedData -name "SummerSpark.app" -type d | head -1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: SummerSpark.app not found in DerivedData"
+            exit 1
+          fi
+          
+          echo "Found app at: $APP_PATH"
+          
+          # Create Payload directory and copy app
+          mkdir -p build/Payload
+          cp -r "$APP_PATH" build/Payload/
+          
+          # Create IPA
+          cd build
+          zip -r SummerSpark.ipa Payload
+          
+          # Move to root for artifact upload
+          mv SummerSpark.ipa ../SummerSpark.ipa
+          
+          echo "IPA created successfully"
+          ls -lh ../SummerSpark.ipa
+      
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SummerSpark-IPA-${{ github.sha }}
+          path: SummerSpark.ipa
+          retention-days: 30
+      
+      - name: Create release on tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SummerSpark.ipa
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Optional: Notify on build status
+  notify:
+    name: Notify Build Status
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Build succeeded
+        if: needs.build.result == 'success'
+        run: |
+          echo "✅ iOS build completed successfully!"
+          echo "IPA available in workflow artifacts"
+      
+      - name: Build failed
+        if: needs.build.result == 'failure'
+        run: |
+          echo "❌ iOS build failed"
+          echo "Check the build job logs for details"
