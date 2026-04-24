@@ -20,6 +20,7 @@ env:
   SCHEME: SummerSpark
   WORKSPACE: SummerSpark.xcodeproj
   CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -80,38 +81,34 @@ jobs:
       
       - name: Create IPA (ad-hoc, no signing)
         run: |
-          # Debug: show DerivedData structure
-          echo "DerivedData structure:"
-          find build/DerivedData -type d -name "*.app" 2>/dev/null || echo "No .app found yet"
+          # The .app should be in Build/Products/Release-iphoneos/ or Debug-iphoneos/
+          CONFIG_LOWER=$(echo "${{ env.CONFIGURATION }}" | tr '[:upper:]' '[:lower:]')
+          APP_PATH="build/DerivedData/Build/Products/${{ env.CONFIGURATION }}-iphoneos/SummerSpark.app"
           
-          # Find the .app in DerivedData
-          APP_PATH=$(find build/DerivedData -name "SummerSpark.app" -type d | head -1)
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "Searching in Build/Products..."
-            APP_PATH=$(find build -name "SummerSpark.app" -type d | head -1)
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Trying alternate locations..."
+            APP_PATH=$(find build/DerivedData -path "*/Products/*-iphoneos/SummerSpark.app" -type d | head -1)
           fi
           
-          if [ -z "$APP_PATH" ]; then
-            echo "Error: SummerSpark.app not found"
-            echo "Full build directory structure:"
-            find build -type f -name "*.app" -o -type d -name "*.app" 2>/dev/null || true
-            ls -laR build/ 2>/dev/null | head -200
+          if [ ! -d "$APP_PATH" ]; then
+            echo "❌ SummerSpark.app not found"
+            echo "DerivedData structure:"
+            find build/DerivedData -type d -name "*.app" 2>/dev/null || true
+            find build/DerivedData -type d -name "Products" 2>/dev/null || true
             exit 1
           fi
           
-          echo "Found app at: $APP_PATH"
+          echo "✅ Found app at: $APP_PATH"
           ls -la "$APP_PATH"
           
           # Create Payload directory and copy app
+          rm -rf build/Payload
           mkdir -p build/Payload
           cp -r "$APP_PATH" build/Payload/
           
           # Create IPA
           cd build
-          zip -r SummerSpark.ipa Payload
-          
-          # Move to root for artifact upload
+          zip -qr SummerSpark.ipa Payload
           mv SummerSpark.ipa ../SummerSpark.ipa
           
           echo "✅ IPA created successfully"
