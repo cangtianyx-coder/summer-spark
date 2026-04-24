@@ -6,112 +6,52 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-    inputs:
-      configuration:
-        description: 'Build configuration'
-        required: false
-        default: 'Release'
-        type: choice
-        options:
-          - Release
-          - Debug
 
 jobs:
   build:
-    name: Build and Export IPA
-    runs-on: macos-14
+    name: Build IPA
+    runs-on: macos-latest
     timeout-minutes: 60
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Environment info
+      - name: Info
         run: |
-          echo "=== System ==="
-          uname -a
-          echo ""
-          echo "=== Xcode ==="
+          echo "Runner: $(uname -a)"
           xcodebuild -version
-          echo ""
-          echo "=== Available SDKs ==="
-          xcodebuild -showsdks
-          echo ""
-          echo "=== Project structure ==="
-          pwd
+          xcodebuild -showsdks | grep -i ios || true
           ls -la
-          echo ""
-          echo "=== Project info ==="
-          xcodebuild -list -project SummerSpark.xcodeproj 2>&1 || true
       
       - name: Build
         run: |
-          echo "Starting build..."
-          
           xcodebuild \
             -project SummerSpark.xcodeproj \
             -scheme SummerSpark \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath ./DerivedData \
+            -derivedDataPath build \
             clean build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | tee build.log
+            2>&1 | tee build.log
           
-          echo ""
-          echo "Build log exit code: ${PIPESTATUS[0]}"
-          
-          if grep -q "** BUILD SUCCEEDED **" build.log; then
-            echo "✅ Build succeeded!"
-          else
-            echo "❌ Build failed!"
-            echo ""
-            echo "=== Last 100 lines ==="
-            tail -100 build.log
-            exit 1
-          fi
+          grep -q "BUILD SUCCEEDED" build.log || { tail -50 build.log; exit 1; }
       
-      - name: Create IPA
+      - name: Package
         run: |
-          echo "=== DerivedData structure ==="
-          find ./DerivedData -type d -maxdepth 5 2>/dev/null | head -50
-          echo ""
-          
-          echo "=== Looking for .app ==="
-          APP=$(find ./DerivedData -name "SummerSpark.app" -type d 2>/dev/null | head -1)
-          
-          if [ -z "$APP" ]; then
-            echo "❌ App not found"
-            echo "All .app files:"
-            find ./DerivedData -name "*.app" -type d 2>/dev/null
-            exit 1
-          fi
-          
-          echo "✅ Found: $APP"
-          ls -la "$APP"
-          echo ""
-          
-          echo "=== Creating IPA ==="
-          mkdir -p Payload
-          cp -R "$APP" Payload/
+          APP=$(find build -name "SummerSpark.app" -type d | head -1)
+          test -n "$APP" || { find build -type d -name "*.app"; exit 1; }
+          echo "App: $APP"
+          mkdir -p Payload && cp -R "$APP" Payload/
           zip -rq SummerSpark.ipa Payload
-          
-          echo "✅ Done!"
           ls -lh SummerSpark.ipa
       
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: SummerSpark-IPA-${{ github.run_number }}
+          name: SummerSpark-IPA
           path: SummerSpark.ipa
           retention-days: 30
-      
-      - name: Release on tag
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: SummerSpark.ipa
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
