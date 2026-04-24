@@ -16,10 +16,6 @@ on:
           - Release
           - Debug
 
-env:
-  SCHEME: SummerSpark
-  CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
-
 jobs:
   build:
     name: Build and Export IPA
@@ -27,103 +23,95 @@ jobs:
     timeout-minutes: 60
     
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Xcode
+      - name: Environment info
         run: |
+          echo "=== System ==="
+          uname -a
+          echo ""
+          echo "=== Xcode ==="
           xcodebuild -version
-          xcodebuild -showsdks | grep -E "iOS|iphoneos" || true
-      
-      - name: Show project structure
-        run: |
-          echo "Project files:"
+          echo ""
+          echo "=== Available SDKs ==="
+          xcodebuild -showsdks
+          echo ""
+          echo "=== Project structure ==="
+          pwd
           ls -la
           echo ""
-          echo "Xcode project:"
+          echo "=== Project info ==="
           xcodebuild -list -project SummerSpark.xcodeproj 2>&1 || true
       
-      - name: Build app for device (unsigned)
-        id: build
+      - name: Build
         run: |
-          set +e
+          echo "Starting build..."
           
           xcodebuild \
             -project SummerSpark.xcodeproj \
             -scheme SummerSpark \
-            -configuration ${{ env.CONFIGURATION }} \
-            -derivedDataPath DerivedData \
+            -configuration Release \
             -destination 'generic/platform=iOS' \
+            -derivedDataPath ./DerivedData \
             clean build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            2>&1 | tee build_output.log
-          
-          BUILD_EXIT_CODE=${PIPESTATUS[0]}
-          echo "build_exit_code=$BUILD_EXIT_CODE" >> $GITHUB_OUTPUT
-          
-          if [ $BUILD_EXIT_CODE -ne 0 ]; then
-            echo ""
-            echo "❌ Build failed with exit code: $BUILD_EXIT_CODE"
-            echo ""
-            echo "Last 50 lines of build output:"
-            tail -50 build_output.log
-            exit 1
-          fi
+            | tee build.log
           
           echo ""
-          echo "✅ Build succeeded"
+          echo "Build log exit code: ${PIPESTATUS[0]}"
+          
+          if grep -q "** BUILD SUCCEEDED **" build.log; then
+            echo "✅ Build succeeded!"
+          else
+            echo "❌ Build failed!"
+            echo ""
+            echo "=== Last 100 lines ==="
+            tail -100 build.log
+            exit 1
+          fi
       
-      - name: Find and package app
+      - name: Create IPA
         run: |
-          echo "Searching for SummerSpark.app..."
+          echo "=== DerivedData structure ==="
+          find ./DerivedData -type d -maxdepth 5 2>/dev/null | head -50
           echo ""
           
-          # Show DerivedData structure
-          echo "DerivedData directories:"
-          find DerivedData -type d -maxdepth 4 2>/dev/null | head -30
-          echo ""
+          echo "=== Looking for .app ==="
+          APP=$(find ./DerivedData -name "SummerSpark.app" -type d 2>/dev/null | head -1)
           
-          # Find the .app
-          APP_PATH=$(find DerivedData -name "SummerSpark.app" -type d | head -1)
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "❌ SummerSpark.app not found in DerivedData"
-            echo ""
-            echo "All .app files found:"
-            find DerivedData -name "*.app" -type d 2>/dev/null || echo "None"
+          if [ -z "$APP" ]; then
+            echo "❌ App not found"
+            echo "All .app files:"
+            find ./DerivedData -name "*.app" -type d 2>/dev/null
             exit 1
           fi
           
-          echo "✅ Found app at: $APP_PATH"
-          echo ""
-          echo "App contents:"
-          ls -la "$APP_PATH"
+          echo "✅ Found: $APP"
+          ls -la "$APP"
           echo ""
           
-          # Create IPA
-          echo "Creating IPA..."
+          echo "=== Creating IPA ==="
           mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -qr SummerSpark.ipa Payload
+          cp -R "$APP" Payload/
+          zip -rq SummerSpark.ipa Payload
           
-          echo ""
-          echo "✅ IPA created:"
+          echo "✅ Done!"
           ls -lh SummerSpark.ipa
       
-      - name: Upload IPA artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SummerSpark-IPA-${{ github.run_number }}
           path: SummerSpark.ipa
           retention-days: 30
       
-      - name: Create release on tag
+      - name: Release on tag
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: SummerSpark.ipa
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
