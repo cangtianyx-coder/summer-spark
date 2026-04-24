@@ -18,9 +18,7 @@ on:
 
 env:
   SCHEME: SummerSpark
-  WORKSPACE: SummerSpark.xcodeproj
   CONFIGURATION: ${{ github.event.inputs.configuration || 'Release' }}
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -31,93 +29,93 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
-      - name: Show Xcode version
+      - name: Setup Xcode
         run: |
           xcodebuild -version
-          xcodebuild -showsdks
+          xcodebuild -showsdks | grep -E "iOS|iphoneos" || true
       
-      - name: List project info
+      - name: Show project structure
         run: |
-          xcodebuild -list -project SummerSpark.xcodeproj || true
+          echo "Project files:"
+          ls -la
+          echo ""
+          echo "Xcode project:"
+          xcodebuild -list -project SummerSpark.xcodeproj 2>&1 || true
       
-      - name: Cache DerivedData
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-derived-${{ hashFiles('**/*.swift', '**/*.xcodeproj/project.pbxproj') }}
-          restore-keys: |
-            ${{ runner.os }}-derived-
-      
-      - name: Build app (unsigned)
+      - name: Build app for device (unsigned)
+        id: build
         run: |
-          # Clean previous builds
-          rm -rf build/
+          set +e
           
-          # Build for generic iOS platform (device)
           xcodebuild \
             -project SummerSpark.xcodeproj \
             -scheme SummerSpark \
             -configuration ${{ env.CONFIGURATION }} \
-            -derivedDataPath build/DerivedData \
+            -derivedDataPath DerivedData \
             -destination 'generic/platform=iOS' \
             clean build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS CODE_SIGNING_ALLOWED=NO' \
-            2>&1 | tee build.log
+            2>&1 | tee build_output.log
           
-          # Check if build succeeded
-          if grep -q "BUILD SUCCEEDED" build.log; then
-            echo "✅ Build succeeded"
-          else
-            echo "❌ Build failed, showing last 100 lines:"
-            tail -100 build.log
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
+          echo "build_exit_code=$BUILD_EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ Build failed with exit code: $BUILD_EXIT_CODE"
+            echo ""
+            echo "Last 50 lines of build output:"
+            tail -50 build_output.log
             exit 1
           fi
+          
+          echo ""
+          echo "✅ Build succeeded"
       
-      - name: Create IPA (ad-hoc, no signing)
+      - name: Find and package app
         run: |
-          # The .app should be in Build/Products/Release-iphoneos/ or Debug-iphoneos/
-          CONFIG_LOWER=$(echo "${{ env.CONFIGURATION }}" | tr '[:upper:]' '[:lower:]')
-          APP_PATH="build/DerivedData/Build/Products/${{ env.CONFIGURATION }}-iphoneos/SummerSpark.app"
+          echo "Searching for SummerSpark.app..."
+          echo ""
           
-          if [ ! -d "$APP_PATH" ]; then
-            echo "Trying alternate locations..."
-            APP_PATH=$(find build/DerivedData -path "*/Products/*-iphoneos/SummerSpark.app" -type d | head -1)
-          fi
+          # Show DerivedData structure
+          echo "DerivedData directories:"
+          find DerivedData -type d -maxdepth 4 2>/dev/null | head -30
+          echo ""
           
-          if [ ! -d "$APP_PATH" ]; then
-            echo "❌ SummerSpark.app not found"
-            echo "DerivedData structure:"
-            find build/DerivedData -type d -name "*.app" 2>/dev/null || true
-            find build/DerivedData -type d -name "Products" 2>/dev/null || true
+          # Find the .app
+          APP_PATH=$(find DerivedData -name "SummerSpark.app" -type d | head -1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ SummerSpark.app not found in DerivedData"
+            echo ""
+            echo "All .app files found:"
+            find DerivedData -name "*.app" -type d 2>/dev/null || echo "None"
             exit 1
           fi
           
           echo "✅ Found app at: $APP_PATH"
+          echo ""
+          echo "App contents:"
           ls -la "$APP_PATH"
-          
-          # Create Payload directory and copy app
-          rm -rf build/Payload
-          mkdir -p build/Payload
-          cp -r "$APP_PATH" build/Payload/
+          echo ""
           
           # Create IPA
-          cd build
+          echo "Creating IPA..."
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
           zip -qr SummerSpark.ipa Payload
-          mv SummerSpark.ipa ../SummerSpark.ipa
           
-          echo "✅ IPA created successfully"
-          ls -lh ../SummerSpark.ipa
+          echo ""
+          echo "✅ IPA created:"
+          ls -lh SummerSpark.ipa
       
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SummerSpark-IPA-${{ github.sha }}
+          name: SummerSpark-IPA-${{ github.run_number }}
           path: SummerSpark.ipa
           retention-days: 30
       
@@ -129,23 +127,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Optional: Notify on build status
-  notify:
-    name: Notify Build Status
-    needs: build
-    runs-on: ubuntu-latest
-    if: always()
-    
-    steps:
-      - name: Build succeeded
-        if: needs.build.result == 'success'
-        run: |
-          echo "✅ iOS build completed successfully!"
-          echo "IPA available in workflow artifacts"
-      
-      - name: Build failed
-        if: needs.build.result == 'failure'
-        run: |
-          echo "❌ iOS build failed"
-          echo "Check the build job logs for details"
