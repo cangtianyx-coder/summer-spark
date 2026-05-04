@@ -523,13 +523,13 @@ public extension AntiAttackGuard {
         )
     }
     
-    public struct SecurityValidationResult {
-        public let isSafe: Bool
-        public let issues: [SecurityIssue]
-        public let confidence: Double
+    struct SecurityValidationResult {
+        let isSafe: Bool
+        let issues: [SecurityIssue]
+        let confidence: Double
     }
-    
-    public enum SecurityIssue {
+
+    enum SecurityIssue {
         case dosDetected
         case tamperingDetected
         case identityForged

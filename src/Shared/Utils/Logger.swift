@@ -85,13 +85,13 @@ final class Logger {
 
         switch level {
         case .debug:
-            logger.debug("\(formattedMessage, privacy: .public)")
+            logger.debug("\(formattedMessage, privacy: .private)")
         case .info:
-            logger.info("\(formattedMessage, privacy: .public)")
+            logger.info("\(formattedMessage, privacy: .private)")
         case .warn:
-            logger.warning("\(formattedMessage, privacy: .public)")
+            logger.warning("\(formattedMessage, privacy: .private)")
         case .error:
-            logger.error("\(formattedMessage, privacy: .public)")
+            logger.error("\(formattedMessage, privacy: .private)")
         }
 
         #if DEBUG

@@ -91,6 +91,11 @@ struct SOSButton: View {
                 onConfirm: { sendSOS() }
             )
         }
+        .alert("sos_error_title".localized, isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
     }
     
     private func triggerSOS() {

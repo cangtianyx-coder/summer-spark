@@ -393,7 +393,9 @@ struct MapContainerView: View {
             VStack {
                 HStack {
                     Spacer()
-                    Button(action: {}) {
+                    Button(action: {
+                        LocationManager.shared.start()
+                    }) {
                         Image(systemName: "location.fill")
                             .padding(10)
                             .background(Color.white)

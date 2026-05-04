@@ -221,32 +221,120 @@ final class OnboardingCoordinator: Coordinator {
     }
 }
 
-// MARK: - 占位视图控制器（需替换为实际实现）
+// MARK: - Placeholder View Controllers (TODO: Replace with actual implementation)
+/// HomeViewController - Main home screen view controller
+/// TODO: Implement home screen with mesh status, quick actions, and connected users
 @MainActor
 class HomeViewController: UIViewController {
     weak var coordinator: HomeCoordinator?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement HomeViewController UI
+    }
 }
+
+/// DiscoverViewController - Discovery and search view controller
+/// TODO: Implement discovery screen with map and search functionality
 @MainActor
 class DiscoverViewController: UIViewController {
     weak var coordinator: DiscoverCoordinator?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement DiscoverViewController UI
+    }
 }
+
+/// ProfileViewController - User profile view controller
+/// TODO: Implement profile screen with user info and settings access
 @MainActor
 class ProfileViewController: UIViewController {
     weak var coordinator: ProfileCoordinator?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement ProfileViewController UI
+    }
 }
+
+/// LoginViewController - Authentication view controller
+/// TODO: Implement login/registration UI with identity verification
 @MainActor
 class LoginViewController: UIViewController {
     weak var coordinator: LoginCoordinator?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement LoginViewController UI
+    }
 }
+
+/// OnboardingViewController - First-launch onboarding view controller
+/// TODO: Implement onboarding flow with permission requests
 @MainActor
 class OnboardingViewController: UIViewController {
     weak var coordinator: OnboardingCoordinator?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement OnboardingViewController UI
+    }
 }
+
+/// DetailViewController - Generic detail view controller
+/// TODO: Implement detail view for displaying item details
 @MainActor
 class DetailViewController: UIViewController {
-    init(id: String) { super.init(nibName: nil, bundle: nil) }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    private let itemId: String
+
+    init(id: String) {
+        self.itemId = id
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement DetailViewController UI with itemId
+    }
 }
-class SearchViewController: UIViewController {}
-class SettingsViewController: UIViewController {}
-class MainTabBarController: UITabBarController {}
+
+/// SearchViewController - Search functionality view controller
+/// TODO: Implement search UI for discovering mesh nodes and content
+class SearchViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement SearchViewController UI
+    }
+}
+
+/// SettingsViewController - App settings view controller
+/// TODO: Implement settings screen with preferences and account options
+class SettingsViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        // TODO: Implement SettingsViewController UI
+    }
+}
+
+/// MainTabBarController - Main tab bar controller
+/// TODO: Implement tab bar with proper view controllers and styling
+class MainTabBarController: UITabBarController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tabBar.backgroundColor = .systemBackground
+        // TODO: Implement MainTabBarController tabs and styling
+    }
+}

@@ -290,22 +290,22 @@ struct QuickActionsSection: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("快速操作")
                 .font(.headline)
-            
+
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 QuickActionButton(title: "创建救援队", icon: "person.3.fill", color: .blue) {
-                    // TODO: 创建救援队界面
+                    NotificationCenter.default.post(name: .createRescueTeam, object: nil)
                 }
-                
+
                 QuickActionButton(title: "标记伤员", icon: "cross.case.fill", color: .red) {
-                    // TODO: 标记伤员界面
+                    NotificationCenter.default.post(name: .markVictim, object: nil)
                 }
-                
+
                 QuickActionButton(title: "撤离点", icon: "location.fill", color: .green) {
-                    // TODO: 创建撤离点界面
+                    NotificationCenter.default.post(name: .createEvacuationPoint, object: nil)
                 }
-                
+
                 QuickActionButton(title: "紧急通道", icon: "antenna.radiowaves.left.and.right", color: .orange) {
-                    // TODO: 紧急通道界面
+                    NotificationCenter.default.post(name: .setupEmergencyRoute, object: nil)
                 }
             }
         }
@@ -343,4 +343,13 @@ struct QuickActionButton: View {
 
 #Preview {
     RescueDashboard()
+}
+
+// MARK: - Rescue Notification Names
+
+extension Notification.Name {
+    static let createRescueTeam = Notification.Name("createRescueTeam")
+    static let markVictim = Notification.Name("markVictim")
+    static let createEvacuationPoint = Notification.Name("createEvacuationPoint")
+    static let setupEmergencyRoute = Notification.Name("setupEmergencyRoute")
 }
