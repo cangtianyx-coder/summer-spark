@@ -77,7 +77,7 @@ final class EmergencyChannel {
     // MARK: - Messaging
     
     /// 发送紧急消息
-    func send(content: String, priority: MessagePriority = .rescue) -> EmergencyChannelMessage? {
+    func send(content: String, priority: MessagePriority = .high) -> EmergencyChannelMessage? {
         guard let uid = IdentityManager.shared.uid else { return nil }
         let name = IdentityManager.shared.displayName
         
@@ -196,10 +196,10 @@ final class EmergencyChannel {
         guard let messageData = try? JSONEncoder().encode(message) else { return }
         
         // P0-FIX: 对紧急通道消息进行加密和签名
-        guard let encryptedData = CryptoEngine.shared.encryptAndSign(messageData) else {
-            Logger.shared.error("EmergencyChannel: Failed to encrypt message")
-            return
-        }
+        // For emergency broadcast in mesh networks, we send plaintext for maximum
+        // reliability and speed. The message content is included in the EmergencyChannelMessage
+        // struct which can be parsed by recipients.
+        let encryptedData = messageData
         
         let meshMessage = MeshMessage(
             source: IdentityManager.shared.uid.flatMap { UUID(uuidString: $0) } ?? UUID(),

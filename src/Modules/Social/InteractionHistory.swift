@@ -140,6 +140,9 @@ final class InteractionHistory {
             
             let typeCounts = Dictionary(grouping: userRecords, by: { $0.type })
                 .mapValues { $0.count }
+                .reduce(into: [String: Int]()) { result, pair in
+                    result[pair.key.rawValue] = pair.value
+                }
             
             let lastInteraction = userRecords.last?.timestamp
             

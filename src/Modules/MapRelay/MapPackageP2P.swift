@@ -9,7 +9,7 @@ import Foundation
 public class MapPackageP2P: MapPackageShareProtocol {
     private var activeSessions: [String: MapShareSession] = [:]
     private var pendingRequests: [String: ShareRequest] = [:]
-    private var completedSessions: [String: MapShareSession] = []
+    private var completedSessions: [String: MapShareSession] = [:]
     
     private let sessionLock = NSLock()
     private let chunkSize = 8192 // 8KB chunks
@@ -93,7 +93,7 @@ public class MapPackageP2P: MapPackageShareProtocol {
         )
         
         activeSessions.removeValue(forKey: shareId)
-        completedSessions.append(failedSession)
+        completedSessions[failedSession.id] = failedSession
         
         delegate?.mapPackageP2P(self, didRejectShare: shareId)
     }
@@ -115,7 +115,7 @@ public class MapPackageP2P: MapPackageShareProtocol {
         )
         
         activeSessions.removeValue(forKey: shareId)
-        completedSessions.append(cancelledSession)
+        completedSessions[cancelledSession.id] = cancelledSession
         
         delegate?.mapPackageP2P(self, didCancelShare: shareId)
     }
@@ -237,7 +237,7 @@ public class MapPackageP2P: MapPackageShareProtocol {
         )
         
         activeSessions.removeValue(forKey: sessionId)
-        completedSessions.append(completedSession)
+        completedSessions[completedSession.id] = completedSession
         sessionLock.unlock()
         
         delegate?.mapPackageP2P(self, didCompleteShare: sessionId)
@@ -261,7 +261,7 @@ public class MapPackageP2P: MapPackageShareProtocol {
         )
         
         activeSessions.removeValue(forKey: sessionId)
-        completedSessions.append(failedSession)
+        completedSessions[failedSession.id] = failedSession
         sessionLock.unlock()
         
         delegate?.mapPackageP2P(self, shareFailed: sessionId, reason: error)

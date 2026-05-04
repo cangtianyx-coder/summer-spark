@@ -4,19 +4,19 @@ import CoreLocation
 // MARK: - Geographic Address
 /// Represents a mesh node address based on geographic location
 /// Used for Geocast routing (position-based addressing)
-struct GeoAddress: Hashable, Codable {
-    let nodeId: String
-    let latitude: Double
-    let longitude: Double
-    let altitude: Double?
-    let precision: Double // meters
-    let timestamp: Date
+public struct GeoAddress: Hashable, Codable {
+    public let nodeId: String
+    public let latitude: Double
+    public let longitude: Double
+    public let altitude: Double?
+    public let precision: Double // meters
+    public let timestamp: Date
 
-    var coordinate: CLLocationCoordinate2D {
+    public var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    func distance(to other: GeoAddress) -> Double {
+    public func distance(to other: GeoAddress) -> Double {
         let loc1 = CLLocation(latitude: latitude, longitude: longitude)
         let loc2 = CLLocation(latitude: other.latitude, longitude: other.longitude)
         return loc1.distance(from: loc2)
@@ -25,15 +25,15 @@ struct GeoAddress: Hashable, Codable {
 
 // MARK: - Geocast Region
 /// A geographic region for Geocast message delivery
-struct GeoRegion: Hashable, Codable {
-    let center: GeoAddress
-    let radiusMeters: Double
+public struct GeoRegion: Hashable, Codable {
+    public let center: GeoAddress
+    public let radiusMeters: Double
 
-    func contains(_ address: GeoAddress) -> Bool {
+    public func contains(_ address: GeoAddress) -> Bool {
         center.distance(to: address) <= radiusMeters
     }
 
-    func intersects(_ other: GeoRegion) -> Bool {
+    public func intersects(_ other: GeoRegion) -> Bool {
         let distance = center.distance(to: other.center)
         return distance <= (radiusMeters + other.radiusMeters)
     }
@@ -41,43 +41,53 @@ struct GeoRegion: Hashable, Codable {
 
 // MARK: - Geocast Message
 /// Message structure for geographic broadcast
-struct GeocastMessage: Codable {
-    let id: String
-    let sourceAddress: GeoAddress
-    let destinationRegion: GeoRegion
-    let payload: Data
-    let ttl: Int
-    let hopLimit: Int
-    let timestamp: Date
-    let priority: MessagePriority
+public struct GeocastMessage: Codable {
+    public let id: String
+    public let sourceAddress: GeoAddress
+    public let destinationRegion: GeoRegion
+    public let payload: Data
+    public let ttl: Int
+    public let hopLimit: Int
+    public let timestamp: Date
+    public let priority: MessagePriority
 
-    var isExpired: Bool {
+    public var isExpired: Bool {
         ttl <= 0 || Date().timeIntervalSince(timestamp) > TimeInterval(ttl * 60)
     }
 }
 
 // MARK: - Location Update
 /// Periodic location broadcast for mesh networking
-struct LocationUpdate: Codable {
-    let nodeId: String
-    let address: GeoAddress
-    let velocity: Double? // m/s
-    let heading: Double? // degrees
-    let accuracy: Double // meters
-    let timestamp: Date
-    let batteryLevel: Double?
+public struct LocationUpdate: Codable {
+    public let nodeId: String
+    public let address: GeoAddress
+    public let velocity: Double? // m/s
+    public let heading: Double? // degrees
+    public let accuracy: Double // meters
+    public let timestamp: Date
+    public let batteryLevel: Double?
+    
+    public init(nodeId: String, address: GeoAddress, velocity: Double?, heading: Double?, accuracy: Double, timestamp: Date, batteryLevel: Double?) {
+        self.nodeId = nodeId
+        self.address = address
+        self.velocity = velocity
+        self.heading = heading
+        self.accuracy = accuracy
+        self.timestamp = timestamp
+        self.batteryLevel = batteryLevel
+    }
 }
 
 // MARK: - Waypoint
 /// A navigation waypoint with metadata
-struct Waypoint: Codable, Identifiable {
-    let id: String
-    let address: GeoAddress
-    let name: String?
-    let type: WaypointType
-    let metadata: [String: String]
+public struct Waypoint: Codable, Identifiable {
+    public let id: String
+    public let address: GeoAddress
+    public let name: String?
+    public let type: WaypointType
+    public let metadata: [String: String]
 
-    enum WaypointType: String, Codable {
+    public enum WaypointType: String, Codable {
         case start
         case waypoint
         case destination
@@ -85,24 +95,42 @@ struct Waypoint: Codable, Identifiable {
         case danger
         case poi
     }
+    
+    public init(id: String, address: GeoAddress, name: String?, type: WaypointType, metadata: [String: String]) {
+        self.id = id
+        self.address = address
+        self.name = name
+        self.type = type
+        self.metadata = metadata
+    }
 }
 
 // MARK: - Path Route (Geographic)
 /// A geographic path between multiple waypoints
-struct GeoPath: Codable {
-    let id: String
-    let waypoints: [Waypoint]
-    let totalDistance: Double // meters
-    let estimatedDuration: TimeInterval
-    let elevationGain: Double? // meters
-    let terrainType: TerrainType
-    let createdAt: Date
+public struct GeoPath: Codable {
+    public let id: String
+    public let waypoints: [Waypoint]
+    public let totalDistance: Double // meters
+    public let estimatedDuration: TimeInterval
+    public let elevationGain: Double? // meters
+    public let terrainType: TerrainType
+    public let createdAt: Date
 
-    enum TerrainType: String, Codable {
+    public enum TerrainType: String, Codable {
         case flat
         case hilly
         case mountainous
         case mixed
+    }
+    
+    public init(id: String, waypoints: [Waypoint], totalDistance: Double, estimatedDuration: TimeInterval, elevationGain: Double?, terrainType: TerrainType, createdAt: Date) {
+        self.id = id
+        self.waypoints = waypoints
+        self.totalDistance = totalDistance
+        self.estimatedDuration = estimatedDuration
+        self.elevationGain = elevationGain
+        self.terrainType = terrainType
+        self.createdAt = createdAt
     }
 }
 
@@ -130,15 +158,4 @@ struct NavigationInstruction: Codable, Identifiable {
     }
 }
 
-// MARK: - Message Priority
-enum MessagePriority: Int, Codable, Comparable {
-    case low = 0
-    case normal = 1
-    case high = 2
-    case urgent = 3
-    case emergency = 4
 
-    static func < (lhs: MessagePriority, rhs: MessagePriority) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-}

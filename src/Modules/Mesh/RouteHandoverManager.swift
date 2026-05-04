@@ -10,8 +10,8 @@ public class RouteHandoverManager {
     private let stabilityMonitor: RouteStabilityMonitor
     private let qosRouter: QoSRouter
     
-    private var primaryRoutes: [String: RouteEntry] = [:]
-    private var backupRoutes: [String: RouteEntry] = [:]
+    private var primaryRoutes: [String: MeshRouteEntry] = [:]
+    private var backupRoutes: [String: MeshRouteEntry] = [:]
     private var pendingHandovers: [String: HandoverContext] = [:]
     private var messageBuffer: [String: [BufferedMessage]] = [:]
     
@@ -29,7 +29,7 @@ public class RouteHandoverManager {
     // MARK: - Route Registration
     
     /// Register a primary route with automatic backup computation
-    public func registerRoute(_ route: RouteEntry, forDestination destination: String) {
+    func registerRoute(_ route: MeshRouteEntry, forDestination destination: String) {
         primaryRoutes[destination] = route
         
         // Pre-compute backup route
@@ -40,7 +40,7 @@ public class RouteHandoverManager {
     }
     
     /// Compute a backup route that avoids single points of failure
-    private func computeBackupRoute(for primary: RouteEntry) -> RouteEntry? {
+    private func computeBackupRoute(for primary: MeshRouteEntry) -> MeshRouteEntry? {
         // Find alternative path that doesn't share critical nodes with primary
         // This would integrate with RouteTable/MeshService
         // For now, return nil - actual implementation would query mesh for alternatives
@@ -48,7 +48,7 @@ public class RouteHandoverManager {
     }
     
     /// Update backup route
-    public func updateBackupRoute(_ route: RouteEntry, forDestination destination: String) {
+    func updateBackupRoute(_ route: MeshRouteEntry, forDestination destination: String) {
         backupRoutes[destination] = route
     }
     
@@ -167,7 +167,7 @@ public class RouteHandoverManager {
     }
     
     /// Flush buffered messages to new route
-    private func flushBuffer(destination: String, newRoute: RouteEntry) {
+    private func flushBuffer(destination: String, newRoute: MeshRouteEntry) {
         bufferLock.lock()
         let messages = messageBuffer[destination] ?? []
         messageBuffer.removeValue(forKey: destination)
@@ -213,12 +213,12 @@ public class RouteHandoverManager {
     }
     
     /// Get current route for a destination
-    public func getCurrentRoute(for destination: String) -> RouteEntry? {
+    func getCurrentRoute(for destination: String) -> MeshRouteEntry? {
         return primaryRoutes[destination]
     }
     
     /// Get backup route for a destination
-    public func getBackupRoute(for destination: String) -> RouteEntry? {
+    func getBackupRoute(for destination: String) -> MeshRouteEntry? {
         return backupRoutes[destination]
     }
     
@@ -248,8 +248,8 @@ public class RouteHandoverManager {
 
 public struct HandoverContext {
     let destination: String
-    let oldRoute: RouteEntry?
-    let newRoute: RouteEntry
+    let oldRoute: MeshRouteEntry?
+    let newRoute: MeshRouteEntry
     let reason: RouteHandoverEvent.HandoverReason
     let startTime: Date
     let state: HandoverState
@@ -278,8 +278,8 @@ public struct HandoverStatistics {
 // MARK: - Route Handover Delegate
 
 public protocol RouteHandoverDelegate: AnyObject {
-    func routeHandoverManager(_ manager: RouteHandoverManager, didComputeBackup route: RouteEntry, for destination: String)
+    func routeHandoverManager(_ manager: RouteHandoverManager, didComputeBackup route: MeshRouteEntry, for destination: String)
     func routeHandoverManager(_ manager: RouteHandoverManager, didCompleteHandover event: RouteHandoverEvent)
     func routeHandoverManager(_ manager: RouteHandoverManager, handoverFailed destination: String, reason: String)
-    func routeHandoverManager(_ manager: RouteHandoverManager, shouldSendMessage message: Data, via route: RouteEntry)
+    func routeHandoverManager(_ manager: RouteHandoverManager, shouldSendMessage message: Data, via route: MeshRouteEntry)
 }

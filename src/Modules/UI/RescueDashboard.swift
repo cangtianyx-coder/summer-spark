@@ -5,8 +5,8 @@ import SwiftUI
 /// 救援态势仪表盘
 struct RescueDashboard: View {
     @State private var statistics: RescueStatistics?
-    @State private var activeTasks: [RescueTask] = []
-    @State private var victimMarkers: [VictimMarker] = []
+    @State private var activeTasks: [RescueTaskModel] = []
+    @State private var victimMarkers: [VictimMarkerModel] = []
     @State private var evacuationStats: EvacuationStatistics?
     
     private let refreshTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
@@ -45,7 +45,7 @@ struct RescueDashboard: View {
     private func refreshData() {
         statistics = RescueCoordinator.shared.getStatistics()
         activeTasks = RescueCoordinator.shared.getUrgentTasks()
-        victimMarkers = VictimMarkerManager.shared.getAllMarkers()
+        victimMarkers = VictimMarkerModelManager.shared.getAllMarkers()
         evacuationStats = EvacuationPlanner.shared.getStatistics()
     }
 }
@@ -105,7 +105,7 @@ struct StatCard: View {
 // MARK: - Urgent Tasks Section
 
 struct UrgentTasksSection: View {
-    let tasks: [RescueTask]
+    let tasks: [RescueTaskModel]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -137,7 +137,7 @@ struct UrgentTasksSection: View {
 }
 
 struct TaskRow: View {
-    let task: RescueTask
+    let task: RescueTaskModel
     
     var body: some View {
         HStack {
@@ -206,7 +206,7 @@ struct PriorityBadge: View {
 // MARK: - Victim Markers Section
 
 struct VictimMarkersSection: View {
-    let markers: [VictimMarker]
+    let markers: [VictimMarkerModel]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -238,14 +238,14 @@ struct VictimMarkersSection: View {
 }
 
 struct VictimRow: View {
-    let marker: VictimMarker
+    let marker: VictimMarkerModel
     
     var body: some View {
         HStack {
             SeverityIndicator(severity: marker.severity)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(marker.severity.displayName)
+                Text(marker.severity.displayNameText)
                     .font(.subheadline)
                     .fontWeight(.medium)
                 Text(marker.status.rawValue)

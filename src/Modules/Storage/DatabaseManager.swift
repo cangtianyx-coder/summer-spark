@@ -248,19 +248,18 @@ final class DatabaseManager {
 
         databasePath = dbDir.appendingPathComponent(self.config.databaseName)
 
-        dbQueue.sync { [weak self] in
+        dbQueue.async { [weak self] in
             self?.setupDatabase()
             self?.runMigrations()
+            self?.isInitialized = true
         }
-
-        isInitialized = true
     }
 
     private func setupDatabase() {
         guard let path = databasePath else { return }
 
         if sqlite3_open(path.path, &db) != SQLITE_OK {
-            let errMsg = String(cString: sqlite3_errmsg(db))
+            let errMsg = db != nil ? String(cString: sqlite3_errmsg(db)) : "Unknown open error"
             delegate?.databaseManager(self, didEncounterError: .openFailed(errMsg))
             db = nil
             return
@@ -383,11 +382,12 @@ final class DatabaseManager {
     }
 
     func createAllTables() {
-        dbQueue.sync { [weak self] in
-            guard let self = self, let db = self.db else { return }
-            for (_, schema) in Self.schemas {
-                sqlite3_exec(db, schema.createSQL(), nil, nil, nil)
-            }
+        // Note: do NOT wrap in dbQueue.sync here — this is called from
+        // setupDatabase() which is already executing on dbQueue. Adding
+        // another sync on the same serial queue would cause a deadlock.
+        guard let db = db else { return }
+        for (_, schema) in Self.schemas {
+            sqlite3_exec(db, schema.createSQL(), nil, nil, nil)
         }
     }
 
@@ -416,66 +416,66 @@ final class DatabaseManager {
     // MARK: - Schema Version & Migrations
 
     private func getUserVersion() -> Int {
+        // Note: do NOT wrap in dbQueue.sync — called from runMigrations()
+        // which is already executing on dbQueue.
+        guard let db = db else { return 0 }
         var version = 0
-        dbQueue.sync { [weak self] in
-            guard let self = self, let db = self.db else { return }
-
-            var stmt: OpaquePointer?
-            if sqlite3_prepare_v2(db, "PRAGMA user_version;", -1, &stmt, nil) == SQLITE_OK {
-                if sqlite3_step(stmt) == SQLITE_ROW {
-                    version = Int(sqlite3_column_int(stmt, 0))
-                }
+        var stmt: OpaquePointer?
+        if sqlite3_prepare_v2(db, "PRAGMA user_version;", -1, &stmt, nil) == SQLITE_OK {
+            if sqlite3_step(stmt) == SQLITE_ROW {
+                version = Int(sqlite3_column_int(stmt, 0))
             }
-            sqlite3_finalize(stmt)
         }
+        sqlite3_finalize(stmt)
         return version
     }
 
     private func setUserVersion(_ version: Int) {
-        dbQueue.sync { [weak self] in
-            guard let self = self, let db = self.db else { return }
-            let sql = "PRAGMA user_version=\(version);"
-            sqlite3_exec(db, sql, nil, nil, nil)
-        }
+        // Note: do NOT wrap in dbQueue.sync — called from runMigrations()
+        // which is already executing on dbQueue.
+        guard let db = db else { return }
+        let sql = "PRAGMA user_version=\(version);"
+        sqlite3_exec(db, sql, nil, nil, nil)
     }
 
     func runMigrations() {
+        // Note: do NOT wrap in dbQueue.sync — called from initialize()
+        // which is already executing on dbQueue.
+        guard let db = db else { return }
+
         let oldVersion = getUserVersion()
         let newVersion = Self.migrations.count
 
         guard oldVersion < newVersion else { return }
 
-        dbQueue.sync { [weak self] in
-            guard let self = self, let db = self.db else { return }
+        if sqlite3_exec(db, "BEGIN TRANSACTION;", nil, nil, nil) != SQLITE_OK {
+            return
+        }
 
-            if sqlite3_exec(db, "BEGIN TRANSACTION;", nil, nil, nil) != SQLITE_OK {
-                return
-            }
+        var failed = false
 
-            var failed = false
-
-            for migration in Self.migrations where migration.version > oldVersion {
-                for sql in migration.upSQL {
-                    if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK {
-                        let errMsg = String(cString: sqlite3_errmsg(db))
-                        self.delegate?.databaseManager(self, didEncounterError: .migrationFailed(errMsg, migration.version))
-                        failed = true
-                        break
-                    }
+        for migration in Self.migrations where migration.version > oldVersion {
+            for sql in migration.upSQL {
+                if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK {
+                    let errMsg = String(cString: sqlite3_errmsg(db))
+                    delegate?.databaseManager(self, didEncounterError: .migrationFailed(errMsg, migration.version))
+                    failed = true
+                    break
                 }
-                if failed { break }
             }
+            if failed { break }
+        }
 
-            if failed {
-                sqlite3_exec(db, "ROLLBACK;", nil, nil, nil)
-            } else {
-                sqlite3_exec(db, "COMMIT;", nil, nil, nil)
-                self.setUserVersion(newVersion)
-                self.currentVersion = newVersion
+        if failed {
+            sqlite3_exec(db, "ROLLBACK;", nil, nil, nil)
+        } else {
+            sqlite3_exec(db, "COMMIT;", nil, nil, nil)
+            setUserVersion(newVersion)
+            currentVersion = newVersion
 
-                DispatchQueue.main.async {
-                    self.delegate?.databaseManagerDidMigrate(self, from: oldVersion, to: newVersion)
-                }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.databaseManagerDidMigrate(self, from: oldVersion, to: newVersion)
             }
         }
     }

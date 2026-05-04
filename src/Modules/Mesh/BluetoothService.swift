@@ -69,11 +69,11 @@ final class BluetoothService: NSObject {
 
     func startCentral() {
         guard !isCentralStarted else { return }
-        // P0-FIX: 添加后台状态恢复配置
-        let options: [String: Any] = [
-            CBCentralManagerOptionRestoreIdentifierKey: "com.summerspark.mesh.central"
-        ]
-        centralManager = CBCentralManager(delegate: self, queue: bluetoothQueue, options: options)
+        // Note: CBCentralManagerOptionRestoreIdentifierKey requires implementing
+        // centralManager(_:willRestoreState:) to handle state restoration. Without it,
+        // CoreBluetooth can assert on init when a stale restore state exists from
+        // a previous process. Remove the identifier unless state restoration is implemented.
+        centralManager = CBCentralManager(delegate: self, queue: bluetoothQueue)
         isCentralStarted = true
     }
 

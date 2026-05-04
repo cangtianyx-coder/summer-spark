@@ -21,6 +21,7 @@ public class PowerSaveManager {
     private var lowPowerModeEnabled = false
     
     private var stateHistory: [StateTransition] = []
+    private let maxStateHistorySize = 100  // P1-FIX: Prevent unbounded array growth
     private var adaptiveSettings: AdaptivePowerSettings = .normal
     
     private let stateLock = NSLock()
@@ -54,6 +55,11 @@ public class PowerSaveManager {
             timestamp: Date(),
             reason: determineTransitionReason(from: oldState, to: newState)
         )
+
+        // P1-FIX: Limit state history size to prevent unbounded growth
+        if stateHistory.count >= maxStateHistorySize {
+            stateHistory.removeFirst(stateHistory.count / 4)  // Remove oldest 25%
+        }
         stateHistory.append(transition)
         
         previousState = oldState

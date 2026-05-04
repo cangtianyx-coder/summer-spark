@@ -96,7 +96,7 @@ struct SOSButton: View {
     private func triggerSOS() {
         // 震动反馈
         let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.critical)
+        generator.notificationOccurred(.error)
         
         // 显示确认界面
         isShowingConfirmation = true
@@ -105,7 +105,7 @@ struct SOSButton: View {
     }
     
     private func sendSOS() {
-        guard let location = LocationManager.shared.currentLocation else {
+        guard LocationManager.shared.currentLocation != nil else {
             // P0-FIX: 显示错误提示而不是静默失败
             errorMessage = "sos_error_no_location".localized
             showErrorAlert = true
@@ -116,7 +116,7 @@ struct SOSButton: View {
         SOSManager.shared.triggerSOS(
             type: selectedEmergencyType,
             severity: selectedSeverity,
-            location: location
+            message: nil
         )
         
         isShowingConfirmation = false
@@ -147,7 +147,7 @@ struct SOSConfirmationView: View {
                 Section("紧急程度") {
                     Picker("程度", selection: $severity) {
                         ForEach(Severity.allCases.reversed(), id: \.self) { sev in
-                            Text(sev.displayName).tag(sev)
+                            Text(sev.displayNameText).tag(sev)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -184,12 +184,9 @@ struct SOSConfirmationView: View {
 
 // MARK: - Emergency Type Extension
 
-extension EmergencyType: CaseIterable {
-    static var allCases: [EmergencyType] {
-        return [.injury, .lost, .trapped, .medical, .fire, .flood, .earthquake, .other]
-    }
-    
-    var displayName: String {
+extension EmergencyType {
+    /// Localized display name for the emergency type
+    var localizedDisplayName: String {
         switch self {
         case .injury: return "受伤"
         case .lost: return "迷路"
@@ -199,21 +196,6 @@ extension EmergencyType: CaseIterable {
         case .flood: return "水灾"
         case .earthquake: return "地震"
         case .other: return "其他"
-        }
-    }
-}
-
-extension Severity: CaseIterable {
-    static var allCases: [Severity] {
-        return [.low, .medium, .high, .critical]
-    }
-    
-    var displayName: String {
-        switch self {
-        case .low: return "轻度"
-        case .medium: return "中度"
-        case .high: return "重度"
-        case .critical: return "危急"
         }
     }
 }

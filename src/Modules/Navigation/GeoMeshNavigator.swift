@@ -275,29 +275,45 @@ public class GeoMeshNavigator {
 // MARK: - Path Segment
 
 public struct PathSegment {
-    let id: String
-    let startWaypoint: Waypoint
-    let endWaypoint: Waypoint
-    let region: GeoRegion
-    let distance: Double
+    public let id: String
+    public let startWaypoint: Waypoint
+    public let endWaypoint: Waypoint
+    public let region: GeoRegion
+    public let distance: Double
+    
+    public init(id: String, startWaypoint: Waypoint, endWaypoint: Waypoint, region: GeoRegion, distance: Double) {
+        self.id = id
+        self.startWaypoint = startWaypoint
+        self.endWaypoint = endWaypoint
+        self.region = region
+        self.distance = distance
+    }
 }
 
 // MARK: - Navigation State
 
-public enum NavigationState {
+public enum NavigationState: Equatable {
     case idle
     case active
     case paused
+    case completed
     case error(String)
 }
 
 // MARK: - Geo Navigation Stats
 
 public struct GeoNavigationStats {
-    let activePaths: Int
-    let totalSegments: Int
-    let queuedMessages: Int
-    let trackedNodes: Int
+    public let activePaths: Int
+    public let totalSegments: Int
+    public let queuedMessages: Int
+    public let trackedNodes: Int
+    
+    public init(activePaths: Int, totalSegments: Int, queuedMessages: Int, trackedNodes: Int) {
+        self.activePaths = activePaths
+        self.totalSegments = totalSegments
+        self.queuedMessages = queuedMessages
+        self.trackedNodes = trackedNodes
+    }
 }
 
 // MARK: - Geo Mesh Navigator Delegate

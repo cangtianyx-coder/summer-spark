@@ -15,7 +15,7 @@ enum SchedulerCycle: TimeInterval, CaseIterable {
 }
 
 // MARK: - 调度任务状态
-enum ScheduledTaskState {
+enum ScheduledTaskState: Equatable {
     case pending
     case delayed(remainingDelay: TimeInterval)
     case ready
@@ -111,7 +111,7 @@ final class SchedulableTask {
         }
 
         let finalPriority = (basePriority + waitTimeBonus) * tierMultiplier * balanceFactor
-        return min(finalPriority, Double(MessagePriority.critical.rawValue) * 2.0)
+        return min(finalPriority, Double(MessagePriority.emergency.rawValue) * 2.0)
     }
 }
 
@@ -479,7 +479,7 @@ final class PriorityScheduler {
         timer?.cancel()
 
         timer = DispatchSource.makeTimerSource(queue: schedulerQueue)
-        timer?.schedule(deadline: .now(), repeating: schedulerCycle)
+        timer?.schedule(deadline: .now(), repeating: schedulerCycle.rawValue)
         timer?.setEventHandler { [weak self] in
             self?.processScheduledTasks()
         }
@@ -715,7 +715,7 @@ final class PriorityScheduler {
     ) -> String? {
         return scheduleTask(
             taskType: taskType,
-            priority: .critical,
+            priority: .emergency,
             creditCost: creditCost,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,

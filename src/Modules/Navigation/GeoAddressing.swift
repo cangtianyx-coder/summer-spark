@@ -73,7 +73,7 @@ public class GeoDecoder {
     public static func decodeMessage(_ data: Data) -> GeocastMessage? {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return try? decoder.decode(GeastMessage.self, from: data)
+        return try? decoder.decode(GeocastMessage.self, from: data)
     }
     
     /// Decode geohash to coordinates
@@ -180,7 +180,7 @@ public class GeoAddressingEngine {
             }
         }
         
-        return results.sorted { $0.distance < $1.distance }
+        return results.sorted { ($0.2 as Double) < ($1.2 as Double) }
     }
     
     /// Anycast: find nearest node providing a service type

@@ -29,7 +29,7 @@ public class QoSRouter {
     // MARK: - Route Selection
     
     /// Select best route for traffic with given QoS requirements
-    public func selectRoute(for descriptor: TrafficDescriptor, candidates: [RouteEntry]) -> RouteEntry? {
+    func selectRoute(for descriptor: TrafficDescriptor, candidates: [MeshRouteEntry]) -> MeshRouteEntry? {
         let qosClass = descriptor.qosClass
         
         // Filter routes that meet QoS requirements
@@ -53,9 +53,9 @@ public class QoSRouter {
     }
     
     /// Check if a route meets QoS requirements
-    private func meetsQoSRequirements(route: RouteEntry, descriptor: TrafficDescriptor) -> Bool {
+    private func meetsQoSRequirements(route: MeshRouteEntry, descriptor: TrafficDescriptor) -> Bool {
         // Get link qualities for the route
-        let hops = route.path // Assuming RouteEntry has a path property
+        let hops = route.path
         var cumulativeLatency: TimeInterval = 0
         var minBandwidth = Double.infinity
         
@@ -83,7 +83,7 @@ public class QoSRouter {
     }
     
     /// Calculate route score for QoS class
-    private func calculateRouteScore(route: RouteEntry, qosClass: QoSClass) -> Double {
+    private func calculateRouteScore(route: MeshRouteEntry, qosClass: QoSClass) -> Double {
         let hops = route.path
         
         // Base stability score
@@ -102,7 +102,7 @@ public class QoSRouter {
     }
     
     /// Select best effort route when QoS requirements can't be met
-    private func selectBestEffortRoute(candidates: [RouteEntry], priority: MessagePriority) -> RouteEntry? {
+    private func selectBestEffortRoute(candidates: [MeshRouteEntry], priority: MessagePriority) -> MeshRouteEntry? {
         let sorted = candidates.sorted { route1, route2 in
             let score1 = stabilityMonitor.calculateRouteStability(hops: route1.path)
             let score2 = stabilityMonitor.calculateRouteStability(hops: route2.path)
@@ -115,7 +115,7 @@ public class QoSRouter {
     // MARK: - Bandwidth Reservation
     
     /// Reserve bandwidth for a flow
-    public func reserveBandwidth(flowId: String, requiredBw: Double, route: RouteEntry) -> Bool {
+    func reserveBandwidth(flowId: String, requiredBw: Double, route: MeshRouteEntry) -> Bool {
         routerLock.lock()
         defer { routerLock.unlock() }
         
@@ -144,7 +144,7 @@ public class QoSRouter {
     }
     
     /// Get available bandwidth on a route
-    private func getAvailableBandwidth(route: RouteEntry) -> Double {
+    private func getAvailableBandwidth(route: MeshRouteEntry) -> Double {
         var minAvailable = Double.infinity
         
         for hop in route.path {
@@ -221,7 +221,7 @@ public class QoSRouter {
     }
     
     /// Get congestion factor for route scoring
-    private func getCongestionFactor(route: RouteEntry) -> Double {
+    private func getCongestionFactor(route: MeshRouteEntry) -> Double {
         routerLock.lock()
         defer { routerLock.unlock() }
         
@@ -238,7 +238,7 @@ public class QoSRouter {
     }
     
     /// Get bandwidth factor for route scoring
-    private func getBandwidthFactor(route: RouteEntry) -> Double {
+    private func getBandwidthFactor(route: MeshRouteEntry) -> Double {
         let available = getAvailableBandwidth(route: route)
         // Normalize to 0-1 range (assume max 1000 kbps)
         return min(1.0, available / 1000.0)
@@ -247,14 +247,14 @@ public class QoSRouter {
     // MARK: - Multi-Path Routing
     
     /// Find multiple paths for load balancing
-    public func findMultiPath(to destination: String, maxPaths: Int = 3) -> [RouteEntry] {
+    func findMultiPath(to destination: String, maxPaths: Int = 3) -> [MeshRouteEntry] {
         // This would integrate with RouteTable to find candidate routes
         // For now, return empty - would be implemented with actual route table
         return []
     }
     
     /// Select path for load balancing among multiple paths
-    public func selectPathForLoadBalancing(paths: [RouteEntry], flowId: String) -> RouteEntry? {
+    func selectPathForLoadBalancing(paths: [MeshRouteEntry], flowId: String) -> MeshRouteEntry? {
         guard !paths.isEmpty else { return nil }
         
         // Simple round-robin with congestion awareness
@@ -288,7 +288,7 @@ public class QoSRouter {
 
 // MARK: - Supporting Types
 
-public struct RouteEntry {
+public struct MeshRouteEntry {
     let destination: String
     let path: [String]
     let metric: Int
@@ -298,7 +298,7 @@ public struct RouteEntry {
 public struct BandwidthReservation {
     let flowId: String
     let bandwidth: Double
-    let route: RouteEntry
+    let route: MeshRouteEntry
     let createdAt: Date
 }
 
@@ -327,5 +327,5 @@ public enum TrafficType {
 public protocol QoSRouterDelegate: AnyObject {
     func qosRouter(_ router: QoSRouter, didDetectCongestion nodeId: String, level: CongestionLevel)
     func qosRouter(_ router: QoSRouter, didReserveBandwidth flowId: String, bandwidth: Double)
-    func qosRouter(_ router: QoSRouter, routeDidChange route: RouteEntry, reason: String)
+    func qosRouter(_ router: QoSRouter, routeDidChange route: MeshRouteEntry, reason: String)
 }

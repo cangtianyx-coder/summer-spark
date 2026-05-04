@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Link Quality Metrics
 /// Represents the quality of a mesh link between two nodes
-struct LinkQuality: Codable, Comparable {
+public struct LinkQuality: Codable, Comparable {
     let nodeId: String
     let neighborId: String
     let signalStrength: Double // dBm
@@ -45,14 +45,14 @@ struct LinkQuality: Codable, Comparable {
         }
     }
 
-    static func < (lhs: LinkQuality, rhs: LinkQuality) -> Bool {
+    public static func < (lhs: LinkQuality, rhs: LinkQuality) -> Bool {
         lhs.score < rhs.score
     }
 }
 
 // MARK: - QoS Class
 /// Quality of Service class for traffic prioritization
-enum QoSClass: Int, Codable, CaseIterable {
+public enum QoSClass: Int, Codable, CaseIterable {
     case background = 0    // Lowest priority, delay tolerant
     case bestEffort = 1    // Default
     case interactive = 2   // Voice/video
@@ -123,7 +123,7 @@ struct RouteMetrics: Codable {
 
 // MARK: - Route Handover Event
 /// Event when a route failover occurs
-struct RouteHandoverEvent: Codable {
+public struct RouteHandoverEvent: Codable {
     let eventId: String
     let oldRouteId: String
     let newRouteId: String

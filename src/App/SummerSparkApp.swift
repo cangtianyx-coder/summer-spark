@@ -24,8 +24,9 @@ enum SummerSparkApp {
         }
         
         // iOS 13+ Scene-based lifecycle
-        // 注册 AppDelegate 的 shared 实例
-        _ = AppDelegate.shared
+        // Note: do NOT access AppDelegate.shared before UIApplicationMain runs —
+        // UIApplication.shared.delegate is nil until then and force-unwrap crashes.
+        // UIApplicationMain sets it up, then the scene delegate takes over.
     }
     
     // MARK: - 模块初始化

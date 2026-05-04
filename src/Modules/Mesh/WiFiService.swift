@@ -27,8 +27,21 @@ final class WiFiService {
     
     private let host: String
     private let port: UInt16
-    
-    var connectionState: NWConnection.State = .cancelled
+
+    private let connectionStateLock = NSLock()  // P1-FIX: Thread-safe access to connectionState
+    private var _connectionState: NWConnection.State = .cancelled
+    var connectionState: NWConnection.State {  // P1-FIX: Thread-safe property
+        get {
+            connectionStateLock.lock()
+            defer { connectionStateLock.unlock() }
+            return _connectionState
+        }
+        set {
+            connectionStateLock.lock()
+            defer { connectionStateLock.unlock() }
+            _connectionState = newValue
+        }
+    }
     
     init(host: String = "0.0.0.0", port: UInt16 = 8080) {
         self.host = host

@@ -27,7 +27,7 @@ enum VictimStatus: String, Codable {
 // MARK: - Victim Marker
 
 /// 伤员标记
-struct VictimMarker: Codable, Identifiable {
+struct VictimMarkerModel: Codable, Identifiable {
     let id: UUID
     let location: LocationData
     let severity: Severity
@@ -56,30 +56,30 @@ struct VictimMarker: Codable, Identifiable {
 // MARK: - Victim Marker Manager
 
 /// 伤员标记管理器
-final class VictimMarkerManager {
-    static let shared = VictimMarkerManager()
+final class VictimMarkerModelManager {
+    static let shared = VictimMarkerModelManager()
     
-    private var markers: [UUID: VictimMarker] = [:]
+    private var markers: [UUID: VictimMarkerModel] = [:]
     private let queue = DispatchQueue(label: "com.summerspark.victimmarker", attributes: .concurrent)
     
-    weak var delegate: VictimMarkerManagerDelegate?
+    weak var delegate: VictimMarkerModelManagerDelegate?
     
     private init() {}
     
     // MARK: - Public API
     
     /// 标记伤员
-    func markVictim(location: LocationData, severity: Severity, notes: String? = nil) -> VictimMarker? {
+    func markVictim(location: LocationData, severity: Severity, notes: String? = nil) -> VictimMarkerModel? {
         guard let uid = IdentityManager.shared.uid else { return nil }
         
         // P0-FIX: 权限验证 - 检查用户信任等级
         let trustScore = TrustNetwork.shared.getTrustScore(for: uid)
-        guard trustScore >= Constants.minimumTrustScoreForVictimMarking else {
-            Logger.shared.warning("VictimMarker: User \(uid) has insufficient trust score: \(trustScore)")
+        guard trustScore.score >= AppConstants.Security.minimumTrustScoreForVictimMarking else {
+            Logger.shared.warn("VictimMarkerModel: User \(uid) has insufficient trust score: \(trustScore)")
             return nil
         }
         
-        let marker = VictimMarker(location: location, severity: severity, reportedBy: uid, notes: notes)
+        let marker = VictimMarkerModel(location: location, severity: severity, reportedBy: uid, notes: notes)
         
         queue.sync(flags: .barrier) {
             markers[marker.id] = marker
@@ -93,7 +93,7 @@ final class VictimMarkerManager {
             self.delegate?.victimMarkerManager(self, didAddMarker: marker)
         }
         
-        Logger.shared.info("VictimMarker: Marked victim at \(location.latitude), \(location.longitude), severity: \(severity.rawValue)")
+        Logger.shared.info("VictimMarkerModel: Marked victim at \(location.latitude), \(location.longitude), severity: \(severity.rawValue)")
         return marker
     }
     
@@ -109,7 +109,7 @@ final class VictimMarkerManager {
                 let hasPermission = RescueCoordinator.shared.isMedicalStaff(uid) ||
                                    RescueCoordinator.shared.isTeamLeader(uid)
                 guard hasPermission else {
-                    Logger.shared.warning("VictimMarker: User \(uid) not authorized to set status \(status.rawValue)")
+                    Logger.shared.warn("VictimMarkerModel: User \(uid) not authorized to set status \(status.rawValue)")
                     return false
                 }
             }
@@ -128,7 +128,7 @@ final class VictimMarkerManager {
             marker.updatedAt = Date()
             markers[markerId] = marker
             
-            Logger.shared.info("VictimMarker: Updated marker \(markerId) status to \(status.rawValue)")
+            Logger.shared.info("VictimMarkerModel: Updated marker \(markerId) status to \(status.rawValue)")
             return true
         }
     }
@@ -165,18 +165,18 @@ final class VictimMarkerManager {
             marker.updatedAt = Date()
             markers[markerId] = marker
             
-            Logger.shared.info("VictimMarker: Assigned responder \(responderId) to marker \(markerId)")
+            Logger.shared.info("VictimMarkerModel: Assigned responder \(responderId) to marker \(markerId)")
             return true
         }
     }
     
     /// 获取所有伤员标记
-    func getAllMarkers() -> [VictimMarker] {
+    func getAllMarkers() -> [VictimMarkerModel] {
         return queue.sync { Array(markers.values) }
     }
     
     /// 获取附近伤员
-    func getNearbyVictims(center: LocationData, radius: Double) -> [VictimMarker] {
+    func getNearbyVictims(center: LocationData, radius: Double) -> [VictimMarkerModel] {
         return queue.sync {
             markers.values.filter { marker in
                 let distance = center.clLocation.distance(from: marker.location.clLocation)
@@ -186,7 +186,7 @@ final class VictimMarkerManager {
     }
     
     /// 获取指定状态的伤员
-    func getMarkersByStatus(_ status: VictimStatus) -> [VictimMarker] {
+    func getMarkersByStatus(_ status: VictimStatus) -> [VictimMarkerModel] {
         return queue.sync {
             markers.values.filter { $0.status == status }
         }
@@ -199,12 +199,12 @@ final class VictimMarkerManager {
                 $0.value.status != .rescued && $0.value.status != .deceased && $0.value.status != .cancelled
             }
         }
-        Logger.shared.info("VictimMarker: Cleared resolved markers")
+        Logger.shared.info("VictimMarkerModel: Cleared resolved markers")
     }
     
     // MARK: - Private
     
-    private func broadcastMarker(_ marker: VictimMarker) {
+    private func broadcastMarker(_ marker: VictimMarkerModel) {
         guard let markerData = try? JSONEncoder().encode(marker) else { return }
         
         let message = MeshMessage(
@@ -218,7 +218,7 @@ final class VictimMarkerManager {
     }
     
     /// 接收外部伤员标记
-    func receiveMarker(_ marker: VictimMarker) {
+    func receiveMarker(_ marker: VictimMarkerModel) {
         queue.sync(flags: .barrier) {
             markers[marker.id] = marker
         }
@@ -232,7 +232,7 @@ final class VictimMarkerManager {
 
 // MARK: - Delegate
 
-protocol VictimMarkerManagerDelegate: AnyObject {
-    func victimMarkerManager(_ manager: VictimMarkerManager, didAddMarker marker: VictimMarker)
-    func victimMarkerManager(_ manager: VictimMarkerManager, didUpdateMarker marker: VictimMarker)
+protocol VictimMarkerModelManagerDelegate: AnyObject {
+    func victimMarkerManager(_ manager: VictimMarkerModelManager, didAddMarker marker: VictimMarkerModel)
+    func victimMarkerManager(_ manager: VictimMarkerModelManager, didUpdateMarker marker: VictimMarkerModel)
 }

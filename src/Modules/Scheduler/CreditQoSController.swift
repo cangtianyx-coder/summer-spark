@@ -585,15 +585,15 @@ final class CreditQoSController {
 
     private func qosClassToPriority(_ qosClass: QoSClass, permissionLevel: QoSPermissionLevel) -> MessagePriority {
         if permissionLevel == .premium {
-            return .critical
+            return .emergency
         }
 
         switch qosClass {
-        case .critical: return .critical
+        case .critical: return .emergency
         case .streaming: return .high
         case .interactive: return .normal
         case .bestEffort: return .low
-        case .background: return .background
+        case .background: return .low
         }
     }
 

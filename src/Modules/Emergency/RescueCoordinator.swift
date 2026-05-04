@@ -75,7 +75,7 @@ enum TaskStatus: String, Codable {
 }
 
 /// 救援任务
-struct RescueTask: Codable, Identifiable {
+struct RescueTaskModel: Codable, Identifiable {
     let id: UUID
     let type: TaskType
     let location: LocationData
@@ -135,7 +135,7 @@ struct TeamMember: Codable {
 }
 
 /// 救援队
-struct RescueTeam: Codable, Identifiable {
+struct RescueTeamModel: Codable, Identifiable {
     let id: UUID
     let name: String
     let leaderId: String
@@ -172,8 +172,8 @@ struct RescueTeam: Codable, Identifiable {
 final class RescueCoordinator {
     static let shared = RescueCoordinator()
     
-    private var teams: [UUID: RescueTeam] = [:]
-    private var tasks: [UUID: RescueTask] = [:]
+    private var teams: [UUID: RescueTeamModel] = [:]
+    private var tasks: [UUID: RescueTaskModel] = [:]
     private var searchAreas: [UUID: SearchArea] = [:]
     private let queue = DispatchQueue(label: "com.summerspark.rescuecoordinator", attributes: .concurrent)
     
@@ -184,10 +184,10 @@ final class RescueCoordinator {
     // MARK: - Team Management
     
     /// 创建救援队
-    func createTeam(name: String) -> RescueTeam? {
+    func createTeam(name: String) -> RescueTeamModel? {
         guard let uid = IdentityManager.shared.uid else { return nil }
         
-        let team = RescueTeam(name: name, leaderId: uid)
+        let team = RescueTeamModel(name: name, leaderId: uid)
         
         queue.sync(flags: .barrier) {
             teams[team.id] = team
@@ -215,12 +215,12 @@ final class RescueCoordinator {
     }
     
     /// 获取所有救援队
-    func getAllTeams() -> [RescueTeam] {
+    func getAllTeams() -> [RescueTeamModel] {
         return queue.sync { Array(teams.values) }
     }
     
     /// 获取可用的救援队
-    func getAvailableTeams() -> [RescueTeam] {
+    func getAvailableTeams() -> [RescueTeamModel] {
         return queue.sync {
             teams.values.filter { $0.status == .available }
         }
@@ -229,8 +229,8 @@ final class RescueCoordinator {
     // MARK: - Task Management
     
     /// 创建救援任务
-    func createTask(type: TaskType, location: LocationData, priority: Int = 3, description: String? = nil) -> RescueTask? {
-        let task = RescueTask(type: type, location: location, priority: priority, description: description)
+    func createTask(type: TaskType, location: LocationData, priority: Int = 3, description: String? = nil) -> RescueTaskModel? {
+        let task = RescueTaskModel(type: type, location: location, priority: priority, description: description)
         
         queue.sync(flags: .barrier) {
             tasks[task.id] = task
@@ -277,7 +277,8 @@ final class RescueCoordinator {
     func completeTask(taskId: UUID, result: String? = nil) -> Bool {
         return queue.sync(flags: .barrier) {
             guard var task = tasks[taskId], let teamIdStr = task.assignedTeam,
-                  var team = teams[UUID(uuidString: teamIdStr)] else { return false }
+                  let teamId = UUID(uuidString: teamIdStr),
+                  var team = teams[teamId] else { return false }
             
             task.status = .completed
             task.completedAt = Date()
@@ -297,12 +298,12 @@ final class RescueCoordinator {
     }
     
     /// 获取所有任务
-    func getAllTasks() -> [RescueTask] {
+    func getAllTasks() -> [RescueTaskModel] {
         return queue.sync { Array(tasks.values) }
     }
     
     /// 获取紧急任务
-    func getUrgentTasks() -> [RescueTask] {
+    func getUrgentTasks() -> [RescueTaskModel] {
         return queue.sync {
             tasks.values.filter { $0.priority <= 2 && $0.status != .completed && $0.status != .cancelled }
                 .sorted { $0.priority < $1.priority }
@@ -406,7 +407,7 @@ struct RescueStatistics: Codable {
 // MARK: - Delegate
 
 protocol RescueCoordinatorDelegate: AnyObject {
-    func rescueCoordinator(_ coordinator: RescueCoordinator, didCreateTeam team: RescueTeam)
-    func rescueCoordinator(_ coordinator: RescueCoordinator, didAssignTask task: RescueTask, toTeam team: RescueTeam)
-    func rescueCoordinator(_ coordinator: RescueCoordinator, didCompleteTask task: RescueTask)
+    func rescueCoordinator(_ coordinator: RescueCoordinator, didCreateTeam team: RescueTeamModel)
+    func rescueCoordinator(_ coordinator: RescueCoordinator, didAssignTask task: RescueTaskModel, toTeam team: RescueTeamModel)
+    func rescueCoordinator(_ coordinator: RescueCoordinator, didCompleteTask task: RescueTaskModel)
 }

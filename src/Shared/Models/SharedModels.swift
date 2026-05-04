@@ -93,13 +93,13 @@ struct RoutingDecision: Codable {
 // MARK: - MessagePriority
 
 /// 消息优先级
-enum MessagePriority: Int, Codable, Comparable {
+public enum MessagePriority: Int, Codable, Comparable {
     case low = 1
     case normal = 2
     case high = 3
     case emergency = 4
     
-    static func < (lhs: MessagePriority, rhs: MessagePriority) -> Bool {
+    public static func < (lhs: MessagePriority, rhs: MessagePriority) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
     

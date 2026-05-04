@@ -102,7 +102,7 @@ struct MaliciousBehaviorRecord: Codable {
 }
 
 // MARK: - 信誉状态
-struct ReputationState {
+struct ReputationState: Codable {
     let nodeId: String
     var score: Double                    // 0-100
     var tier: ReputationTier
@@ -116,7 +116,7 @@ struct ReputationState {
     var blacklistReason: String?
     var blacklistExpiresAt: Date?
 
-    enum ReputationTier: Int, Comparable {
+    enum ReputationTier: Int, Comparable, Codable {
         case unknown = 0
         case veryLow = 1
         case low = 2

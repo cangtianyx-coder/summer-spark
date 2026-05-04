@@ -24,12 +24,14 @@ final class KeychainHelper {
         SecItemDelete(deleteQuery as CFDictionary)
 
         // Save with accessibility set to WhenUnlockedThisDeviceOnly (not backed up)
+        // Prevent iCloud Keychain sync to protect sensitive data
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            kSecAttrSynchronizable as String: kCFBooleanFalse!
         ]
 
         let status = SecItemAdd(query as CFDictionary, nil)

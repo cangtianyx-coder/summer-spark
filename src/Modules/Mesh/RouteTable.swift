@@ -1,6 +1,6 @@
 import Foundation
 
-struct RouteEntry: Codable, Equatable {
+public struct RouteEntry: Codable, Equatable {
     let destination: String
     let subnetMask: String
     let gateway: String
@@ -205,8 +205,12 @@ final class RouteTable {
     }
     
     private init() {
-        let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        fileURL = documentsPath.appendingPathComponent("route_table.json")
+        if let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            fileURL = documentsPath.appendingPathComponent("route_table.json")
+        } else {
+            // Fallback to temp directory if documents directory unavailable
+            fileURL = fileManager.temporaryDirectory.appendingPathComponent("route_table.json")
+        }
         loadRoutes()
     }
     

@@ -18,6 +18,7 @@ final class MeshService {
     private let bluetoothService: BluetoothService
     private let meshQueue = DispatchQueue(label: "com.mesh.service", qos: .userInitiated)
     private var nodeExpirationTimer: Timer?
+    private var isTimerCreated: Bool = false  // P0-FIX: Timer creation race condition
     private let nodeExpirationInterval: TimeInterval = 60.0  // P1-FIX: 从30秒增加到60秒
     
     // 消息优先级队列
@@ -28,6 +29,7 @@ final class MeshService {
     private var forwardedMessageIds: Set<UUID> = []
     private let maxForwardedCacheSize = 1000
     private var forwardedCacheCleanTimer: Timer?
+    private var isCacheTimerCreated: Bool = false  // P0-FIX: Timer creation race condition
     
     // P2-FIX: 发现节点容量限制
     private let maxDiscoveredNodes = 150  // 限制最大发现节点数
@@ -76,12 +78,16 @@ final class MeshService {
             self.forwardedCacheCleanTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
                 self?.cleanForwardedCache()
             }
+            self.isCacheTimerCreated = true
         }
     }
-    
+
     private func stopForwardedCacheCleanTimer() {
-        forwardedCacheCleanTimer?.invalidate()
-        forwardedCacheCleanTimer = nil
+        if isCacheTimerCreated {
+            forwardedCacheCleanTimer?.invalidate()
+            forwardedCacheCleanTimer = nil
+            isCacheTimerCreated = false
+        }
     }
     
     // P1-FIX: 清理去重缓存，防止内存无限增长
@@ -349,12 +355,16 @@ final class MeshService {
             self.nodeExpirationTimer = Timer.scheduledTimer(withTimeInterval: self.nodeExpirationInterval, repeats: true) { [weak self] _ in
                 self?.removeExpiredNodes()
             }
+            self.isTimerCreated = true
         }
     }
 
     private func stopNodeExpirationMonitor() {
-        nodeExpirationTimer?.invalidate()
-        nodeExpirationTimer = nil
+        if isTimerCreated {
+            nodeExpirationTimer?.invalidate()
+            nodeExpirationTimer = nil
+            isTimerCreated = false
+        }
     }
 
     private func removeExpiredNodes() {

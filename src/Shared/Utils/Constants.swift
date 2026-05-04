@@ -137,7 +137,6 @@ extension Notification.Name {
     // Mesh Network
     static let meshNodeDiscovered = Notification.Name("com.summerspark.mesh.nodeDiscovered")
     static let meshNodeLost = Notification.Name("com.summerspark.mesh.nodeLost")
-    static let meshMessageReceived = Notification.Name("com.summerspark.mesh.messageReceived")
     static let meshRouteUpdated = Notification.Name("com.summerspark.mesh.routeUpdated")
 
     // Credit

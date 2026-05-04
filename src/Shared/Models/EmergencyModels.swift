@@ -45,11 +45,11 @@ enum EmergencyType: String, Codable, CaseIterable {
         case .medical, .fire, .earthquake:
             return .emergency
         case .trapped, .flood:
-            return .rescue
+            return .high
         case .injury, .lost:
-            return .rescue
+            return .high
         case .other:
-            return .rescue
+            return .high
         }
     }
 }
@@ -57,7 +57,7 @@ enum EmergencyType: String, Codable, CaseIterable {
 // MARK: - Severity Level
 
 /// Severity level of an emergency
-enum Severity: Int, Codable, Comparable {
+enum Severity: Int, Codable, Comparable, CaseIterable {
     case low = 1
     case medium = 2
     case high = 3
@@ -67,7 +67,7 @@ enum Severity: Int, Codable, Comparable {
         lhs.rawValue < rhs.rawValue
     }
     
-    var displayName: String {
+    var displayNameText: String {
         switch self {
         case .low: return "Low"
         case .medium: return "Medium"
@@ -86,30 +86,7 @@ enum Severity: Int, Codable, Comparable {
     }
 }
 
-// MARK: - Message Priority (Extended for Emergency)
 
-/// Message priority levels for emergency communications
-enum MessagePriority: Int, Codable, Comparable {
-    case background = 0
-    case normal = 1
-    case command = 2
-    case rescue = 3
-    case emergency = 4
-    
-    static func < (lhs: MessagePriority, rhs: MessagePriority) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-    
-    var displayName: String {
-        switch self {
-        case .background: return "Background"
-        case .normal: return "Normal"
-        case .command: return "Command"
-        case .rescue: return "Rescue"
-        case .emergency: return "Emergency"
-        }
-    }
-}
 
 // MARK: - SOS Status
 
@@ -185,11 +162,11 @@ struct EmergencySOS: Codable, Identifiable {
         case .critical:
             return .emergency
         case .high:
-            return .rescue
+            return .high
         case .medium:
-            return .rescue
+            return .normal
         case .low:
-            return .command
+            return .low
         }
     }
 }
@@ -237,7 +214,7 @@ struct RescueTask: Codable, Identifiable {
         id: String = UUID().uuidString,
         sosId: String,
         targetLocation: LocationData,
-        priority: MessagePriority = .rescue
+        priority: MessagePriority = .high
     ) {
         self.id = id
         self.sosId = sosId

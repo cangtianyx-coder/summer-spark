@@ -1,7 +1,8 @@
 import Foundation
 
-// MARK: - Geo Region
-public struct GeoRegion: Codable {
+// MARK: - Geo Bounding Box
+/// A rectangular geographic bounding box (min/max lat/lon)
+public struct GeoBoundingBox: Codable {
     public let minLat: Double
     public let maxLat: Double
     public let minLon: Double
@@ -42,11 +43,6 @@ protocol MapRelayServiceProtocol: AnyObject {
     func getRelayStats() -> MapRelayStats
 }
 
-// MARK: - Map Relay Service (placeholder class for protocol)
-public class MapRelayService {
-    public init() {}
-}
-
 // MARK: - Map Relay Delegate
 protocol MapRelayDelegate: AnyObject {
     func mapRelay(_ service: MapRelayService, didReceiveTile tile: TileCoordinate, data: Data, from relayPath: [String])
@@ -62,7 +58,7 @@ public struct MapPackage: Codable, Identifiable {
     public let regionName: String
     public let minZoom: Int
     public let maxZoom: Int
-    public let boundingBox: GeoRegion
+    public let boundingBox: GeoBoundingBox
     public let totalTiles: Int
     public let downloadedTiles: Int
     public let fileSizeBytes: Int64
@@ -79,7 +75,7 @@ public struct MapPackage: Codable, Identifiable {
         downloadedTiles >= totalTiles
     }
     
-    public init(id: String, name: String, regionName: String, minZoom: Int, maxZoom: Int, boundingBox: GeoRegion, totalTiles: Int, downloadedTiles: Int, fileSizeBytes: Int64, checksum: String, sourceNodeId: String, createdAt: Date) {
+    public init(id: String, name: String, regionName: String, minZoom: Int, maxZoom: Int, boundingBox: GeoBoundingBox, totalTiles: Int, downloadedTiles: Int, fileSizeBytes: Int64, checksum: String, sourceNodeId: String, createdAt: Date) {
         self.id = id
         self.name = name
         self.regionName = regionName

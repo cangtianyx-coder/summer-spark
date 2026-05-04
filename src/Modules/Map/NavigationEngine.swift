@@ -35,14 +35,7 @@ enum NotificationPriority: Int {
     case urgent = 3
 }
 
-// MARK: - Navigation State
-enum NavigationState {
-    case idle
-    case active
-    case paused
-    case completed
-    case error(String)
-}
+
 
 // MARK: - Offline Navigation Engine
 class NavigationEngine: NSObject {

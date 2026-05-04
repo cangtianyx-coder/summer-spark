@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Crypto
+import CryptoKit
 
 // MARK: - MapRelayService
 
@@ -178,7 +178,8 @@ final class MapRelayService: MapRelayServiceProtocol {
         log("Forward tile request: \(request.tile.key) hop: \(hopCount + 1)")
         
         if let cachedData = getCachedTileData(for: request.tile) {
-            serveRequestedTile(request, data: cachedData)
+            serveTile(request.tile, data: cachedData, via: nodeId)
+            return
         }
     }
     
@@ -204,7 +205,7 @@ final class MapRelayService: MapRelayServiceProtocol {
             verifiedAt: Date()
         )
         
-        guard integrityVerifier.verifyChecksum(data, expected: checksum) else {
+        guard integrityVerifier.verifyTile(tile, data: data, expectedChecksum: checksum) else {
             throw RelayError.checksumMismatch(tile: tile.key)
         }
         
@@ -435,7 +436,7 @@ final class MapRelayCacheManager {
     
     func getTileData(for tile: TileCoordinate) -> Data? {
         return queue.sync {
-            guard let entry = tileIndex[tile.key] else { return nil }
+            guard var entry = tileIndex[tile.key] else { return nil }
             entry.lastAccessed = Date()
             moveToEndOfAccessOrder(tile.key)
             return entry.tile.data
@@ -530,16 +531,4 @@ struct CacheStats {
     }
 }
 
-// MARK: - GeoRegion
 
-struct GeoRegion: Codable {
-    let northLat: Double
-    let southLat: Double
-    let eastLon: Double
-    let westLon: Double
-    
-    func contains(lat: Double, lon: Double) -> Bool {
-        return lat >= southLat && lat <= northLat &&
-               lon >= westLon && lon <= eastLon
-    }
-}
