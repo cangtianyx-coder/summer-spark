@@ -22,12 +22,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Create the window
         let window = UIWindow(windowScene: windowScene)
 
-        // Set up root view controller based on launch state
-        if isFirstLaunch() {
-            showOnboarding(window: window)
-        } else {
-            showMainApp(window: window)
-        }
+        // Always show main app (skip onboarding for now)
+        showMainApp(window: window)
 
         self.window = window
         window.makeKeyAndVisible()
@@ -35,24 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         Logger.shared.info("[SceneDelegate] Window connected to scene")
     }
 
-    // MARK: - Launch State
-
-    private func isFirstLaunch() -> Bool {
-        return !UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
-    }
-
-    private func setLaunched() {
-        UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
-    }
-
     // MARK: - Navigation
-
-    private func showOnboarding(window: UIWindow) {
-        setLaunched()
-        let rootVC = OnboardingViewController()
-        let navController = UINavigationController(rootViewController: rootVC)
-        window.rootViewController = navController
-    }
 
     private func showMainApp(window: UIWindow) {
         // Use SwiftUI ContentView as root with UIHostingController

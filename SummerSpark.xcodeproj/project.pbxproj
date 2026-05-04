@@ -59,6 +59,7 @@
 		9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2596A86288D658D5502C81 /* UIDGenerator.swift */; };
 		A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */; };
 		A38E720C7911497ECA20916A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDBA060EB076DFA292D381F /* Extensions.swift */; };
+		A5C283FB3DA52D124305AB4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */; };
 		AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */; };
 		AFBA371B84F80B74EC0A4EBD /* UserStatusManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3585F28D054D9BBEDDAF92D7 /* UserStatusManager.swift */; };
 		B15536164D88EC3D17CD05C1 /* InteractionHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB11DAD259EF088BC0572F4C /* InteractionHistory.swift */; };
@@ -98,6 +99,7 @@
 		11FD4DF938D24B67263656AB /* SummerSparkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummerSparkApp.swift; sourceTree = "<group>"; };
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
 		17D767EA182724FDEBE8014D /* TileIntegrityVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileIntegrityVerifier.swift; sourceTree = "<group>"; };
+		19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMeshNavigator.swift; sourceTree = "<group>"; };
 		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				0E4552507835A75973FBDD6D /* Localizable.strings */,
+				19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -527,6 +530,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5C283FB3DA52D124305AB4A /* Assets.xcassets in Resources */,
 				EBBFB1EF85E383837894C64D /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
