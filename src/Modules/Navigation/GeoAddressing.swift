@@ -82,9 +82,9 @@ public class GeoDecoder {
         var latMin = -90.0, latMax = 90.0
         var lonMin = -180.0, lonMax = 180.0
         var isLon = true
-        
+
         for c in hash {
-            guard let cd = base32.firstIndex(of: c)?.encodedOffset else { continue }
+            guard let cd = base32.firstIndex(of: c).map({ base32.distance(from: base32.startIndex, to: $0) }) else { continue }
             for i in stride(from: 4, through: 0, by: -1) {
                 let mask = 1 << i
                 if isLon {
