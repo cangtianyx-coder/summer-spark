@@ -434,21 +434,37 @@ final class SOSManager {
             Logger.shared.error("SOSManager: Failed to encode SOS")
             return
         }
-        
-        // P0-FIX: 对SOS消息进行签名
-        let signedData = CryptoEngine.shared.sign(
-            data: sosData,
-            privateKey: IdentityManager.shared.getPrivateKey() ?? P256.Signing.PrivateKey()
-        )
-        // Note: sign always returns Data (may be empty on failure)
-        
+
+        // P0-FIX: 对SOS消息进行加密和签名
+        // 1. 生成临时对称密钥加密SOS数据
+        // 2. 用发送者私钥签名以验证身份
+        guard let localSigningKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+            Logger.shared.error("SOSManager: No signing key available")
+            return
+        }
+
+        // 生成临时会话密钥加密SOS内容
+        let sessionKey = SymmetricKey(size: .bits256)
+        guard let encryptedPayload = try? CryptoEngine.shared.encryptAESGCM(data: sosData, symmetricKey: sessionKey) else {
+            Logger.shared.error("SOSManager: Failed to encrypt SOS payload")
+            return
+        }
+
+        // 签名加密后的payload以验证身份和完整性
+        let signature = CryptoEngine.shared.sign(data: encryptedPayload, privateKey: localSigningKey)
+
+        // 打包: [加密payload || 签名(64字节)]
+        var signedData = Data()
+        signedData.append(encryptedPayload)
+        signedData.append(signature)
+
         let emergencyMessage = EmergencyMessage(
             type: .sos,
             senderId: sos.senderId,
             priority: sos.priority,
-            payload: signedData  // 使用签名后的数据
+            payload: signedData  // 使用加密+签名后的数据
         )
-        
+
         sendEmergencyMessage(emergencyMessage)
     }
     

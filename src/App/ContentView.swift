@@ -86,7 +86,9 @@ struct HomeView: View {
             .alert("Emergency SOS", isPresented: $showSOSConfirmation) {
                 Button("Cancel", role: .cancel) {}
                 Button("Activate SOS", role: .destructive) {
-                    EmergencyManager.shared.triggerSOS()
+                    // P0-FIX: Ensure message is not nil for emergency SOS
+                    let sosMessage = "Emergency SOS triggered from HomeView"
+                    SOSManager.shared.triggerSOS(type: .other, severity: .high, message: sosMessage)
                 }
             } message: {
                 Text("sos_confirmation_message".localized)
@@ -615,7 +617,9 @@ struct SOSButtonOverlay: View {
         .alert("Emergency SOS", isPresented: $showSOSAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Activate SOS", role: .destructive) {
-                EmergencyManager.shared.triggerSOS()
+                // P0-FIX: Ensure message is not nil for emergency SOS
+                let sosMessage = "Emergency SOS triggered from SOSButtonOverlay"
+                SOSManager.shared.triggerSOS(type: .other, severity: .high, message: sosMessage)
             }
         } message: {
             Text("sos_confirmation_message".localized)

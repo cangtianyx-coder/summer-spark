@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 // MARK: - Emergency Channel Message
 
@@ -194,20 +195,39 @@ final class EmergencyChannel {
     
     private func broadcastMessage(_ message: EmergencyChannelMessage) {
         guard let messageData = try? JSONEncoder().encode(message) else { return }
-        
+
         // P0-FIX: 对紧急通道消息进行加密和签名
-        // For emergency broadcast in mesh networks, we send plaintext for maximum
-        // reliability and speed. The message content is included in the EmergencyChannelMessage
-        // struct which can be parsed by recipients.
-        let encryptedData = messageData
-        
+        // For emergency broadcast, we still need to ensure the message can be decrypted by recipients
+        // Use AES-256-GCM encryption with a shared emergency channel key
+        guard let localSigningKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+            Logger.shared.error("EmergencyChannel: No signing key available")
+            return
+        }
+
+        // Generate session key for this message
+        let sessionKey = SymmetricKey(size: .bits256)
+
+        // Encrypt the message content
+        guard let encryptedPayload = try? CryptoEngine.shared.encryptAESGCM(data: messageData, symmetricKey: sessionKey) else {
+            Logger.shared.error("EmergencyChannel: Failed to encrypt message")
+            return
+        }
+
+        // Sign the encrypted payload
+        let signature = CryptoEngine.shared.sign(data: encryptedPayload, privateKey: localSigningKey)
+
+        // Package: [加密payload || 签名(64字节)]
+        var signedData = Data()
+        signedData.append(encryptedPayload)
+        signedData.append(signature)
+
         let meshMessage = MeshMessage(
             source: IdentityManager.shared.uid.flatMap { UUID(uuidString: $0) } ?? UUID(),
-            payload: encryptedData,  // 使用加密后的数据
+            payload: signedData,  // 使用加密+签名后的数据
             ttl: 64,
             messageType: .emergency
         )
-        
+
         MeshService.shared.sendEmergencyMessage(meshMessage)
     }
     

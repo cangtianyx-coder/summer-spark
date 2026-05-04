@@ -3,6 +3,7 @@
 // 功能：P2P 地图包分发协议
 
 import Foundation
+import CryptoKit
 
 // MARK: - Map Package P2P
 
@@ -268,18 +269,27 @@ public class MapPackageP2P: MapPackageShareProtocol {
     }
     
     // MARK: - Checksum
-    
+
     private func calculateChecksum(_ data: Data) -> String {
-        // Simple hash - in production use SHA256
-        var hash: UInt8 = 0
-        for byte in data {
-            hash = hash &+ byte
-        }
-        return String(format: "%02x", hash)
+        // Use SHA256 for strong integrity verification
+        let hash = SHA256.hash(data: data)
+        return hash.map { String(format: "%02x", $0) }.joined()
     }
-    
+
     private func verifyChecksum(_ data: Data, expected: String) -> Bool {
-        return calculateChecksum(data) == expected
+        // Use constant-time comparison to prevent timing attacks
+        let actual = calculateChecksum(data)
+        return constantTimeCompare(actual, expected)
+    }
+
+    // Constant-time string comparison to prevent timing attacks
+    private func constantTimeCompare(_ a: String, _ b: String) -> Bool {
+        guard a.count == b.count else { return false }
+        var result: UInt8 = 0
+        for (c1, c2) in zip(a.utf8, b.utf8) {
+            result |= c1 ^ c2
+        }
+        return result == 0
     }
 }
 
