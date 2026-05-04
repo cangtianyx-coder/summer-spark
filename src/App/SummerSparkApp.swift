@@ -2,196 +2,201 @@ import UIKit
 import SwiftUI
 import BackgroundTasks
 
+// MARK: - SummerSpark App Entry Point
+
 @main
-enum SummerSparkApp {
+struct SummerSparkApp {
+    // App entry point - delegate to proper initialization
     static func main() {
-        // 模块初始化
+        // Initialize all modules before UI setup
         initializeModules()
-        
-        // 后台配置
+
+        // Configure background modes
         configureBackgroundModes()
-        
-        // 启动应用
-        guard #available(iOS 13.0, *) else {
-            // iOS 13 以下使用传统方式
-            UIApplicationMain(
-                CommandLine.argc,
-                CommandLine.unsafeArgv,
-                NSStringFromClass(UIApplication.self),
-                NSStringFromClass(AppDelegate.self)
-            )
-            return
-        }
-        
-        // iOS 13+ Scene-based lifecycle
-        // Note: do NOT access AppDelegate.shared before UIApplicationMain runs —
-        // UIApplication.shared.delegate is nil until then and force-unwrap crashes.
-        // UIApplicationMain sets it up, then the scene delegate takes over.
+
+        // Set minimum background fetch interval
+        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+
+        Logger.shared.info("[SummerSpark] Starting application")
+
+        // Use AppDelegate as the main entry point for scene-based app
+        // This bridges the @main struct with the traditional AppDelegate lifecycle
+        _ = UIApplicationMain(
+            CommandLine.argc,
+            CommandLine.unsafeArgv,
+            NSStringFromClass(UIApplication.self),
+            NSStringFromClass(AppDelegate.self)
+        )
     }
-    
-    // MARK: - 模块初始化
+
+    // MARK: - Module Initialization
+
     private static func initializeModules() {
-        // 身份模块
+        // Identity module
         IdentityManager.shared.initialize()
-        
-        // 存储模块
+
+        // Storage module
         DatabaseManager.shared.setup()
         GroupStore.shared.load()
-        
-        // 积分模块
+
+        // Credit/Points module
         CreditEngine.shared.start()
         CreditSyncManager.shared.startSync()
-        
-        // 地图模块
+
+        // Map module
         MapService.configure()
         OfflineMapManager.shared.prepareOfflineData()
-        
-        // 语音模块
+
+        // Voice module
         VoiceService.shared.configure()
-        
-        // Mesh 网络模块
+
+        // Mesh network module
         MeshService.shared.start()
         BluetoothService.shared.configure()
         WiFiService.shared.configure()
-        
-        // 安全模块
+
+        // Security module
         AntiAttackGuard.shared.enable()
-        
-        // 自动更新模块
+
+        // Auto-update module
         AutoUpdater.shared.startAutoCheck()
-        
+
         Logger.shared.info("[SummerSpark] All modules initialized")
     }
-    
-    // MARK: - 后台模式配置
+
+    // MARK: - Background Mode Configuration
+
     private static func configureBackgroundModes() {
-        // 后台刷新
-        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
-        
-        // 后台任务调度器配置
+        // Register background task handlers
+        registerBackgroundTasks()
+
+        Logger.shared.info("[SummerSpark] Background modes configured")
+    }
+
+    // MARK: - Background Task Registration
+
+    private static func registerBackgroundTasks() {
+        // App refresh task
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.summerspark.refresh",
             using: nil
         ) { task in
-            // P0-FIX: 安全类型转换
             guard let refreshTask = task as? BGAppRefreshTask else {
                 task.setTaskCompleted(success: false)
                 return
             }
             handleBackgroundRefresh(task: refreshTask)
         }
-        
+
+        // Processing task for sync
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.summerspark.sync",
             using: nil
         ) { task in
-            // P0-FIX: 安全类型转换
             guard let processingTask = task as? BGProcessingTask else {
                 task.setTaskCompleted(success: false)
                 return
             }
             handleBackgroundSync(task: processingTask)
         }
-        
-        // Mesh路由维护后台任务
+
+        // Mesh routing maintenance task
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.summerspark.mesh-routing",
             using: nil
         ) { task in
-            // P0-FIX: 安全类型转换
             guard let processingTask = task as? BGProcessingTask else {
                 task.setTaskCompleted(success: false)
                 return
             }
             handleMeshRoutingTask(task: processingTask)
         }
-        
-        Logger.shared.info("[SummerSpark] Background modes configured")
     }
-    
-    // MARK: - 后台任务处理
+
+    // MARK: - Background Task Handlers
+
     private static func handleBackgroundRefresh(task: BGAppRefreshTask) {
         scheduleBackgroundRefresh()
-        
+
         let operation = CreditSyncManager.shared.createSyncOperation()
-        
+
         task.expirationHandler = {
             operation.cancel()
         }
-        
+
         operation.completionBlock = {
             task.setTaskCompleted(success: !operation.isCancelled)
         }
-        
+
         CreditSyncManager.shared.operationQueue.addOperation(operation)
     }
-    
+
     private static func handleBackgroundSync(task: BGProcessingTask) {
         scheduleBackgroundSync()
-        
+
         let operation = OfflineMapManager.shared.createMapSyncOperation()
-        
+
         task.expirationHandler = {
             operation.cancel()
         }
-        
+
         operation.completionBlock = {
             task.setTaskCompleted(success: !operation.isCancelled)
         }
-        
+
         MapCacheManager.shared.operationQueue.addOperation(operation)
     }
-    
+
+    private static func handleMeshRoutingTask(task: BGProcessingTask) {
+        scheduleMeshRoutingTask()
+
+        let operation = BlockOperation {
+            MeshService.shared.performRouteMaintenance()
+        }
+
+        task.expirationHandler = {
+            operation.cancel()
+        }
+
+        operation.completionBlock = {
+            task.setTaskCompleted(success: !operation.isCancelled)
+        }
+
+        OperationQueue.main.addOperation(operation)
+    }
+
+    // MARK: - Schedule Background Tasks
+
     private static func scheduleBackgroundRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: "com.summerspark.refresh")
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // 15分钟后
-        
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
+
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
             Logger.shared.error("[SummerSpark] Could not schedule app refresh: \(error)")
         }
     }
-    
+
     private static func scheduleBackgroundSync() {
         let request = BGProcessingTaskRequest(identifier: "com.summerspark.sync")
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 60 * 60) // 1小时后
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60 * 60)
         request.requiresNetworkConnectivity = true
         request.requiresExternalPower = false
-        
+
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
             Logger.shared.error("[SummerSpark] Could not schedule background sync: \(error)")
         }
     }
-    
-    private static func handleMeshRoutingTask(task: BGProcessingTask) {
-        scheduleMeshRoutingTask()
-        
-        // 创建Mesh路由维护操作
-        let operation = BlockOperation {
-            // 执行Mesh路由维护
-            MeshService.shared.performRouteMaintenance()
-        }
-        
-        task.expirationHandler = {
-            operation.cancel()
-        }
-        
-        operation.completionBlock = {
-            task.setTaskCompleted(success: !operation.isCancelled)
-        }
-        
-        OperationQueue.main.addOperation(operation)
-    }
-    
+
     private static func scheduleMeshRoutingTask() {
         let request = BGProcessingTaskRequest(identifier: "com.summerspark.mesh-routing")
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // 15分钟后
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
         request.requiresNetworkConnectivity = false
         request.requiresExternalPower = false
-        
+
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
@@ -200,25 +205,27 @@ enum SummerSparkApp {
     }
 }
 
-// MARK: - AppDelegate（传统生命周期支持）
-@available(iOS 13.0, *)
-@MainActor
+// MARK: - AppDelegate
+
+/// Main application delegate handling lifecycle events
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     static var shared: AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
-    
+
     var window: UIWindow?
-    
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        Logger.shared.info("[AppDelegate] Application did finish launching")
         return true
     }
-    
+
     // MARK: - UISceneSession Lifecycle
+
     func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
@@ -229,84 +236,88 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             sessionRole: connectingSceneSession.role
         )
     }
-    
+
     func application(
         _ application: UIApplication,
         didDiscardSceneSessions sceneSessions: Set<UISceneSession>
     ) {
-        // 清理废弃的场景
+        // Clean up discarded scenes
     }
-    
-    // MARK: - 内存警告处理
+
+    // MARK: - Memory Warning
+
     func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
         Logger.shared.warn("[AppDelegate] Received memory warning, clearing caches...")
-        
-        // 清理各模块缓存
+
+        // Clear caches from all modules
         LocationManager.shared.clearCache()
         MeshService.shared.clearCache()
         MapService.shared.clearCache()
         MapCacheManager.shared.clearCache()
         OfflineMapManager.shared.clearCache()
-        
+
         Logger.shared.info("[AppDelegate] Memory warning handled")
     }
-    
-    // MARK: - 远程通知注册
+
+    // MARK: - Remote Notifications
+
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        // 脱敏处理：仅记录token前4位和后4位，防止敏感信息泄露
+        // Mask token for privacy - only log first and last 4 characters
         let maskedToken = String(token.prefix(4)) + "****" + String(token.suffix(4))
         Logger.shared.info("[SummerSpark] Device Token: \(maskedToken)")
-        // 将 token 发送到服务器
         IdentityManager.shared.updatePushToken(token)
     }
-    
+
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
         Logger.shared.error("[SummerSpark] Failed to register for remote notifications: \(error)")
     }
-    
-    // MARK: - 后台获取
+
+    // MARK: - Background Fetch
+
     func application(
         _ application: UIApplication,
         performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
     ) {
         CreditSyncManager.shared.performSync { result in
             switch result {
-            case .success(()):
+            case .success:
                 completionHandler(.newData)
             case .failure:
                 completionHandler(.failed)
             }
         }
     }
-    
-    // MARK: - 链接处理
+
+    // MARK: - URL Handling
+
     func application(
         _ application: UIApplication,
         continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
-        // 处理 Universal Links 和 Handoff
+        // Handle Universal Links and Handoff
         return true
     }
-    
-    // MARK: - 后台生命周期
+
+    // MARK: - Background Lifecycle
+
     func applicationDidEnterBackground(_ application: UIApplication) {
         PowerSaveManager.shared.handleAppLifecycle(.didEnterBackground)
         Logger.shared.info("[AppDelegate] Application did enter background")
     }
-    
+
     func applicationWillEnterForeground(_ application: UIApplication) {
         PowerSaveManager.shared.handleAppLifecycle(.willEnterForeground)
         Logger.shared.info("[AppDelegate] Application will enter foreground")
     }
-    
+
     func applicationWillTerminate(_ application: UIApplication) {
         PowerSaveManager.shared.handleAppLifecycle(.willTerminate)
         Logger.shared.info("[AppDelegate] Application will terminate")

@@ -455,4 +455,29 @@ final class MeshService {
         }
         return nil
     }
+
+    // MARK: - UI State Manager Support
+
+    /// Get active (connected) nodes
+    func getActiveNodes() -> [MeshNode] {
+        return meshQueue.sync {
+            discoveredNodes.values.filter { $0.connectionState == .connected }
+        }
+    }
+
+    /// Get current network connection info
+    func getConnectionInfo() -> NetworkConnectionInfo {
+        return meshQueue.sync {
+            let connectedCount = discoveredNodes.values.filter { $0.connectionState == .connected }.count
+            let signalStrength = discoveredNodes.values.reduce(0) { $0 + $1.rssi } / max(1, discoveredNodes.count)
+
+            return NetworkConnectionInfo(
+                medium: .bluetoothLE,
+                isConnected: isRunning && connectedCount > 0,
+                signalStrength: max(0, min(100, (signalStrength + 100) * 2)),
+                latency: 0,
+                connectedNodes: connectedCount
+            )
+        }
+    }
 }

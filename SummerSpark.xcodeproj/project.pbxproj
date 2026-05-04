@@ -43,6 +43,7 @@
 		6CBD4867AE4639374EA5FE11 /* GeoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A352E2C2A262CA05469FEB /* GeoModels.swift */; };
 		74A62E2B1B497C89191CCE0E /* MapPackageP2P.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C416CFA1133AFDB369E387 /* MapPackageP2P.swift */; };
 		771F1162095406993F6D6E6E /* EvacuationPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F4902EAB2C6DC516F9A612 /* EvacuationPlanner.swift */; };
+		77505194B2802AFA951E2367 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */; };
 		7A32A15AC55C1A335B91E31B /* PushToTalkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */; };
 		811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */; };
 		855B906FCE0B71507352C480 /* VictimMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA96BF6AA02F34FB1C6BA0D0 /* VictimMarker.swift */; };
@@ -81,6 +82,7 @@
 		EAA30B26A5B683F63D5785AE /* MapRelayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055D012F8018D1E231FCF4F9 /* MapRelayService.swift */; };
 		EB411951005289C41191D2F8 /* GroupVoiceMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5C2796BBA1CD22D6ECFE31 /* GroupVoiceMixer.swift */; };
 		EBBFB1EF85E383837894C64D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0E4552507835A75973FBDD6D /* Localizable.strings */; };
+		EE5ED4F2FF88E01B38986535 /* UIStateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD768332A67A3D472D8B2959 /* UIStateManagers.swift */; };
 		EF0861C76B279103DF8D3F15 /* GroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A93AFEE76567ED8352F5E3A /* GroupStore.swift */; };
 		F0C0CA784596A1EA06A23D9C /* EncryptedPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6BC2852851878B44107929 /* EncryptedPackage.swift */; };
 		F15C503FD8439AB4D255C9A7 /* VoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */; };
@@ -116,6 +118,7 @@
 		4F7F525C70A73849F51AC716 /* TrackRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackRecorder.swift; sourceTree = "<group>"; };
 		5204D97D6404B9011EB22AC6 /* SOSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SOSButton.swift; sourceTree = "<group>"; };
 		523C52B4E591765F49A36011 /* CoordinateTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinateTransformer.swift; sourceTree = "<group>"; };
+		54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		55B8C8FCF1A4A140B62C38A4 /* SOSManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SOSManager.swift; sourceTree = "<group>"; };
 		55C416CFA1133AFDB369E387 /* MapPackageP2P.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPackageP2P.swift; sourceTree = "<group>"; };
 		573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoEngine.swift; sourceTree = "<group>"; };
@@ -158,6 +161,7 @@
 		CB11CF5AE142747BD92FED00 /* EmergencyChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyChannel.swift; sourceTree = "<group>"; };
 		CC7C8C4B6BE895F7BD154C42 /* SharedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedModels.swift; sourceTree = "<group>"; };
 		CCD6FA0DB24273B0B8A81373 /* RescueDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RescueDashboard.swift; sourceTree = "<group>"; };
+		CD768332A67A3D472D8B2959 /* UIStateManagers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStateManagers.swift; sourceTree = "<group>"; };
 		CFE79ACBECD037B8426A5B04 /* NavigationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationEngine.swift; sourceTree = "<group>"; };
 		D08FD4C7B83578F07F5F956F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshMessageType.swift; sourceTree = "<group>"; };
@@ -340,8 +344,10 @@
 				1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */,
 				C870FCBEF85581B599E4CA3B /* ContentView.swift */,
 				721E45379F7B8B8CB7F9708E /* Info.plist */,
+				54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */,
 				4F3CE8AB4081974CC38ABEF1 /* SettingsView.swift */,
 				11FD4DF938D24B67263656AB /* SummerSparkApp.swift */,
+				CD768332A67A3D472D8B2959 /* UIStateManagers.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -593,6 +599,7 @@
 				9A4995F51F314935D77BCAC0 /* RouteTable.swift in Sources */,
 				B3C7D31B8B0D1C8ED22480A1 /* SOSButton.swift in Sources */,
 				9B6520284A65EFA7E9815A69 /* SOSManager.swift in Sources */,
+				77505194B2802AFA951E2367 /* SceneDelegate.swift in Sources */,
 				638869712B31398A694AD581 /* SecureEnclaveManager.swift in Sources */,
 				6C57A434F6D1A42AB501E9FB /* ServiceProtocols.swift in Sources */,
 				DD4C3F8ADF7CF6092006E602 /* SettingsView.swift in Sources */,
@@ -603,6 +610,7 @@
 				66407BA00E2FCBD7F6CD40AF /* TrackRecorder.swift in Sources */,
 				46CFA47B5FB37E700CF8D835 /* TrustNetwork.swift in Sources */,
 				9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */,
+				EE5ED4F2FF88E01B38986535 /* UIStateManagers.swift in Sources */,
 				47EF058726D036540CB81D35 /* UpdateViews.swift in Sources */,
 				AFBA371B84F80B74EC0A4EBD /* UserStatusManager.swift in Sources */,
 				5E7A54239FBE3C61313BDD94 /* UsernameValidator.swift in Sources */,

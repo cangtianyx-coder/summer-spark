@@ -424,6 +424,39 @@ final class VoiceService {
         setSpeakerOn(!isSpeakerOn)
     }
 
+    // MARK: - PTT (Push-to-Talk) Support
+
+    /// Start transmitting audio for PTT
+    /// Call this when PTT button is pressed
+    func startTransmitting() {
+        voiceQueue.async { [weak self] in
+            guard let self = self else { return }
+            guard !self.isRunning else { return }
+
+            do {
+                try self.audioCodec.start()
+                self.startAudioPipeline()
+                self.isRunning = true
+                Logger.shared.debug("VoiceService: PTT transmit started")
+            } catch {
+                Logger.shared.error("VoiceService: Failed to start PTT - \(error)")
+            }
+        }
+    }
+
+    /// Stop transmitting audio for PTT
+    /// Call this when PTT button is released
+    func stopTransmitting() {
+        voiceQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            self.stopAudioPipeline()
+            self.audioCodec.stop()
+            self.isRunning = false
+            Logger.shared.debug("VoiceService: PTT transmit stopped")
+        }
+    }
+
     // MARK: - Audio Pipeline
 
     private func startAudioPipeline() {

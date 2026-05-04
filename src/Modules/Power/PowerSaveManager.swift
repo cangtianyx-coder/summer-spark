@@ -37,6 +37,11 @@ public class PowerSaveManager {
         defer { stateLock.unlock() }
         return currentState
     }
+
+    /// Get current battery level (0.0 to 1.0)
+    public var currentBatteryLevel: Double {
+        return batteryLevel
+    }
     
     /// Transition to a new power state
     public func transitionTo(_ newState: PowerState) {
