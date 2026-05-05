@@ -4,6 +4,7 @@ import MapKit
 // MARK: - Map View
 
 struct MapView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var showGroupMembers: Bool = true
     @State private var selectedMapType: MapTypeOption = .standard
     @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion(
@@ -19,10 +20,23 @@ struct MapView: View {
 
             // 顶部控制面板
             VStack {
-                // 地图类型选择器
+                // 顶部工具栏
                 HStack {
+                    // 返回按钮
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .frame(width: 36, height: 36)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+
                     Spacer()
 
+                    // 地图类型选择器
                     Menu {
                         ForEach(MapTypeOption.allCases, id: \.self) { option in
                             Button(action: {
@@ -49,7 +63,8 @@ struct MapView: View {
                         .cornerRadius(20)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 60)
 
                 Spacer()
 
@@ -111,7 +126,6 @@ struct MapView: View {
     }
 
     private func zoomToFitAll() {
-        // 实际应从 MeshService 获取真实位置
         var coordinates: [CLLocationCoordinate2D] = [
             CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
             CLLocationCoordinate2D(latitude: 37.7751, longitude: -122.4180)
@@ -158,13 +172,10 @@ struct MapKitMapView: UIViewRepresentable {
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.setRegion(region, animated: true)
 
-        // 移除旧的群组成员标注
         let oldAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
         mapView.removeAnnotations(oldAnnotations)
 
-        // 添加群组成员标注
         if showMembers {
-            // 模拟数据 - 实际应从 MeshService 获取
             let member1 = MKPointAnnotation()
             member1.coordinate = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
             member1.title = "Alice"
