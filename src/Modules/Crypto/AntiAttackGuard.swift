@@ -362,33 +362,34 @@ public final class AntiAttackGuard {
             Logger.shared.warn("AntiAttackGuard: Invalid certificate encoding for node \(nodeId)")
             return false
         }
-        
+
         // 证书格式: [原始数据(变长) || 签名(64字节)]
         guard certData.count > 64 else {
             Logger.shared.warn("AntiAttackGuard: Certificate too short for node \(nodeId)")
             return false
         }
-        
+
         let signatureData = certData.suffix(64)
         let originalData = certData.dropLast(64)
-        
-        // 从IdentityManager获取CA公钥验证证书
-        if let caPublicKey = IdentityManager.shared.getCAPublicKey() {
-            return CryptoEngine.shared.verify(
-                signature: signatureData,
-                data: originalData,
-                publicKey: caPublicKey
-            )
+
+        // P0-FIX: 从IdentityManager获取CA公钥验证证书
+        // 如果CA公钥不可用，应该fail closed（返回false），而不是降级验证
+        guard let caPublicKey = IdentityManager.shared.getCAPublicKey() else {
+            Logger.shared.error("AntiAttackGuard: CA public key unavailable, rejecting certificate")
+            return false  // P0-FIX: fail closed - 不安全的证书必须被拒绝
         }
-        
-        // 方案2: 检查证书格式和内容（降级验证）
-        // 检查证书是否包含节点ID（基础验证）
-        guard certificate.contains(nodeId) else {
-            Logger.shared.warn("AntiAttackGuard: Certificate doesn't contain node ID")
-            return false
+
+        let verified = CryptoEngine.shared.verify(
+            signature: signatureData,
+            data: Data(originalData),
+            publicKey: caPublicKey
+        )
+
+        if !verified {
+            Logger.shared.warn("AntiAttackGuard: Certificate signature verification failed for node \(nodeId)")
         }
-        
-        return true
+
+        return verified
     }
     
     // P0-FIX: 使用DispatchSourceTimer替代while true无限循环

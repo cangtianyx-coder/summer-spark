@@ -468,18 +468,37 @@ final class SOSManager {
         sendEmergencyMessage(emergencyMessage)
     }
     
+    // P0-FIX: SOS取消消息也需要加密，防止伪造取消
     private func broadcastSOSCancellation(_ sos: EmergencySOS) {
         guard let sosData = try? JSONEncoder().encode(sos) else {
             return
         }
-        
+
+        guard let localSigningKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+            Logger.shared.error("SOSManager: No signing key available for cancellation")
+            return
+        }
+
+        // P0-FIX: 加密SOS取消消息，与broadcastSOS相同的加密流程
+        let sessionKey = SymmetricKey(size: .bits256)
+        guard let encryptedPayload = try? CryptoEngine.shared.encryptAESGCM(data: sosData, symmetricKey: sessionKey) else {
+            Logger.shared.error("SOSManager: Failed to encrypt SOS cancellation payload")
+            return
+        }
+
+        let signature = CryptoEngine.shared.sign(data: encryptedPayload, privateKey: localSigningKey)
+
+        var signedData = Data()
+        signedData.append(encryptedPayload)
+        signedData.append(signature)
+
         let emergencyMessage = EmergencyMessage(
             type: .sosCancel,
             senderId: sos.senderId,
             priority: .normal,
-            payload: sosData
+            payload: signedData
         )
-        
+
         sendEmergencyMessage(emergencyMessage)
     }
     

@@ -137,8 +137,7 @@
     <string>需要访问本地网络以发现和连接附近的设备</string>
     <key>NSBonjourServices</key>
     <array>
-        <string>_http._tcp</string>
-        <string>_https._tcp</string>
+        <string>_summerspark._tcp</string>
     </array>
 
     <!-- 推送通知权限 -->

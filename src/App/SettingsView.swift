@@ -5,13 +5,37 @@ import SwiftUI
 /// 设置视图 - 包含语言切换等功能
 @available(iOS 13.0, *)
 struct SettingsView: View {
-    
+
     @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showLanguagePicker = false
-    
+
     var body: some View {
         NavigationView {
             List {
+                // P1-FIX: 添加权限说明 Section
+                Section(header: Text("settings_permissions".localized)) {
+                    PermissionRow(
+                        icon: "location.fill",
+                        title: "Location Permission",
+                        description: "位置权限用于紧急救援和离线地图功能。当您发送SOS时，救援人员需要知道您的位置。",
+                        isGranted: LocationManager.shared.hasLocationPermission()
+                    )
+
+                    PermissionRow(
+                        icon: "antenna.radiowaves.left.and.right",
+                        title: "Bluetooth Permission",
+                        description: "蓝牙权限用于Mesh网络发现和连接附近的设备，实现离线通信。",
+                        isGranted: true
+                    )
+
+                    PermissionRow(
+                        icon: "bell.fill",
+                        title: "Notification Permission",
+                        description: "通知权限用于接收紧急SOS警报和消息通知。",
+                        isGranted: false
+                    )
+                }
+
                 // 语言设置 Section
                 Section(header: Text("settings_language".localized)) {
                     // 当前语言
@@ -21,7 +45,7 @@ struct SettingsView: View {
                         Text(languageManager.currentLanguage.localizedDisplayName)
                             .foregroundColor(.secondary)
                     }
-                    
+
                     // 语言选择按钮
                     Button(action: {
                         showLanguagePicker = true
@@ -35,7 +59,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
+
                 // 关于 Section
                 Section(header: Text("settings_about".localized)) {
                     // 版本信息
@@ -45,7 +69,7 @@ struct SettingsView: View {
                         Text(appVersion)
                             .foregroundColor(.secondary)
                     }
-                    
+
                     // 更新检查
                     NavigationLink(destination: UpdateCheckView()) {
                         HStack {
@@ -54,12 +78,12 @@ struct SettingsView: View {
                             Text("update_settings".localized)
                         }
                     }
-                    
+
                     // 隐私政策
                     NavigationLink(destination: PrivacyPolicyView()) {
                         Text("settings_privacy".localized)
                     }
-                    
+
                     // 关于页面
                     NavigationLink(destination: AboutView()) {
                         Text("settings_about".localized)
@@ -72,12 +96,45 @@ struct SettingsView: View {
             }
         }
     }
-    
+
     // 获取应用版本
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "\(version) (\(build))"
+    }
+}
+
+// MARK: - Permission Row
+
+struct PermissionRow: View {
+    let icon: String
+    let title: String
+    let description: String
+    let isGranted: Bool
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Spacer()
+                    Image(systemName: isGranted ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(isGranted ? .green : .orange)
+                        .font(.caption)
+                }
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

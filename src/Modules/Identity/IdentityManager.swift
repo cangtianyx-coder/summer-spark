@@ -250,22 +250,22 @@ final class IdentityManager {
     func getPrivateKeyForAgreement() -> P256.KeyAgreement.PrivateKey? {
         // 从Keychain获取私钥数据
         guard let privateKeyData = try? KeychainHelper.shared.load(
-            service: "com.summerspark.identity",
-            account: "privateKey"
+            service: KeychainKeys.service,
+            account: KeychainKeys.privateKey
         ) else {
             return nil
         }
         // 解析为密钥协商私钥
         return try? P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
     }
-    
+
     // P0-FIX: 获取用于签名的私钥
     /// Get private key for signing
     func getPrivateKeyForSigning() -> P256.Signing.PrivateKey? {
         // 从Keychain获取私钥数据
         guard let privateKeyData = try? KeychainHelper.shared.load(
-            service: "com.summerspark.identity",
-            account: "privateKey"
+            service: KeychainKeys.service,
+            account: KeychainKeys.privateKey
         ) else {
             return nil
         }

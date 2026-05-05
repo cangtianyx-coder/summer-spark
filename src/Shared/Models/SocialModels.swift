@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 // MARK: - User Status
 
@@ -153,6 +154,9 @@ struct UserStatusBroadcast: Codable {
         self.status = status
         self.location = location
         self.timestamp = Date()
-        self.batteryLevel = nil  // TODO: 获取实际电池电量
+        // 获取实际电池电量
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        let batteryLevel = UIDevice.current.batteryLevel
+        self.batteryLevel = batteryLevel >= 0 ? Double(batteryLevel) : nil
     }
 }

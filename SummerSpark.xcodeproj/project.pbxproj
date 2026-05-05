@@ -13,7 +13,6 @@
 		099FC1FB3F67C3042AE4733F /* MapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0F4B790BD5565FD9190A85 /* MapService.swift */; };
 		0E1C55D57139E408546C6B55 /* CreditQoSController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3AE7CF2CCA513AD4423E60 /* CreditQoSController.swift */; };
 		10A24121848C294E4E3C6F78 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE110374026BF49593FD9127 /* Constants.swift */; };
-		11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */; };
 		1F2B4D593098DE0CC4261944 /* RescueDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD6FA0DB24273B0B8A81373 /* RescueDashboard.swift */; };
 		24D5F790C279756C8275C9A4 /* ReputationTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A61A02C4F7A6ABF00CA84AAF /* ReputationTracker.swift */; };
 		25D6180C44379D809EE49E7A /* RouteStabilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97F700EEBB7BA1F99D5A76C /* RouteStabilityMonitor.swift */; };
@@ -100,7 +99,6 @@
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
 		17D767EA182724FDEBE8014D /* TileIntegrityVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileIntegrityVerifier.swift; sourceTree = "<group>"; };
 		19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMeshNavigator.swift; sourceTree = "<group>"; };
 		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
 		2A93AFEE76567ED8352F5E3A /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
@@ -344,7 +342,6 @@
 		BD1C841A56CF886F0E9EC882 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				1C52CCDC8D28F74C6D28E496 /* AppCoordinator.swift */,
 				C870FCBEF85581B599E4CA3B /* ContentView.swift */,
 				721E45379F7B8B8CB7F9708E /* Info.plist */,
 				54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */,
@@ -544,7 +541,6 @@
 			files = (
 				B4F3EC7B880F939EF564B708 /* AdaptiveBeaconController.swift in Sources */,
 				AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */,
-				11A698B59AEAC9862A9EB660 /* AppCoordinator.swift in Sources */,
 				F88215840F03CD3F9CC39E69 /* AppMode.swift in Sources */,
 				98EC2AD1B90A04E44A96FBA4 /* AudioCodec.swift in Sources */,
 				CFC3C6B61FFFE71FB2899A91 /* AutoUpdater.swift in Sources */,

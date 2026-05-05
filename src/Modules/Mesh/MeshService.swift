@@ -95,13 +95,11 @@ final class MeshService {
         meshQueue.async { [weak self] in
             guard let self = self else { return }
             if self.forwardedMessageIds.count > self.maxForwardedCacheSize {
-                // Set是无序的，随机移除一半元素
+                // P0-FIX: 先收集要删除的ID，避免在遍历时修改Set
                 let toRemove = self.forwardedMessageIds.count / 2
-                var removed = 0
-                for id in self.forwardedMessageIds {
-                    if removed >= toRemove { break }
+                let idsToRemove = Array(self.forwardedMessageIds.prefix(toRemove))
+                for id in idsToRemove {
                     self.forwardedMessageIds.remove(id)
-                    removed += 1
                 }
                 Logger.shared.debug("MeshService: Cleaned forwarded cache, remaining: \(self.forwardedMessageIds.count)")
             }

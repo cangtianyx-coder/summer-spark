@@ -8,6 +8,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedIndex: Int = 0
     @State private var showPTTOverlay: Bool = false
+    @State private var showBatteryWarning: Bool = false
 
     var body: some View {
         ZStack {
@@ -39,6 +40,18 @@ struct ContentView: View {
             }
             .accentColor(.blue)
 
+            // P1-FIX: 低电量警告横幅
+            if showBatteryWarning {
+                VStack {
+                    BatteryWarningBanner {
+                        showBatteryWarning = false
+                    }
+                    Spacer()
+                }
+                .transition(.move(edge: .top))
+                .animation(.easeInOut, value: showBatteryWarning)
+            }
+
             // Floating PTT Button Overlay
             PTTButtonOverlay(isVisible: MeshStatusManager.shared.isConnected)
                 .allowsHitTesting(true)
@@ -47,6 +60,54 @@ struct ContentView: View {
             SOSButtonOverlay()
                 .allowsHitTesting(true)
         }
+        .onAppear {
+            checkBatteryLevel()
+        }
+    }
+
+    private func checkBatteryLevel() {
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        let batteryLevel = UIDevice.current.batteryLevel
+        if batteryLevel > 0 && batteryLevel < 0.2 {
+            showBatteryWarning = true
+        }
+    }
+}
+
+// MARK: - Battery Warning Banner
+
+struct BatteryWarningBanner: View {
+    var onDismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "battery.25")
+                .foregroundColor(.white)
+                .font(.title2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Low Battery Warning")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                Text("Mesh functionality may be limited. Charge your device soon.")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+
+            Spacer()
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .foregroundColor(.white.opacity(0.8))
+            }
+        }
+        .padding()
+        .background(Color.orange)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+        .padding(.horizontal)
+        .padding(.top, 50)
     }
 }
 
@@ -102,6 +163,7 @@ struct HomeView: View {
 @available(iOS 13.0, *)
 struct MeshStatusCard: View {
     @ObservedObject var status: MeshStatusManager
+    @State private var isReconnecting: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -113,7 +175,7 @@ struct MeshStatusCard: View {
                 Spacer()
                 Circle()
                     .fill(status.isConnected ? Color.green : Color.orange)
-                    .frame(width: 10, height: 10)
+                    .frame(width: 12, height: 12)
             }
 
             if status.isConnected {
@@ -124,15 +186,43 @@ struct MeshStatusCard: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {
-                Text("Searching for mesh network...")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                // P1-FIX: 添加重连状态和手动重连按钮
+                HStack(spacing: 8) {
+                    if isReconnecting {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(0.8)
+                    }
+                    Text(isReconnecting ? "Reconnecting..." : "Searching for mesh network...")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+
+                Button(action: reconnect) {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Reconnect")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                }
+                .disabled(isReconnecting)
             }
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+    }
+
+    private func reconnect() {
+        isReconnecting = true
+        MeshService.shared.start()
+
+        // Simulate reconnection check after delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            isReconnecting = false
+        }
     }
 }
 
@@ -141,6 +231,7 @@ struct MeshStatusCard: View {
 @available(iOS 13.0, *)
 struct LocationCard: View {
     var manager: LocationManager
+    @State private var isAcquiring: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -164,15 +255,30 @@ struct LocationCard: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {
-                Text("Acquiring location...")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                // P0-FIX: 添加loading动画而不是静态文本
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .scaleEffect(0.8)
+                    Text("Acquiring location...")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .onAppear {
+            checkLocationAcquisition()
+        }
+    }
+
+    private func checkLocationAcquisition() {
+        if manager.currentLocation == nil {
+            isAcquiring = true
+        }
     }
 }
 
@@ -224,8 +330,8 @@ struct ContentViewQuickActionsSection: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -281,8 +387,8 @@ struct ConnectedUsersSection: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -295,14 +401,16 @@ struct UserAvatar: View {
     var body: some View {
         VStack {
             Circle()
-                .fill(Color.blue.opacity(0.3))
-                .frame(width: 50, height: 50)
+                .fill(Color(.systemGray5))
+                .frame(width: 70, height: 70)
                 .overlay(
                     Image(systemName: "person.fill")
+                        .font(.title2)
                         .foregroundColor(.blue)
                 )
+                .overlay(Circle().stroke(Color.blue, lineWidth: 2))
             Text("User \(index + 1)")
-                .font(.caption2)
+                .font(.caption)
                 .foregroundColor(.secondary)
         }
     }
@@ -593,22 +701,50 @@ struct PTTButtonOverlay: View {
 @available(iOS 13.0, *)
 struct SOSButtonOverlay: View {
     @State private var showSOSAlert: Bool = false
+    @State private var isSOSActive: Bool = false
+    @State private var showCancelConfirmation: Bool = false
 
     var body: some View {
         VStack {
             HStack {
                 Spacer()
-                Button(action: { showSOSAlert = true }) {
+                Button(action: {
+                    if isSOSActive {
+                        showCancelConfirmation = true
+                    } else {
+                        showSOSAlert = true
+                    }
+                }) {
                     ZStack {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 50, height: 50)
-                            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 3)
+                        // P0-FIX: SOS激活时显示脉冲动画效果，增大比例
+                        if isSOSActive {
+                            Circle()
+                                .fill(Color.red.opacity(0.3))
+                                .frame(width: 85, height: 85)
+                                .modifier(PulseAnimation())
 
-                        Text("SOS")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            Circle()
+                                .fill(Color.red.opacity(0.5))
+                                .frame(width: 70, height: 70)
+                                .modifier(PulseAnimation(delay: 0.2))
+                        }
+
+                        Circle()
+                            .fill(isSOSActive ? Color.red : Color.red.opacity(0.9))
+                            .frame(width: 60, height: 60)
+                            .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+
+                        VStack(spacing: 3) {
+                            Text("SOS")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            if isSOSActive {
+                                Image(systemName: "checkmark")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                            }
+                        }
                     }
                 }
                 .padding(.trailing, 20)
@@ -619,13 +755,52 @@ struct SOSButtonOverlay: View {
         .alert("Emergency SOS", isPresented: $showSOSAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Activate SOS", role: .destructive) {
-                // P0-FIX: Ensure message is not nil for emergency SOS
                 let sosMessage = "Emergency SOS triggered from SOSButtonOverlay"
                 SOSManager.shared.triggerSOS(type: .other, severity: .high, message: sosMessage)
+                isSOSActive = true
             }
         } message: {
             Text("sos_confirmation_message".localized)
         }
+        .alert("Cancel SOS", isPresented: $showCancelConfirmation) {
+            Button("Keep SOS Active", role: .cancel) {}
+            Button("Cancel SOS", role: .destructive) {
+                SOSManager.shared.cancelActiveSOS()
+                isSOSActive = false
+            }
+        } message: {
+            Text("sos_cancel_confirmation_message".localized)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .sosStatusChanged)) { notification in
+            if let isActive = notification.userInfo?["isActive"] as? Bool {
+                isSOSActive = isActive
+            }
+        }
+        .onAppear {
+            isSOSActive = SOSManager.shared.activeSOS != nil
+        }
+    }
+}
+
+// MARK: - Pulse Animation
+
+struct PulseAnimation: ViewModifier {
+    var delay: Double = 0
+    @State private var isPulsing: Bool = false
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(isPulsing ? 1.3 : 1.0)
+            .opacity(isPulsing ? 0 : 0.7)
+            .animation(
+                Animation.easeInOut(duration: 1.0)
+                    .repeatForever(autoreverses: false)
+                    .delay(delay),
+                value: isPulsing
+            )
+            .onAppear {
+                isPulsing = true
+            }
     }
 }
 
