@@ -48,6 +48,7 @@
 		811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */; };
 		84E45ECFB08DCA7D5EC39FB1 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9E3C7D4BA6817E4043BF64 /* MapView.swift */; };
 		855B906FCE0B71507352C480 /* VictimMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA96BF6AA02F34FB1C6BA0D0 /* VictimMarker.swift */; };
+		859DA81900B80F2689BBAAA7 /* VoiceCallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E628ABC3CB7E28E2C83D446 /* VoiceCallManager.swift */; };
 		87D960C0FD1CAC01D9D42280 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97418BF190428DEA652E3675 /* LocationManager.swift */; };
 		890F699537B9C370574BCED2 /* GeoMeshNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */; };
 		8B9A024B9BE1BEB36D22FE91 /* MapCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7866E4614D06A00AF14EADEF /* MapCacheManager.swift */; };
@@ -58,6 +59,7 @@
 		9A4995F51F314935D77BCAC0 /* RouteTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F328CF87E70ECA105B7F9F9 /* RouteTable.swift */; };
 		9B6520284A65EFA7E9815A69 /* SOSManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8C8FCF1A4A140B62C38A4 /* SOSManager.swift */; };
 		9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2596A86288D658D5502C81 /* UIDGenerator.swift */; };
+		9EB245D69E8E6BFD1839C641 /* IncomingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C15AF5224C7CDB4C706D58 /* IncomingCallView.swift */; };
 		A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */; };
 		A38E720C7911497ECA20916A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDBA060EB076DFA292D381F /* Extensions.swift */; };
 		A5C283FB3DA52D124305AB4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */; };
@@ -101,6 +103,7 @@
 		14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshService.swift; sourceTree = "<group>"; };
 		17D767EA182724FDEBE8014D /* TileIntegrityVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileIntegrityVerifier.swift; sourceTree = "<group>"; };
 		19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1E628ABC3CB7E28E2C83D446 /* VoiceCallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCallManager.swift; sourceTree = "<group>"; };
 		1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMeshNavigator.swift; sourceTree = "<group>"; };
 		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
 		2A93AFEE76567ED8352F5E3A /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
@@ -147,6 +150,7 @@
 		A61A02C4F7A6ABF00CA84AAF /* ReputationTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReputationTracker.swift; sourceTree = "<group>"; };
 		A6359FCDA70B449265545A8C /* CreditSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditSyncManager.swift; sourceTree = "<group>"; };
 		A98D0B52BE09FCD2BD41B7BE /* ContactPriority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPriority.swift; sourceTree = "<group>"; };
+		A9C15AF5224C7CDB4C706D58 /* IncomingCallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallView.swift; sourceTree = "<group>"; };
 		AA0A305890202BF66BDA81E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AA2596A86288D658D5502C81 /* UIDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDGenerator.swift; sourceTree = "<group>"; };
 		ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSession.swift; sourceTree = "<group>"; };
@@ -456,7 +460,9 @@
 			children = (
 				B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */,
 				0D5C2796BBA1CD22D6ECFE31 /* GroupVoiceMixer.swift */,
+				A9C15AF5224C7CDB4C706D58 /* IncomingCallView.swift */,
 				C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */,
+				1E628ABC3CB7E28E2C83D446 /* VoiceCallManager.swift */,
 				4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */,
 				ABA19335B140E4AE59C6CE00 /* VoiceSession.swift */,
 			);
@@ -576,6 +582,7 @@
 				EF0861C76B279103DF8D3F15 /* GroupStore.swift in Sources */,
 				EB411951005289C41191D2F8 /* GroupVoiceMixer.swift in Sources */,
 				BE687545F0336567C59AFC57 /* IdentityManager.swift in Sources */,
+				9EB245D69E8E6BFD1839C641 /* IncomingCallView.swift in Sources */,
 				B15536164D88EC3D17CD05C1 /* InteractionHistory.swift in Sources */,
 				CB39C0FC5631C7EABBBFF7AE /* KeychainHelper.swift in Sources */,
 				D661DD26741CCC33652A3951 /* LanguageManager.swift in Sources */,
@@ -623,6 +630,7 @@
 				AFBA371B84F80B74EC0A4EBD /* UserStatusManager.swift in Sources */,
 				5E7A54239FBE3C61313BDD94 /* UsernameValidator.swift in Sources */,
 				855B906FCE0B71507352C480 /* VictimMarker.swift in Sources */,
+				859DA81900B80F2689BBAAA7 /* VoiceCallManager.swift in Sources */,
 				F15C503FD8439AB4D255C9A7 /* VoiceService.swift in Sources */,
 				01EF516754CB4AA3D9466A9C /* VoiceSession.swift in Sources */,
 				4FE951BF91CD1A50F067523E /* WiFiService.swift in Sources */,

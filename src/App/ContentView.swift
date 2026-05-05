@@ -69,7 +69,11 @@ struct ContentView: View {
             // SOS Emergency Button (top right corner)
             SOSButtonOverlay()
                 .allowsHitTesting(true)
+
+            // Voice Call Overlay
+            IncomingCallView()
         }
+        .callOverlay()
         .onAppear {
             checkBatteryLevel()
             // Splash screen auto-hides after loading
@@ -317,11 +321,8 @@ struct ContentViewQuickActionsSection: View {
             Text("Quick Actions")
                 .font(.headline)
 
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                // Mesh - 移到原来Map的位置
+            // 第一行：Mesh 和 Groups
+            HStack(spacing: 12) {
                 ContentViewQuickActionButton(
                     icon: "antenna.radiowaves.left.and.right",
                     title: "Mesh",
@@ -337,19 +338,15 @@ struct ContentViewQuickActionsSection: View {
                 ) {
                     NotificationCenter.default.post(name: .navigateToGroups, object: nil)
                 }
+            }
 
-                // Voice - 占领原来Mesh的位置
-                ContentViewQuickActionButton(
-                    icon: "waveform",
-                    title: "Voice",
-                    color: .orange
-                ) {
-                    NotificationCenter.default.post(name: .navigateToVoice, object: nil)
-                }
-
-                // 占位保持2x2布局
-                Color.clear
-                    .frame(height: 80)
+            // 第二行：Voice Call - 占两格
+            ContentViewQuickActionButton(
+                icon: "waveform",
+                title: "Voice Call",
+                color: .orange
+            ) {
+                NotificationCenter.default.post(name: .navigateToVoice, object: nil)
             }
         }
         .padding()
@@ -370,49 +367,99 @@ struct ContentViewQuickActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.title2)
                     .foregroundColor(color)
                 Text(title)
-                    .font(.caption)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(.primary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             .frame(maxWidth: .infinity)
             .padding()
             .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .cornerRadius(12)
         }
     }
 }
 
-// MARK: - Connected Users Section
+// MARK: - Group Members Section
 
 @available(iOS 13.0, *)
 struct ConnectedUsersSection: View {
+    @State private var callingMemberId: String?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Connected Users")
+                Text("Group Members")
                     .font(.headline)
                 Spacer()
-                Text("\(MeshStatusManager.shared.connectedNodes)")
+                Text("\(VoiceCallManager.shared.groupMembers.count)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(0..<min(MeshStatusManager.shared.connectedNodes, 5), id: \.self) { index in
-                        UserAvatar(index: index)
+            ForEach(VoiceCallManager.shared.groupMembers) { member in
+                GroupMemberRow(
+                    member: member,
+                    isCalling: callingMemberId == member.id,
+                    onVoiceCall: {
+                        callingMemberId = member.id
+                        VoiceCallManager.shared.initiateCall(to: member)
                     }
-                }
+                )
             }
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+    }
+}
+
+// MARK: - Group Member Row
+
+struct GroupMemberRow: View {
+    let member: VoiceGroupMember
+    var isCalling: Bool = false
+    var onVoiceCall: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Avatar
+            Circle()
+                .fill(Color(.systemGray5))
+                .frame(width: 44, height: 44)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .font(.body)
+                        .foregroundColor(.blue)
+                )
+
+            // Name
+            Text(member.name)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+
+            Spacer()
+
+            // Voice Call Button
+            Button(action: onVoiceCall) {
+                Image(systemName: isCalling ? "phone.fill" : "phone")
+                    .font(.system(size: 18))
+                    .foregroundColor(isCalling ? .red : .green)
+                    .frame(width: 44, height: 44)
+                    .background(isCalling ? Color.red.opacity(0.1) : Color.green.opacity(0.1))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.vertical, 8)
     }
 }
 
