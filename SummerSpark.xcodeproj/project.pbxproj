@@ -34,6 +34,7 @@
 		5ACE88DC719B45369D85CD7A /* RescueCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FCE5B1F0DB50B478E508C45 /* RescueCoordinator.swift */; };
 		5E68C9EB559E3FC2E14F2738 /* SocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D52F83B99138133015127BC /* SocialModels.swift */; };
 		5E7A54239FBE3C61313BDD94 /* UsernameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A136164FB90DCA46F5062D6 /* UsernameValidator.swift */; };
+		5F709023263E0307937A26D4 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055FDB2C1BC76EBBC4DE7DD /* SplashScreen.swift */; };
 		6146D26BD063B4B5B85DD1BC /* ContourRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62373BA01A255B107003A869 /* ContourRenderer.swift */; };
 		638869712B31398A694AD581 /* SecureEnclaveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */; };
 		66407BA00E2FCBD7F6CD40AF /* TrackRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7F525C70A73849F51AC716 /* TrackRecorder.swift */; };
@@ -45,6 +46,7 @@
 		77505194B2802AFA951E2367 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */; };
 		7A32A15AC55C1A335B91E31B /* PushToTalkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */; };
 		811A89929F4A481365E6A7D3 /* CryptoEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573DB2DBA4F6526D4D6E860A /* CryptoEngine.swift */; };
+		84E45ECFB08DCA7D5EC39FB1 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9E3C7D4BA6817E4043BF64 /* MapView.swift */; };
 		855B906FCE0B71507352C480 /* VictimMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA96BF6AA02F34FB1C6BA0D0 /* VictimMarker.swift */; };
 		87D960C0FD1CAC01D9D42280 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97418BF190428DEA652E3675 /* LocationManager.swift */; };
 		890F699537B9C370574BCED2 /* GeoMeshNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */; };
@@ -151,11 +153,13 @@
 		AD3B81187B5622CF1BC02CD6 /* SummerSpark.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SummerSpark.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD6AC2D8BC8BE0E2CE01D37F /* AutoUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUpdater.swift; sourceTree = "<group>"; };
 		AE110374026BF49593FD9127 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		AE9E3C7D4BA6817E4043BF64 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		B0D999311B7B835CB217D069 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		B0FC44A9A84B8EDA5B49A7FB /* AppMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMode.swift; sourceTree = "<group>"; };
 		B5F4902EAB2C6DC516F9A612 /* EvacuationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvacuationPlanner.swift; sourceTree = "<group>"; };
 		B8B0E60C307C6E2B0247F8EF /* AudioCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCodec.swift; sourceTree = "<group>"; };
 		BEED88770AEACDE39B2798B6 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		C055FDB2C1BC76EBBC4DE7DD /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		C16E778AE8B9DC9DCBD244C2 /* PushToTalkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushToTalkButton.swift; sourceTree = "<group>"; };
 		C870FCBEF85581B599E4CA3B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CB11CF5AE142747BD92FED00 /* EmergencyChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyChannel.swift; sourceTree = "<group>"; };
@@ -346,6 +350,7 @@
 				721E45379F7B8B8CB7F9708E /* Info.plist */,
 				54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */,
 				4F3CE8AB4081974CC38ABEF1 /* SettingsView.swift */,
+				C055FDB2C1BC76EBBC4DE7DD /* SplashScreen.swift */,
 				11FD4DF938D24B67263656AB /* SummerSparkApp.swift */,
 				CD768332A67A3D472D8B2959 /* UIStateManagers.swift */,
 			);
@@ -463,6 +468,7 @@
 			children = (
 				993B393544168128F210982D /* GeoAddressing.swift */,
 				1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */,
+				AE9E3C7D4BA6817E4043BF64 /* MapView.swift */,
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -579,6 +585,7 @@
 				74A62E2B1B497C89191CCE0E /* MapPackageP2P.swift in Sources */,
 				EAA30B26A5B683F63D5785AE /* MapRelayService.swift in Sources */,
 				099FC1FB3F67C3042AE4733F /* MapService.swift in Sources */,
+				84E45ECFB08DCA7D5EC39FB1 /* MapView.swift in Sources */,
 				4B963173EC0E7AF592CDE526 /* MeshMessageType.swift in Sources */,
 				549876F0E46949E697CEE481 /* MeshRelayProtocols.swift in Sources */,
 				A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */,
@@ -605,6 +612,7 @@
 				DD4C3F8ADF7CF6092006E602 /* SettingsView.swift in Sources */,
 				B7AE4148E76D221BB5007294 /* SharedModels.swift in Sources */,
 				5E68C9EB559E3FC2E14F2738 /* SocialModels.swift in Sources */,
+				5F709023263E0307937A26D4 /* SplashScreen.swift in Sources */,
 				4F8DF55227A1D7FBC5ACFAD5 /* SummerSparkApp.swift in Sources */,
 				CECBACE5D38EBF0E90C9CC8C /* TileIntegrityVerifier.swift in Sources */,
 				66407BA00E2FCBD7F6CD40AF /* TrackRecorder.swift in Sources */,

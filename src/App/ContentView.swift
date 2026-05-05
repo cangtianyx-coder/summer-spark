@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - ContentView
 
@@ -9,9 +10,16 @@ struct ContentView: View {
     @State private var selectedIndex: Int = 0
     @State private var showPTTOverlay: Bool = false
     @State private var showBatteryWarning: Bool = false
+    @State private var showSplash: Bool = true
 
     var body: some View {
         ZStack {
+            // 启动画面
+            if showSplash {
+                SplashScreen()
+                    .transition(.opacity)
+            }
+
             // Main TabView
             TabView(selection: $selectedIndex) {
                 HomeView()
@@ -38,7 +46,9 @@ struct ContentView: View {
                     }
                     .tag(3)
             }
+            .tabViewStyle(.automatic)
             .accentColor(.blue)
+            .opacity(showSplash ? 0 : 1)
 
             // P1-FIX: 低电量警告横幅
             if showBatteryWarning {
@@ -62,6 +72,12 @@ struct ContentView: View {
         }
         .onAppear {
             checkBatteryLevel()
+            // Splash screen auto-hides after loading
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                withAnimation {
+                    showSplash = false
+                }
+            }
         }
     }
 
@@ -232,6 +248,7 @@ struct MeshStatusCard: View {
 struct LocationCard: View {
     var manager: LocationManager
     @State private var isAcquiring: Bool = false
+    @State private var showMap: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -245,6 +262,9 @@ struct LocationCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                 }
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
 
             if let location = manager.currentLocation {
@@ -270,8 +290,14 @@ struct LocationCard: View {
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .onTapGesture {
+            showMap = true
+        }
         .onAppear {
             checkLocationAcquisition()
+        }
+        .fullScreenCover(isPresented: $showMap) {
+            MapView()
         }
     }
 
@@ -295,12 +321,13 @@ struct ContentViewQuickActionsSection: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 12) {
+                // Mesh - 移到原来Map的位置
                 ContentViewQuickActionButton(
-                    icon: "map.fill",
-                    title: "Map",
-                    color: .blue
+                    icon: "antenna.radiowaves.left.and.right",
+                    title: "Mesh",
+                    color: .green
                 ) {
-                    NotificationCenter.default.post(name: .navigateToMap, object: nil)
+                    NotificationCenter.default.post(name: .navigateToMesh, object: nil)
                 }
 
                 ContentViewQuickActionButton(
@@ -311,14 +338,7 @@ struct ContentViewQuickActionsSection: View {
                     NotificationCenter.default.post(name: .navigateToGroups, object: nil)
                 }
 
-                ContentViewQuickActionButton(
-                    icon: "antenna.radiowaves.left.and.right",
-                    title: "Mesh",
-                    color: .green
-                ) {
-                    NotificationCenter.default.post(name: .navigateToMesh, object: nil)
-                }
-
+                // Voice - 占领原来Mesh的位置
                 ContentViewQuickActionButton(
                     icon: "waveform",
                     title: "Voice",
@@ -326,6 +346,10 @@ struct ContentViewQuickActionsSection: View {
                 ) {
                     NotificationCenter.default.post(name: .navigateToVoice, object: nil)
                 }
+
+                // 占位保持2x2布局
+                Color.clear
+                    .frame(height: 80)
             }
         }
         .padding()
