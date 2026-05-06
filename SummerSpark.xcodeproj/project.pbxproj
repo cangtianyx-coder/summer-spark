@@ -63,8 +63,12 @@
 		A1B07B415AC90688EC6111BF /* MeshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B48C44ECE5BC9DF9A79F73 /* MeshService.swift */; };
 		A38E720C7911497ECA20916A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDBA060EB076DFA292D381F /* Extensions.swift */; };
 		A5C283FB3DA52D124305AB4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19C8B363287DD6FF1EEF2D31 /* Assets.xcassets */; };
+		A90711A416F3C46CC1E0171D /* UIComponentViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212D09D6622E53E4B066FF56 /* UIComponentViews.swift */; };
 		AF1186FEC7D21413DA2A16E1 /* AntiAttackGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAEFE3B6A151B6C0841C5EA /* AntiAttackGuard.swift */; };
 		AFBA371B84F80B74EC0A4EBD /* UserStatusManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3585F28D054D9BBEDDAF92D7 /* UserStatusManager.swift */; };
+		FTFGM001 /* FaceToFaceGroupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTFGM002 /* FaceToFaceGroupManager.swift */; };
+		FTFGV001 /* FaceToFaceGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTFGV002 /* FaceToFaceGroupView.swift */; };
+		FTFMD001 /* FaceToFaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTFMD002 /* FaceToFaceModels.swift */; };
 		B15536164D88EC3D17CD05C1 /* InteractionHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB11DAD259EF088BC0572F4C /* InteractionHistory.swift */; };
 		B3C7D31B8B0D1C8ED22480A1 /* SOSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5204D97D6404B9011EB22AC6 /* SOSButton.swift */; };
 		B4F3EC7B880F939EF564B708 /* AdaptiveBeaconController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED710FF3E406F8F7169E5293 /* AdaptiveBeaconController.swift */; };
@@ -85,6 +89,7 @@
 		EA1BC36CD10750193741C1FE /* ObserverProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B4AC93FD57D7FC9F3BB835 /* ObserverProtocols.swift */; };
 		EAA30B26A5B683F63D5785AE /* MapRelayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055D012F8018D1E231FCF4F9 /* MapRelayService.swift */; };
 		EB411951005289C41191D2F8 /* GroupVoiceMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5C2796BBA1CD22D6ECFE31 /* GroupVoiceMixer.swift */; };
+		EB740CC757A1099A774D0206 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409BC082692BFED36DED35CC /* OnboardingView.swift */; };
 		EBBFB1EF85E383837894C64D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0E4552507835A75973FBDD6D /* Localizable.strings */; };
 		EE5ED4F2FF88E01B38986535 /* UIStateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD768332A67A3D472D8B2959 /* UIStateManagers.swift */; };
 		EF0861C76B279103DF8D3F15 /* GroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A93AFEE76567ED8352F5E3A /* GroupStore.swift */; };
@@ -106,6 +111,7 @@
 		1E628ABC3CB7E28E2C83D446 /* VoiceCallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCallManager.swift; sourceTree = "<group>"; };
 		1FE682D14B1887C3D1621534 /* GeoMeshNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoMeshNavigator.swift; sourceTree = "<group>"; };
 		1FF43A4996AF194424462B1A /* SecureEnclaveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureEnclaveManager.swift; sourceTree = "<group>"; };
+		212D09D6622E53E4B066FF56 /* UIComponentViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentViews.swift; sourceTree = "<group>"; };
 		2A93AFEE76567ED8352F5E3A /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
 		2DEF3D8189237A7D62DA0BA8 /* CreditEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditEngine.swift; sourceTree = "<group>"; };
 		2E0F4B790BD5565FD9190A85 /* MapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapService.swift; sourceTree = "<group>"; };
@@ -116,6 +122,7 @@
 		3C5AFF2162A771F4B5763629 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		3C6CEFD4505FF1F9C040275E /* EmergencyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyModels.swift; sourceTree = "<group>"; };
 		3FDBA060EB076DFA292D381F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		409BC082692BFED36DED35CC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		442A105684A6E24BD0436954 /* OfflineMapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineMapManager.swift; sourceTree = "<group>"; };
 		4A37E29F4500C621178D32A0 /* CreditCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCalculator.swift; sourceTree = "<group>"; };
 		4E9636DBE4E24FBFFC2B7DFD /* VoiceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceService.swift; sourceTree = "<group>"; };
@@ -174,6 +181,9 @@
 		D08FD4C7B83578F07F5F956F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		D2DE8E55215A58C2120C4405 /* MeshMessageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshMessageType.swift; sourceTree = "<group>"; };
 		D8C34165B0D198FC691AE139 /* TrustNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrustNetwork.swift; sourceTree = "<group>"; };
+		FTFGM002 /* FaceToFaceGroupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceToFaceGroupManager.swift; sourceTree = "<group>"; };
+		FTFGV002 /* FaceToFaceGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceToFaceGroupView.swift; sourceTree = "<group>"; };
+		FTFMD002 /* FaceToFaceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceToFaceModels.swift; sourceTree = "<group>"; };
 		D97F700EEBB7BA1F99D5A76C /* RouteStabilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteStabilityMonitor.swift; sourceTree = "<group>"; };
 		DB11DAD259EF088BC0572F4C /* InteractionHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionHistory.swift; sourceTree = "<group>"; };
 		DEF28DAC708820F02AB0C93C /* ServiceProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProtocols.swift; sourceTree = "<group>"; };
@@ -193,6 +203,9 @@
 				DB11DAD259EF088BC0572F4C /* InteractionHistory.swift */,
 				D8C34165B0D198FC691AE139 /* TrustNetwork.swift */,
 				3585F28D054D9BBEDDAF92D7 /* UserStatusManager.swift */,
+				FTFGM002 /* FaceToFaceGroupManager.swift */,
+				FTFGV002 /* FaceToFaceGroupView.swift */,
+				FTFMD002 /* FaceToFaceModels.swift */,
 			);
 			path = Social;
 			sourceTree = "<group>";
@@ -352,10 +365,12 @@
 			children = (
 				C870FCBEF85581B599E4CA3B /* ContentView.swift */,
 				721E45379F7B8B8CB7F9708E /* Info.plist */,
+				409BC082692BFED36DED35CC /* OnboardingView.swift */,
 				54EBAD2A6E9CF1B00E30626A /* SceneDelegate.swift */,
 				4F3CE8AB4081974CC38ABEF1 /* SettingsView.swift */,
 				C055FDB2C1BC76EBBC4DE7DD /* SplashScreen.swift */,
 				11FD4DF938D24B67263656AB /* SummerSparkApp.swift */,
+				212D09D6622E53E4B066FF56 /* UIComponentViews.swift */,
 				CD768332A67A3D472D8B2959 /* UIStateManagers.swift */,
 			);
 			path = App;
@@ -576,6 +591,9 @@
 				F0C0CA784596A1EA06A23D9C /* EncryptedPackage.swift in Sources */,
 				771F1162095406993F6D6E6E /* EvacuationPlanner.swift in Sources */,
 				A38E720C7911497ECA20916A /* Extensions.swift in Sources */,
+				FTFGM001 /* FaceToFaceGroupManager.swift in Sources */,
+				FTFGV001 /* FaceToFaceGroupView.swift in Sources */,
+				FTFMD001 /* FaceToFaceModels.swift in Sources */,
 				93DE5EBF259855EAF312B02B /* GeoAddressing.swift in Sources */,
 				890F699537B9C370574BCED2 /* GeoMeshNavigator.swift in Sources */,
 				6CBD4867AE4639374EA5FE11 /* GeoModels.swift in Sources */,
@@ -599,6 +617,7 @@
 				02B3D4B592E0524960C7DBBF /* NavigationEngine.swift in Sources */,
 				EA1BC36CD10750193741C1FE /* ObserverProtocols.swift in Sources */,
 				54C6544773252F7BF245850C /* OfflineMapManager.swift in Sources */,
+				EB740CC757A1099A774D0206 /* OnboardingView.swift in Sources */,
 				51686D15F594655F2FD76DF7 /* PathPlanner.swift in Sources */,
 				E250059C8F4717B72729C9C9 /* PowerSaveManager.swift in Sources */,
 				2C367B3CCBAE3AF86B3D5092 /* PriorityScheduler.swift in Sources */,
@@ -624,6 +643,7 @@
 				CECBACE5D38EBF0E90C9CC8C /* TileIntegrityVerifier.swift in Sources */,
 				66407BA00E2FCBD7F6CD40AF /* TrackRecorder.swift in Sources */,
 				46CFA47B5FB37E700CF8D835 /* TrustNetwork.swift in Sources */,
+				A90711A416F3C46CC1E0171D /* UIComponentViews.swift in Sources */,
 				9BCEA201FA88782028EF81DE /* UIDGenerator.swift in Sources */,
 				EE5ED4F2FF88E01B38986535 /* UIStateManagers.swift in Sources */,
 				47EF058726D036540CB81D35 /* UpdateViews.swift in Sources */,

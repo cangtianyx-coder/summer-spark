@@ -3,13 +3,13 @@ import CryptoKit
 
 /// Manages local identity: UID, username, public/private key pair, and public key fingerprint
 /// Singleton: use IdentityManager.shared
-final class IdentityManager {
+final class IdentityManager: ObservableObject {
     static let shared = IdentityManager()
 
     // MARK: - Stored Properties
 
     private(set) var uid: String?
-    private(set) var username: String?
+    @Published private(set) var username: String?
 
     private var signingPrivateKey: P256.Signing.PrivateKey?
     private var signingPublicKey: P256.Signing.PublicKey?
@@ -43,18 +43,23 @@ final class IdentityManager {
             }
         }
 
-        // Load private key from Keychain (secure storage)
-        do {
-            let privateKeyData = try KeychainHelper.shared.load(
-                service: KeychainKeys.service,
-                account: KeychainKeys.privateKey
-            )
-            signingPrivateKey = try? P256.Signing.PrivateKey(rawRepresentation: privateKeyData)
-            signingPublicKey = signingPrivateKey?.publicKey
-        } catch {
-            // Key not found or corrupted - will regenerate below
-            signingPrivateKey = nil
-            signingPublicKey = nil
+        // Load private key from Secure Enclave (hardware-backed) or Keychain fallback
+        if let privateKey = try? KeychainHelper.shared.loadPrivateKeyFromSecureEnclave(tag: KeychainKeys.privateKey) {
+            signingPrivateKey = privateKey
+            signingPublicKey = privateKey.publicKey
+        } else {
+            // Fallback to regular Keychain storage
+            do {
+                let privateKeyData = try KeychainHelper.shared.load(
+                    service: KeychainKeys.service,
+                    account: KeychainKeys.privateKey
+                )
+                signingPrivateKey = try? P256.Signing.PrivateKey(rawRepresentation: privateKeyData)
+                signingPublicKey = signingPrivateKey?.publicKey
+            } catch {
+                signingPrivateKey = nil
+                signingPublicKey = nil
+            }
         }
 
         // If any identity component is missing, generate new identity
@@ -65,7 +70,7 @@ final class IdentityManager {
 
     /// Regenerate all identity components (UID, keys)
     func regenerateIdentity() {
-        // Generate new UID
+        // Generate new UID (cryptographically secure)
         uid = UIDGenerator.shared.generateUID()
 
         // Generate new ECDSA P-256 key pair
@@ -73,7 +78,7 @@ final class IdentityManager {
         signingPrivateKey = privateKey
         signingPublicKey = privateKey.publicKey
 
-        // Persist
+        // Persist using Secure Enclave if available
         saveIdentity()
     }
 
@@ -88,7 +93,7 @@ final class IdentityManager {
                 account: KeychainKeys.uid
             )
         }
-        
+
         if let username = username, let usernameData = username.data(using: .utf8) {
             try? KeychainHelper.shared.save(
                 data: usernameData,
@@ -97,13 +102,18 @@ final class IdentityManager {
             )
         }
 
-        // Private key (sensitive) in Keychain with device-only accessibility
+        // Private key (sensitive) in Secure Enclave with hardware protection
         if let privateKey = signingPrivateKey {
-            try? KeychainHelper.shared.save(
-                data: privateKey.rawRepresentation,
-                service: KeychainKeys.service,
-                account: KeychainKeys.privateKey
-            )
+            do {
+                try KeychainHelper.shared.savePrivateKeyToSecureEnclave(privateKey, tag: KeychainKeys.privateKey)
+            } catch {
+                // Fallback to regular Keychain if Secure Enclave fails
+                try? KeychainHelper.shared.save(
+                    data: privateKey.rawRepresentation,
+                    service: KeychainKeys.service,
+                    account: KeychainKeys.privateKey
+                )
+            }
         }
     }
 

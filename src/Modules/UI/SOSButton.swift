@@ -36,7 +36,7 @@ struct SOSButton: View {
                     .frame(width: 100, height: 100)
                     .overlay(
                         VStack(spacing: 4) {
-                            Text("SOS")
+                            Text("sos".localized)
                                 .font(.system(size: 32, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
                             if isPressed {
@@ -92,7 +92,7 @@ struct SOSButton: View {
             )
         }
         .alert("sos_error_title".localized, isPresented: $showErrorAlert) {
-            Button("OK", role: .cancel) {}
+            Button("ok".localized, role: .cancel) {}
         } message: {
             Text(errorMessage)
         }
@@ -136,11 +136,12 @@ struct SOSConfirmationView: View {
     let onConfirm: () -> Void
     
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         NavigationView {
             Form {
-                Section("紧急类型") {
+                Section {
                     Picker("类型", selection: $emergencyType) {
                         ForEach(EmergencyType.allCases, id: \.self) { type in
                             Text(type.displayName).tag(type)
@@ -148,8 +149,9 @@ struct SOSConfirmationView: View {
                     }
                     .pickerStyle(.menu)
                 }
+                .listRowBackground(colorScheme == .dark ? Color(.systemGray5) : Color(.secondarySystemBackground))
                 
-                Section("紧急程度") {
+                Section {
                     Picker("程度", selection: $severity) {
                         ForEach(Severity.allCases.reversed(), id: \.self) { sev in
                             Text(sev.displayNameText).tag(sev)
@@ -157,6 +159,7 @@ struct SOSConfirmationView: View {
                     }
                     .pickerStyle(.segmented)
                 }
+                .listRowBackground(colorScheme == .dark ? Color(.systemGray5) : Color(.secondarySystemBackground))
                 
                 Section {
                     Button(action: {
@@ -165,11 +168,12 @@ struct SOSConfirmationView: View {
                     }) {
                         HStack {
                             Spacer()
-                            Text("确认发送SOS")
+                            Text("sos_confirmation_message".localized)
                                 .font(.headline)
                                 .foregroundColor(.white)
                             Spacer()
                         }
+                        .padding(.vertical, 4)
                     }
                     .listRowBackground(Color.red)
                 }
@@ -184,6 +188,7 @@ struct SOSConfirmationView: View {
                 }
             }
         }
+        .preferredColorScheme(.light)
     }
 }
 

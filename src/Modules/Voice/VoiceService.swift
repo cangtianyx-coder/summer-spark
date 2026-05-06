@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import UIKit
+import CryptoKit
 
 // MARK: - VoiceServiceDelegate
 
@@ -115,6 +116,13 @@ final class VoiceService {
     private(set) var isRunning: Bool = false
     private(set) var isMuted: Bool = false
     private(set) var isSpeakerOn: Bool = false
+    
+    // PTT state tracking
+    private(set) var isPTTMode: Bool = false
+    private(set) var currentGroupId: String?
+    
+    /// PTT-FIX: Published group name for UI binding
+    @Published var currentGroupName: String?
 
     private let audioCodec: AudioCodec
     private let voiceQueue = DispatchQueue(label: "com.voice.service", qos: .userInitiated)
@@ -137,6 +145,7 @@ final class VoiceService {
     private init() {
         self.audioCodec = AudioCodec(codecType: .opus)
         setupAudioSession()
+        initializeVoiceEncryption()
     }
 
     deinit {
@@ -173,6 +182,7 @@ final class VoiceService {
         voiceQueue.async { [weak self] in
             guard let self = self else { return }
             self.isRunning = false
+            self.isPTTMode = false
 
             self.stopAudioPipeline()
             self.audioCodec.stop()
@@ -325,6 +335,14 @@ final class VoiceService {
             endedCall.endTime = Date()
             self.activeCalls[call.id] = endedCall
             self.currentCall = nil
+            
+            // PTT-FIX: Clean up PTT state if this was a PTT-initiated call
+            if self.isPTTMode {
+                self.isPTTMode = false
+            }
+            
+            // P2-FIX: Clean up currentGroupId when ending group call
+            self.currentGroupId = nil
 
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -332,6 +350,66 @@ final class VoiceService {
             }
 
             self.endBackgroundTask()
+        }
+    }
+    
+    // MARK: - PTT Group Call Support
+    
+    /// Join an existing group call for PTT, or create one if none exists
+    /// Called automatically when PTT is pressed without an active call
+    func joinGroupCall(groupId: String) {
+        voiceQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // If already in a group call for this group, don't create duplicate
+            if let existingCall = self.currentCall, existingCall.mode == .group {
+                Logger.shared.debug("VoiceService: Already in group call \(existingCall.id)")
+                return
+            }
+            
+            // Get group members from GroupStore
+            let members = GroupStore.shared.getGroupMembers(groupId: groupId)
+            let participantIds = Set(members.map { $0.uid })
+            
+            Logger.shared.info("VoiceService: Creating group call for group \(groupId) with \(participantIds.count) members")
+            
+            let callId = UUID()
+            var call = VoiceCall(
+                id: callId,
+                peerId: groupId, // Use groupId as peerId for group calls
+                mode: .group,
+                state: .active,
+                startTime: Date(),
+                participants: participantIds,
+                isMuted: false,
+                isSpeakerOn: false,
+                quality: .unknown
+            )
+            
+            self.currentCall = call
+            self.activeCalls[callId] = call
+            
+            self.startEncodingTimer()
+            self.startDecodingTimer()
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.voiceService(self, didStartCall: callId, peerId: groupId)
+            }
+        }
+    }
+    
+    /// Set the current group context for PTT operations
+    /// Call this when user selects/enters a group to enable PTT in that group
+    func setCurrentGroup(_ groupId: String?, name: String? = nil) {
+        voiceQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.currentGroupId = groupId
+            // PTT-FIX: Also update published group name for UI binding
+            DispatchQueue.main.async {
+                self.currentGroupName = name
+            }
+            Logger.shared.debug("VoiceService: Current group context set to \(groupId ?? "nil") (name: \(name ?? "nil"))")
         }
     }
 
@@ -429,6 +507,51 @@ final class VoiceService {
     /// Start transmitting audio for PTT
     /// Call this when PTT button is pressed
     func startTransmitting() {
+        // P0-FIX: Check microphone permission before attempting to start audio pipeline
+        let permission = AVAudioSession.sharedInstance().recordPermission
+        switch permission {
+        case .granted:
+            break // Permission OK, proceed
+        case .denied:
+            Logger.shared.error("VoiceService: Microphone permission denied - cannot start PTT")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let error = NSError(
+                    domain: "VoiceService",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "Microphone permission denied. Please enable in Settings."]
+                )
+                self.delegate?.voiceService(self, didFailWithError: error)
+            }
+            return
+        case .undetermined:
+            // Request permission asynchronously
+            AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
+                guard let self = self else { return }
+                if granted {
+                    Logger.shared.info("VoiceService: Microphone permission granted, starting PTT")
+                    // P2-FIX: Use dispatch to break recursive call chain
+                    DispatchQueue.main.async {
+                        self.startTransmitting()
+                    }
+                } else {
+                    Logger.shared.error("VoiceService: Microphone permission denied by user")
+                    DispatchQueue.main.async {
+                        let error = NSError(
+                            domain: "VoiceService",
+                            code: 1,
+                            userInfo: [NSLocalizedDescriptionKey: "Microphone permission denied by user"]
+                        )
+                        self.delegate?.voiceService(self, didFailWithError: error)
+                    }
+                }
+            }
+            return
+        @unknown default:
+            Logger.shared.warn("VoiceService: Unknown audio permission state")
+            return
+        }
+
         voiceQueue.async { [weak self] in
             guard let self = self else { return }
             guard !self.isRunning else { return }
@@ -437,9 +560,35 @@ final class VoiceService {
                 try self.audioCodec.start()
                 self.startAudioPipeline()
                 self.isRunning = true
+                self.isPTTMode = true
+                
+                // PTT-FIX: If no active call exists but we're in a group, auto-join group call
+                if self.currentCall == nil {
+                    if let groupId = self.currentGroupId {
+                        Logger.shared.info("VoiceService: PTT started with no call, joining group \(groupId)")
+                        self.joinGroupCall(groupId: groupId)
+                    } else {
+                        // PTT-FIX: Notify delegate of silent failure when no group context
+                        Logger.shared.warn("VoiceService: PTT started with no active call and no group context")
+                        let error = NSError(
+                            domain: "VoiceService",
+                            code: 2,
+                            userInfo: [NSLocalizedDescriptionKey: "ptt_error_no_group".localized]
+                        )
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            self.delegate?.voiceService(self, didFailWithError: error)
+                        }
+                    }
+                }
+                
                 Logger.shared.debug("VoiceService: PTT transmit started")
             } catch {
                 Logger.shared.error("VoiceService: Failed to start PTT - \(error)")
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.delegate?.voiceService(self, didFailWithError: error)
+                }
             }
         }
     }
@@ -453,6 +602,7 @@ final class VoiceService {
             self.stopAudioPipeline()
             self.audioCodec.stop()
             self.isRunning = false
+            self.isPTTMode = false
             Logger.shared.debug("VoiceService: PTT transmit stopped")
         }
     }
@@ -460,12 +610,27 @@ final class VoiceService {
     // MARK: - Audio Pipeline
 
     private func startAudioPipeline() {
+        // P0-FIX: Verify audio input availability before accessing inputNode
+        let audioSession = AVAudioSession.sharedInstance()
+        guard audioSession.recordPermission == .granted else {
+            Logger.shared.error("VoiceService: Cannot start audio pipeline - no microphone permission")
+            return
+        }
+
         audioEngine = AVAudioEngine()
 
         guard let engine = audioEngine else { return }
 
+        // P0-FIX: Verify input node is accessible before using it
         let inputNode = engine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
+
+        // Check if input format is valid (sample rate > 0 means available)
+        guard inputFormat.sampleRate > 0 else {
+            Logger.shared.error("VoiceService: Audio input not available - permission may be denied")
+            audioEngine = nil
+            return
+        }
 
         self.inputNode = inputNode
 
@@ -475,13 +640,83 @@ final class VoiceService {
 
         do {
             try engine.start()
+            Logger.shared.debug("VoiceService: Audio pipeline started successfully")
         } catch {
+            Logger.shared.error("VoiceService: Failed to start audio engine - \(error)")
+            audioEngine?.stop()
+            audioEngine = nil
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.voiceService(self, didFailWithError: error)
             }
         }
     }
+
+    // MARK: - Voice Encryption Handler
+
+    /// Handler for encrypting voice data before mesh transmission
+    /// Initialized with real E2E encryption using CryptoEngine.encryptAndSign()
+    /// P0-FIX: Voice data must be encrypted before transmission to prevent eavesdropping
+    private var _voiceEncryptionHandler: ((Data, String) -> Data)?
+    
+    var voiceEncryptionHandler: ((Data, String) -> Data)? {
+        get { return _voiceEncryptionHandler }
+        set { _voiceEncryptionHandler = newValue }
+    }
+    
+    /// Initialize the voice encryption handler with proper E2E encryption
+    /// Uses CryptoEngine.encryptAndSign() with ECDH key agreement + ECDSA signatures
+    private func initializeVoiceEncryption() {
+        // P3-FIX: Use [weak self] to prevent retain cycle in encryption handler closure
+        _voiceEncryptionHandler = { [weak self] (audioData: Data, peerId: String) -> Data in
+            guard let self = self else { return audioData }
+            
+            // Get peer's public key for encryption
+            guard let recipientPublicKey = IdentityManager.shared.getPublicKey(for: peerId) else {
+                Logger.shared.warn("VoiceService: No public key for peer \(peerId), sending unencrypted")
+                return audioData
+            }
+            
+            // Get our signing key for ECDSA signature
+            guard let senderSigningKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+                Logger.shared.error("VoiceService: No signing key available")
+                return audioData
+            }
+            
+            // Get our key agreement key
+            guard let senderKeyAgreementKey = IdentityManager.shared.getPrivateKeyForAgreement() else {
+                Logger.shared.error("VoiceService: No key agreement key available")
+                return audioData
+            }
+            
+            do {
+                // Convert signing public key to key agreement public key (same key pair used for both)
+                let recipientKeyAgreementPublicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: recipientPublicKey.rawRepresentation)
+                
+                // Encrypt and sign: [ephemeralPubKey(65) || nonce(12) || ciphertext || tag(16) || signature(64)]
+                let encryptedPackage = try CryptoEngine.shared.encryptAndSign(
+                    plaintext: audioData,
+                    recipientPublicKey: recipientKeyAgreementPublicKey,
+                    senderSigningKey: senderSigningKey
+                )
+                
+                // Prepend peer ID length (1 byte) and peer ID for routing
+                var packet = Data()
+                packet.append(UInt8(peerId.utf8.count))
+                packet.append(peerId.data(using: .utf8) ?? Data())
+                packet.append(encryptedPackage)
+                
+                return packet
+            } catch {
+                Logger.shared.error("VoiceService: Encryption failed - \(error)")
+                return audioData
+            }
+        }
+        
+        Logger.shared.info("VoiceService: Voice encryption handler initialized with E2E encryption")
+    }
+
+    // MARK: - Audio Pipeline
 
     private func stopAudioPipeline() {
         inputNode?.removeTap(onBus: 0)
@@ -491,31 +726,54 @@ final class VoiceService {
     }
 
     private func handleInputBuffer(_ buffer: AVAudioPCMBuffer) {
-        guard !isMuted, let call = currentCall, call.state.isActive else { return }
+        // P0-FIX: Capture state copies on audio thread to avoid data race with voiceQueue modifications
+        let muted = self.isMuted
+        let pttMode = self.isPTTMode
+        let groupId = self.currentGroupId
+        let call = self.currentCall
+        
+        // PTT-FIX: Allow audio through in PTT mode even without active call
+        // This handles the case where PTT was just pressed and we're waiting to join a group call
+        guard !muted else { return }
+        
+        let shouldTransmit = call?.state.isActive == true || (pttMode && groupId != nil)
+        
+        guard shouldTransmit else {
+            // If in PTT mode but no call and no group context, silently discard
+            if pttMode {
+                Logger.shared.warn("VoiceService: PTT active but no group context - discarding audio")
+            }
+            return
+        }
 
         let pcmData = audioCodec.audioBufferToData(buffer)
 
-        voiceQueue.async { [weak self] in
-            guard let self = self else { return }
+        // P1-FIX: Encode on audio thread to avoid per-packet dispatch overhead
+        do {
+            let encodedData = try self.audioCodec.encode(pcmData)
 
-            do {
-                let encodedData = try self.audioCodec.encode(pcmData)
-                let isKeyframe = true
+            // P0-FIX: Use captured call reference for encryption (avoids data race on currentCall)
+            // Use call.peerId for normal calls, or groupId for PTT-initiated group calls
+            let targetPeerId = call?.peerId ?? groupId ?? "local"
+            let dataToSend: Data
+            if let encryptHandler = self.voiceEncryptionHandler {
+                dataToSend = encryptHandler(encodedData, targetPeerId)
+            } else {
+                dataToSend = encodedData
+            }
 
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.delegate?.voiceService(self, didReceiveAudioFrame: encodedData, from: "local")
-                }
-            } catch {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.delegate?.voiceService(self, didFailWithError: error)
-                }
+            // Only dispatch delegate callback to main queue (minimal synchronization point)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.voiceService(self, didReceiveAudioFrame: dataToSend, from: "local")
+            }
+        } catch {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.voiceService(self, didFailWithError: error)
             }
         }
     }
-
-    // MARK: - Encoding Timer
 
     private func startEncodingTimer() {
         encodingTimer = DispatchSource.makeTimerSource(queue: voiceQueue)

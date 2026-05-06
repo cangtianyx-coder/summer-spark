@@ -199,3 +199,94 @@ extension Notification.Name {
     static let voiceCallAccepted = Notification.Name("voiceCallAccepted")
     static let voiceCallEnded = Notification.Name("voiceCallEnded")
 }
+
+// MARK: - PTT Error Handler (PTT-FIX)
+
+/// Singleton class to handle PTT errors and show UI feedback
+/// Implements VoiceServiceDelegate to catch all PTT error conditions
+@available(iOS 13.0, *)
+final class PTTErrorHandler: ObservableObject, VoiceServiceDelegate {
+    static let shared = PTTErrorHandler()
+    
+    // Published error state for UI binding
+    @Published var showError: Bool = false
+    @Published var errorMessage: String = ""
+    
+    private init() {}
+    
+    // MARK: - VoiceServiceDelegate Implementation
+    
+    func voiceService(_ service: VoiceService, didStartCall callId: UUID, peerId: String) {
+        // Call started - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didEndCall callId: UUID, reason: VoiceCallEndReason) {
+        // Call ended - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didReceiveAudioFrame data: Data, from peerId: String) {
+        // Audio received - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didUpdateMuteState isMuted: Bool) {
+        // Mute state changed - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didUpdateSpeakerState isSpeakerOn: Bool) {
+        // Speaker state changed - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didUpdateCallQuality quality: VoiceCallQuality) {
+        // Call quality changed - no error handling needed
+    }
+    
+    func voiceService(_ service: VoiceService, didFailWithError error: Error) {
+        // PTT-FIX: Handle all PTT errors and show UI feedback
+        // Map error to friendly localized message
+        let friendlyMessage = mapToFriendlyErrorMessage(error)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.errorMessage = friendlyMessage
+            self.showError = true
+            Logger.shared.error("PTTErrorHandler: Received error - \(friendlyMessage)")
+        }
+    }
+
+    // PTT-FIX: Map error to user-friendly localized message
+    private func mapToFriendlyErrorMessage(_ error: Error) -> String {
+        // Check if it's a VoiceCallEndReason
+        if let reason = error as? VoiceCallEndReason {
+            switch reason {
+            case .userEnded:
+                return "ptt_error_call_ended".localized
+            case .peerEnded:
+                return "ptt_error_peer_ended".localized
+            case .callDropped:
+                return "ptt_error_call_dropped".localized
+            case .networkError:
+                return "ptt_error_network".localized
+            case .timeout:
+                return "ptt_error_timeout".localized
+            case .unknown:
+                return "ptt_error_unknown".localized
+            }
+        }
+
+        // Check if it's an NSError from VoiceService
+        if let nsError = error as NSError?, nsError.domain == "VoiceService" {
+            switch nsError.code {
+            case 1:
+                // Microphone permission denied
+                return "ptt_error_mic_denied".localized
+            case 2:
+                // No group selected
+                return "ptt_error_no_group".localized
+            default:
+                return nsError.localizedDescription
+            }
+        }
+
+        // Default to the error's localized description
+        return error.localizedDescription
+    }
+}

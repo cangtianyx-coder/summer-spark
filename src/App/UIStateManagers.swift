@@ -13,8 +13,20 @@ final class MeshStatusManager: ObservableObject {
     @Published var signalStrength: Int = 0
     @Published var currentMedium: MeshNode.TransportMedium = .bluetoothLE
 
+    private var timer: Timer?
+
     private init() {
         setupBindings()
+        startStatusUpdates()
+    }
+
+    private func startStatusUpdates() {
+        // Update immediately on init
+        updateStatus()
+        // Poll every 5 seconds for live updates
+        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.updateStatus()
+        }
     }
 
     private func setupBindings() {
@@ -34,14 +46,16 @@ final class MeshStatusManager: ObservableObject {
     }
 
     func updateStatus() {
-        // Get status from MeshService
+        // Safely get status from MeshService — never crash on uninitialized state
         let nodes = MeshService.shared.getActiveNodes()
         let connectionInfo = MeshService.shared.getConnectionInfo()
 
-        self.connectedNodes = nodes.count
-        self.isConnected = connectionInfo.isConnected
-        self.signalStrength = connectionInfo.signalStrength
-        self.currentMedium = connectionInfo.medium
+        DispatchQueue.main.async {
+            self.connectedNodes = nodes.count
+            self.isConnected = connectionInfo.isConnected
+            self.signalStrength = max(0, min(100, connectionInfo.signalStrength))
+            self.currentMedium = connectionInfo.medium
+        }
     }
 }
 

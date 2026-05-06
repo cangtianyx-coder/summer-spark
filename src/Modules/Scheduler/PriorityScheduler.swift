@@ -40,7 +40,7 @@ final class SchedulableTask {
     let targetNodeId: String?
     let payload: Data?
     var dynamicPriority: Double
-    let creditTier: CreditAccount.CreditTier
+    let creditTier: CreditTier
 
     init(
         id: String = UUID().uuidString,
@@ -53,7 +53,7 @@ final class SchedulableTask {
         sourceNodeId: String,
         targetNodeId: String? = nil,
         payload: Data? = nil,
-        creditTier: CreditAccount.CreditTier = .bronze
+        creditTier: CreditTier = .bronze
     ) {
         self.id = id
         self.taskType = taskType

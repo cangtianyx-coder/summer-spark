@@ -38,8 +38,9 @@ enum MapType: String, CaseIterable, Codable {
 
 // MARK: - OfflineMapInfo
 
-struct OfflineMapInfo: Codable, Equatable {
+struct OfflineMapInfo: Codable, Equatable, Identifiable {
     let mapId: String
+    var id: String { mapId }
     let name: String
     let version: String
     let tileCount: Int

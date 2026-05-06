@@ -227,6 +227,37 @@ struct CreditEvent: Codable {
     }
 }
 
+// MARK: - Credit Tier
+
+enum CreditTier: Int, Codable, Comparable {
+    case bronze = 1
+    case silver = 2
+    case gold = 3
+    case platinum = 4
+
+    static func < (lhs: CreditTier, rhs: CreditTier) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+
+    var multiplier: Double {
+        switch self {
+        case .bronze: return 1.0
+        case .silver: return 1.2
+        case .gold: return 1.5
+        case .platinum: return 2.0
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .bronze: return "Bronze"
+        case .silver: return "Silver"
+        case .gold: return "Gold"
+        case .platinum: return "Platinum"
+        }
+    }
+}
+
 // MARK: - Credit Account
 
 struct CreditAccount: Codable {
@@ -235,35 +266,6 @@ struct CreditAccount: Codable {
     var tier: CreditTier
     var totalEarned: Double
     var totalConsumed: Double
-
-    enum CreditTier: Int, Codable, Comparable {
-        case bronze = 1
-        case silver = 2
-        case gold = 3
-        case platinum = 4
-
-        static func < (lhs: CreditTier, rhs: CreditTier) -> Bool {
-            return lhs.rawValue < rhs.rawValue
-        }
-
-        var multiplier: Double {
-            switch self {
-            case .bronze: return 1.0
-            case .silver: return 1.2
-            case .gold: return 1.5
-            case .platinum: return 2.0
-            }
-        }
-
-        var displayName: String {
-            switch self {
-            case .bronze: return "Bronze"
-            case .silver: return "Silver"
-            case .gold: return "Gold"
-            case .platinum: return "Platinum"
-            }
-        }
-    }
 
     init(balance: Double = 0, tier: CreditTier = .bronze, totalEarned: Double = 0, totalConsumed: Double = 0) {
         self.balance = balance

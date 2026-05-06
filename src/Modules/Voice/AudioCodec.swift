@@ -234,10 +234,24 @@ final class AudioCodec {
 
     // MARK: - PCM Audio Session
 
+    /// P0-FIX: Added permission check before configuring audio session
     func setupAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
-        try session.setActive(true)
+
+        // P0-FIX: Check permission before attempting to activate audio session
+        guard session.recordPermission == .granted else {
+            Logger.shared.error("AudioCodec: Microphone permission not granted")
+            throw AudioCodecError.codecNotAvailable
+        }
+
+        do {
+            try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
+            try session.setActive(true)
+            Logger.shared.debug("AudioCodec: Audio session configured successfully")
+        } catch {
+            Logger.shared.error("AudioCodec: Failed to setup audio session - \(error)")
+            throw error
+        }
     }
 
     func createInputPipeline() throws -> AVAudioInputNode {

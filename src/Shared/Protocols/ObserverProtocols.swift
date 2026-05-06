@@ -87,13 +87,13 @@ extension ModeObserverDelegate {
 
 protocol CreditObserverDelegate: AnyObject {
     func creditBalanceDidChange(balance: Double)
-    func creditTierDidChange(from oldTier: CreditAccount.CreditTier, to newTier: CreditAccount.CreditTier)
+    func creditTierDidChange(from oldTier: CreditTier, to newTier: CreditTier)
     func creditEventOccurred(event: CreditEvent)
 }
 
 extension CreditObserverDelegate {
     func creditBalanceDidChange(balance: Double) {}
-    func creditTierDidChange(from oldTier: CreditAccount.CreditTier, to newTier: CreditAccount.CreditTier) {}
+    func creditTierDidChange(from oldTier: CreditTier, to newTier: CreditTier) {}
     func creditEventOccurred(event: CreditEvent) {}
 }
 
@@ -293,7 +293,7 @@ final class ObserverRegistry {
         }
     }
 
-    func notifyCreditTierObservers(oldTier: CreditAccount.CreditTier, newTier: CreditAccount.CreditTier) {
+    func notifyCreditTierObservers(oldTier: CreditTier, newTier: CreditTier) {
         queue.async {
             let observers = self.creditObservers.values.compactMap { $0.value as? CreditObserverDelegate }
             DispatchQueue.main.async {

@@ -28,7 +28,7 @@ struct IncomingCallView: View {
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [Color.blue, Color.purple],
+                                    colors: [Color.fireflyOrange, Color.purple],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -80,7 +80,7 @@ struct IncomingCallView: View {
                                         .font(.system(size: 28))
                                         .foregroundColor(.white)
                                 }
-                                Text("Decline")
+                                Text("decline".localized)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.8))
                             }
@@ -100,7 +100,7 @@ struct IncomingCallView: View {
                                         .font(.system(size: 28))
                                         .foregroundColor(.white)
                                 }
-                                Text("Accept")
+                                Text("accept".localized)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.8))
                             }
@@ -176,7 +176,7 @@ struct ActiveCallView: View {
                         Circle()
                             .fill(Color.green)
                             .frame(width: 8, height: 8)
-                        Text("Connected")
+                        Text("connected".localized)
                             .font(.caption)
                             .foregroundColor(.green)
                     }
@@ -199,7 +199,7 @@ struct ActiveCallView: View {
                                         .font(.system(size: 24))
                                         .foregroundColor(.white)
                                 }
-                                Text("Mute")
+                                Text("mute".localized)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.6))
                             }
@@ -220,7 +220,7 @@ struct ActiveCallView: View {
                                         .font(.system(size: 28))
                                         .foregroundColor(.white)
                                 }
-                                Text("End")
+                                Text("end_call".localized)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.6))
                             }
@@ -240,7 +240,7 @@ struct ActiveCallView: View {
                                         .font(.system(size: 24))
                                         .foregroundColor(.white)
                                 }
-                                Text("Speaker")
+                                Text("speaker".localized)
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.6))
                             }

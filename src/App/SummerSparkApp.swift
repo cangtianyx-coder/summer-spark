@@ -32,10 +32,16 @@ struct SummerSparkApp {
     // MARK: - Module Initialization
 
     private static func initializeModules() {
+        // P0-FIX: Enable SOS first — all SOS triggers depend on this flag
+        // SOSManager.enable() must be called BEFORE any SOS trigger can work
+        SOSManager.shared.enable()
+
         // Identity module
         IdentityManager.shared.initialize()
 
         // Storage module
+        // P0-FIX: DatabaseManager.setup() now blocks until DB is ready
+        // (changed from async to sync in DatabaseManager itself)
         DatabaseManager.shared.setup()
         GroupStore.shared.load()
 

@@ -1,7 +1,7 @@
-/* 简体中文本地化字符串 */
+/* Chinese Localizable Strings */
 
 /* App Name */
-"app_name" = "夏日萤火";
+"app_name" = "夏日火花";
 
 /* Tab Bar */
 "tab_home" = "首页";
@@ -13,12 +13,12 @@
 "btn_start" = "开始";
 "btn_stop" = "停止";
 "btn_connect" = "连接";
-"btn_disconnect" = "断开";
+"btn_disconnect" = "断开连接";
 
 /* Messages */
 "msg_connecting" = "连接中...";
 "msg_connected" = "已连接";
-"msg_disconnected" = "已断开";
+"msg_disconnected" = "已断开连接";
 "msg_no_network" = "无网络";
 "msg_offline_mode" = "离线模式";
 
@@ -26,7 +26,7 @@
 "title_voice_call" = "语音通话";
 "title_map" = "地图";
 "title_location" = "位置";
-"title_credits" = "积分";
+"title_credits" = "制作人员";
 
 /* Settings */
 "settings_language" = "语言";
@@ -42,21 +42,198 @@
 "language_restart_hint" = "语言更改将在重启后生效";
 
 /* Auto Update */
-"update_available" = "有新版本";
+"update_available" = "有可用更新";
 "critical_update" = "重要更新";
 "version" = "版本";
 "released" = "发布于";
-"view_release_notes" = "查看更新说明";
+"view_release_notes" = "查看更新日志";
 "update_now" = "立即更新";
 "skip_this_version" = "跳过此版本";
-"remind_later" = "稍后提醒";
-"release_notes" = "更新说明";
+"remind_later" = "稍后提醒我";
+"release_notes" = "更新日志";
 "critical" = "重要";
 "close" = "关闭";
 "current_version" = "当前版本";
 "check_for_update" = "检查更新";
 "last_checked" = "上次检查";
 "auto_check_update" = "自动检查更新";
-"no_update_available" = "已是最新版本";
-"ok" = "确定";
+"no_update_available" = "已是最新版本！";
+"ok" = "好的";
 "update_settings" = "更新设置";
+
+/* Battery Warning */
+"low_battery_warning" = "低电量警告";
+"low_battery_message" = "Mesh功能可能受限。请尽快为设备充电。";
+
+/* SOS Alerts */
+"emergency_sos" = "紧急求救";
+"sos_confirmation_message" = "您确定要发送紧急求救信号吗？";
+"cancel" = "取消";
+"activate_sos" = "激活求救";
+"cancel_sos" = "取消求救";
+"keep_sos_active" = "保持求救状态";
+
+/* Mesh Status Card */
+"mesh_network_status" = "Mesh网络状态";
+"standby_mode" = "待机模式";
+"tap_to_switch" = "点击切换";
+"connected_to_nodes" = "已连接 %d 个节点";
+"signal_strength_label" = "信号: %d%%";
+"reconnecting" = "重新连接中...";
+"searching_for_mesh" = "正在搜索Mesh网络...";
+"reconnect" = "重新连接";
+
+/* Location Card */
+"location" = "位置";
+"acquiring_location" = "正在获取位置...";
+"lat_format" = "纬度: %.6f";
+"lng_format" = "经度: %.6f";
+
+/* Quick Actions */
+"quick_actions" = "快捷操作";
+"mesh" = "Mesh";
+"groups" = "群组";
+"voice_call" = "语音通话";
+
+/* Group Members */
+"group_members" = "群组成员";
+"user_placeholder" = "用户 %d";
+"search_location_or_users" = "搜索位置或用户...";
+"map_view" = "地图视图";
+
+/* Incoming Call View */
+"calling" = "呼叫中...";
+"decline" = "拒绝";
+"accept" = "接听";
+"connected" = "已连接";
+"mute" = "静音";
+"speaker" = "扬声器";
+"end_call" = "挂断";
+
+/* Map View */
+"show_group_members" = "显示群组成员";
+"my_location" = "我的位置";
+"fit_all" = "适应全部";
+
+/* SOS Button */
+"sos" = "求救";
+
+/* Mesh Detail View */
+"yes" = "是";
+"no" = "否";
+"active_nodes" = "活跃节点";
+"signal_strength" = "信号强度";
+"transport_medium" = "传输媒介";
+"actions" = "操作";
+"refresh_network" = "刷新网络";
+"stop_mesh" = "停止Mesh";
+"mesh_network" = "Mesh网络";
+"network_status" = "网络状态";
+
+/* Groups */
+"no_groups_yet" = "暂无群组";
+"create_or_join_group" = "创建或加入群组，开始与其他mesh用户聊天";
+"create_group" = "创建群组";
+"groups_title" = "群组";
+
+/* Voice Channel */
+"started_at" = "开始于 %@";
+"push_to_talk" = "按住说话";
+"participants" = "参与者 (%d)";
+"in_voice_channel" = "语音频道中";
+"no_active_call" = "无通话";
+"transmitting" = "传输中...";
+"tap_and_hold" = "点击按住";
+
+/* Offline Maps */
+"downloaded_regions" = "已下载区域";
+"no_offline_maps" = "暂无离线地图";
+"available_regions" = "可用区域";
+"downloaded" = "已下载";
+"offline_maps" = "离线地图";
+
+/* WiFi Direct */
+"wifi_direct" = "WiFi直连";
+"wifi_direct_status" = "状态";
+"nearby_devices" = "附近设备";
+"searching" = "搜索中...";
+"no_devices_found" = "未找到设备";
+"search_again" = "重新搜索";
+"connect" = "连接";
+"wifi_direct_title" = "WiFi直连";
+
+/* Add Contact */
+"or_enter_id_manually" = "或手动输入ID";
+"enter_user_id" = "输入用户ID";
+"add_contact" = "添加联系人";
+"add_contact_title" = "添加联系人";
+
+/* Credits History */
+"credits_history" = "积分历史";
+"activity_history" = "活动历史";
+
+/* Account Settings */
+"identity" = "身份";
+"username" = "用户名";
+"security" = "安全";
+"data" = "数据";
+"account_settings" = "账户设置";
+"clear_local_data" = "清除本地数据？";
+"clear" = "清除";
+
+/* Onboarding */
+"onboarding_welcome_title" = "欢迎使用夏日火花";
+"onboarding_welcome_desc" = "您的去中心化Mesh网络通信助手，支持离线通信";
+"onboarding_mesh_title" = "Mesh网络";
+"onboarding_mesh_desc" = "通过蓝牙和WiFi直接连接其他设备，无需蜂窝网络";
+"onboarding_security_title" = "安全通信";
+"onboarding_security_desc" = "您的通信通过ECDSA P-256加密和AES-256-GCM保护";
+"onboarding_maps_title" = "离线地图";
+"onboarding_maps_desc" = "下载等高线地图，无网络也能导航";
+"onboarding_identity_title" = "安全身份";
+"onboarding_identity_desc" = "您的唯一身份通过安全加密生成并存储在安全隔离区中";
+"skip" = "跳过";
+"choose_your_name" = "选择您的名称";
+"pick_username" = "为mesh网络设置唯一用户名\n(2-16个字符)";
+"leave_empty_default" = "留空使用默认名称";
+
+/* Settings - Permissions */
+"settings_permissions" = "权限";
+"location_permission" = "位置权限";
+"location_permission_desc" = "位置权限用于紧急救援和离线地图功能。当您发送SOS时，救援人员需要知道您的位置。";
+"bluetooth_permission" = "蓝牙权限";
+"bluetooth_permission_desc" = "蓝牙权限用于Mesh网络发现和连接附近的设备，实现离线通信。";
+"notification_permission" = "通知权限";
+"notification_permission_desc" = "通知权限用于接收紧急SOS警报和消息通知。";
+
+/* Rescue Dashboard */
+"rescue_statistics" = "救援统计";
+"emergency_tasks" = "紧急任务";
+"tasks_count" = "%d 个";
+"no_emergency_tasks" = "暂无紧急任务";
+"priority" = "P%d";
+"victim_marker" = "伤员标记";
+
+/* Discover Cards */
+"download_for_offline_use" = "下载以供离线使用";
+"connect_to_nearby_devices" = "连接附近设备";
+"mesh_nodes" = "Mesh节点";
+"view_network_topology" = "查看网络拓扑";
+"scan_or_share_id" = "扫描或分享ID";
+
+/* SOS Cancel Confirmation */
+"sos_cancel_confirmation_message" = "您确定要取消当前活跃的求救信号吗？";
+
+
+/* PTT (Push-to-Talk) */
+"ptt_no_group" = "未选择群组";
+"ptt_error_no_group" = "请先选择一个群组再使用PTT";
+"ptt_error_title" = "PTT错误";
+"select_group" = "选择群组";
+"ptt_error_call_ended" = "通话已结束";
+"ptt_error_peer_ended" = "对方已结束通话";
+"ptt_error_call_dropped" = "由于网络质量较差，通话已断开";
+"ptt_error_network" = "网络错误，请检查您的网络连接";
+"ptt_error_timeout" = "通话超时，请重试";
+"ptt_error_unknown" = "发生了未知错误";
+"ptt_error_mic_denied" = "麦克风访问被拒绝，请在设置中开启";

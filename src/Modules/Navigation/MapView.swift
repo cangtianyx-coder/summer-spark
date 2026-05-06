@@ -3,6 +3,9 @@ import MapKit
 
 // MARK: - Map View
 
+// TODO: 离线等高线地图 - 待集成 Mapbox iOS SDK / GDAL 等高线渲染引擎
+// 当前使用系统 MapKit，未来需要支持离线 MBTiles、DEM 高程、等高线矢量渲染
+
 struct MapView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showGroupMembers: Bool = true
@@ -75,7 +78,7 @@ struct MapView: View {
                         HStack {
                             Image(systemName: "person.2.fill")
                                 .foregroundColor(.blue)
-                            Text("Show Group Members")
+                            Text("show_group_members".localized)
                                 .font(.subheadline)
                         }
                     }
@@ -88,7 +91,7 @@ struct MapView: View {
                         Button(action: centerOnUser) {
                             HStack {
                                 Image(systemName: "location.fill")
-                                Text("My Location")
+                                Text("my_location".localized)
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -99,7 +102,7 @@ struct MapView: View {
                         Button(action: zoomToFitAll) {
                             HStack {
                                 Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                Text("Fit All")
+                                Text("fit_all".localized)
                             }
                             .frame(maxWidth: .infinity)
                             .padding()

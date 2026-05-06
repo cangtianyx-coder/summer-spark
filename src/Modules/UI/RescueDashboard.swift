@@ -1,5 +1,50 @@
 import SwiftUI
 
+// MARK: - Quick Action Configuration
+
+/// Quick action data model for configuration-driven UI
+struct QuickActionConfig: Identifiable {
+    let id: String
+    let title: String
+    let icon: String
+    let color: Color
+    let notificationName: Notification.Name
+}
+
+/// Default quick actions configuration
+struct QuickActionsConfiguration {
+    static let defaultActions: [QuickActionConfig] = [
+        QuickActionConfig(
+            id: "create_rescue_team",
+            title: "创建救援队",
+            icon: "person.3.fill",
+            color: .blue,
+            notificationName: .createRescueTeam
+        ),
+        QuickActionConfig(
+            id: "mark_victim",
+            title: "标记伤员",
+            icon: "cross.case.fill",
+            color: .red,
+            notificationName: .markVictim
+        ),
+        QuickActionConfig(
+            id: "evacuation_point",
+            title: "撤离点",
+            icon: "location.fill",
+            color: .green,
+            notificationName: .createEvacuationPoint
+        ),
+        QuickActionConfig(
+            id: "emergency_route",
+            title: "紧急通道",
+            icon: "antenna.radiowaves.left.and.right",
+            color: .orange,
+            notificationName: .setupEmergencyRoute
+        )
+    ]
+}
+
 // MARK: - Rescue Dashboard
 
 /// 救援态势仪表盘
@@ -12,7 +57,7 @@ struct RescueDashboard: View {
     private let refreshTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     // 统计概览
@@ -24,8 +69,8 @@ struct RescueDashboard: View {
                     // 伤员标记
                     VictimMarkersSection(markers: victimMarkers)
                     
-                    // 快速操作
-                    QuickActionsSection()
+                    // 快速操作 - 使用数据驱动的配置
+                    QuickActionsSection(actions: QuickActionsConfiguration.defaultActions)
                 }
                 .padding()
             }
@@ -286,26 +331,22 @@ struct SeverityIndicator: View {
 // MARK: - Quick Actions Section
 
 struct QuickActionsSection: View {
+    let actions: [QuickActionConfig]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("快速操作")
                 .font(.headline)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                QuickActionButton(title: "创建救援队", icon: "person.3.fill", color: .blue) {
-                    NotificationCenter.default.post(name: .createRescueTeam, object: nil)
-                }
-
-                QuickActionButton(title: "标记伤员", icon: "cross.case.fill", color: .red) {
-                    NotificationCenter.default.post(name: .markVictim, object: nil)
-                }
-
-                QuickActionButton(title: "撤离点", icon: "location.fill", color: .green) {
-                    NotificationCenter.default.post(name: .createEvacuationPoint, object: nil)
-                }
-
-                QuickActionButton(title: "紧急通道", icon: "antenna.radiowaves.left.and.right", color: .orange) {
-                    NotificationCenter.default.post(name: .setupEmergencyRoute, object: nil)
+                ForEach(actions) { action in
+                    QuickActionButton(
+                        title: action.title,
+                        icon: action.icon,
+                        color: action.color
+                    ) {
+                        NotificationCenter.default.post(name: action.notificationName, object: nil)
+                    }
                 }
             }
         }

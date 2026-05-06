@@ -4,7 +4,7 @@ import Foundation
 
 extension String {
     var localized: String {
-        return NSLocalizedString(self, comment: "")
+        return LanguageManager.shared.localizedString(key: self)
     }
 
     func localized(with arguments: CVarArg...) -> String {

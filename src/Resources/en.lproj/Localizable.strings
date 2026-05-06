@@ -60,3 +60,180 @@
 "no_update_available" = "You're up to date!";
 "ok" = "OK";
 "update_settings" = "Update Settings";
+
+/* Battery Warning */
+"low_battery_warning" = "Low Battery Warning";
+"low_battery_message" = "Mesh functionality may be limited. Charge your device soon.";
+
+/* SOS Alerts */
+"emergency_sos" = "Emergency SOS";
+"sos_confirmation_message" = "Are you sure you want to send an emergency SOS?";
+"cancel" = "Cancel";
+"activate_sos" = "Activate SOS";
+"cancel_sos" = "Cancel SOS";
+"keep_sos_active" = "Keep SOS Active";
+
+/* Mesh Status Card */
+"mesh_network_status" = "Mesh Network Status";
+"standby_mode" = "Standby Mode";
+"tap_to_switch" = "Tap to switch";
+"connected_to_nodes" = "Connected to %d nodes";
+"signal_strength_label" = "Signal: %d%%";
+"reconnecting" = "Reconnecting...";
+"searching_for_mesh" = "Searching for mesh network...";
+"reconnect" = "Reconnect";
+
+/* Location Card */
+"location" = "Location";
+"acquiring_location" = "Acquiring location...";
+"lat_format" = "Lat: %.6f";
+"lng_format" = "Lng: %.6f";
+
+/* Quick Actions */
+"quick_actions" = "Quick Actions";
+"mesh" = "Mesh";
+"groups" = "Groups";
+"voice_call" = "Voice Call";
+
+/* Group Members */
+"group_members" = "Group Members";
+"user_placeholder" = "User %d";
+"search_location_or_users" = "Search location or users...";
+"map_view" = "Map View";
+
+/* Incoming Call View */
+"calling" = "Calling...";
+"decline" = "Decline";
+"accept" = "Accept";
+"connected" = "Connected";
+"mute" = "Mute";
+"speaker" = "Speaker";
+"end_call" = "End";
+
+/* Map View */
+"show_group_members" = "Show Group Members";
+"my_location" = "My Location";
+"fit_all" = "Fit All";
+
+/* SOS Button */
+"sos" = "SOS";
+
+/* Mesh Detail View */
+"yes" = "Yes";
+"no" = "No";
+"active_nodes" = "Active Nodes";
+"signal_strength" = "Signal Strength";
+"transport_medium" = "Transport Medium";
+"actions" = "Actions";
+"refresh_network" = "Refresh Network";
+"stop_mesh" = "Stop Mesh";
+"mesh_network" = "Mesh Network";
+"network_status" = "Network Status";
+
+/* Groups */
+"no_groups_yet" = "No Groups Yet";
+"create_or_join_group" = "Create or join a group to start chatting with other mesh users.";
+"create_group" = "Create Group";
+"groups_title" = "Groups";
+
+/* Voice Channel */
+"started_at" = "Started %@";
+"push_to_talk" = "Push to Talk";
+"participants" = "Participants (%d)";
+"in_voice_channel" = "In Voice Channel";
+"no_active_call" = "No Active Call";
+"transmitting" = "Transmitting...";
+"tap_and_hold" = "Tap and hold";
+
+/* Offline Maps */
+"downloaded_regions" = "Downloaded Regions";
+"no_offline_maps" = "No offline maps downloaded";
+"available_regions" = "Available Regions";
+"downloaded" = "Downloaded";
+"offline_maps" = "Offline Maps";
+
+/* WiFi Direct */
+"wifi_direct" = "WiFi Direct";
+"wifi_direct_status" = "Status";
+"nearby_devices" = "Nearby Devices";
+"searching" = "Searching...";
+"no_devices_found" = "No devices found";
+"search_again" = "Search Again";
+"connect" = "Connect";
+"wifi_direct_title" = "WiFi Direct";
+
+/* Add Contact */
+"or_enter_id_manually" = "Or enter ID manually";
+"enter_user_id" = "Enter User ID";
+"add_contact" = "Add Contact";
+"add_contact_title" = "Add Contact";
+
+/* Credits History */
+"credits_history" = "Credits History";
+"activity_history" = "Activity History";
+
+/* Account Settings */
+"identity" = "Identity";
+"username" = "Username";
+"security" = "Security";
+"data" = "Data";
+"account_settings" = "Account Settings";
+"clear_local_data" = "Clear Local Data?";
+"clear" = "Clear";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Welcome to Summer Spark";
+"onboarding_welcome_desc" = "Your decentralized mesh networking companion for offline communication";
+"onboarding_mesh_title" = "Mesh Networking";
+"onboarding_mesh_desc" = "Connect directly with other devices using Bluetooth and WiFi - no cellular network required";
+"onboarding_security_title" = "Secure Communications";
+"onboarding_security_desc" = "Your communications are secured with ECDSA P-256 encryption and AES-256-GCM";
+"onboarding_maps_title" = "Offline Maps";
+"onboarding_maps_desc" = "Download contour maps for navigation even without internet connection";
+"onboarding_identity_title" = "Secure Identity";
+"onboarding_identity_desc" = "Your unique identity is generated securely and stored in the Secure Enclave";
+"skip" = "Skip";
+"choose_your_name" = "Choose Your Name";
+"pick_username" = "Pick a unique username for mesh networking\n(2-16 characters)";
+"leave_empty_default" = "Leave empty for default name";
+
+/* Settings - Permissions */
+"settings_permissions" = "Permissions";
+"location_permission" = "Location Permission";
+"location_permission_desc" = "Location permission is required for emergency rescue and offline map features. When you send an SOS, rescuers need to know your location.";
+"bluetooth_permission" = "Bluetooth Permission";
+"bluetooth_permission_desc" = "Bluetooth permission is used for Mesh network discovery and connecting to nearby devices for offline communication.";
+"notification_permission" = "Notification Permission";
+"notification_permission_desc" = "Notification permission is used to receive emergency SOS alerts and message notifications.";
+
+/* Rescue Dashboard */
+"rescue_statistics" = "Rescue Statistics";
+"emergency_tasks" = "Emergency Tasks";
+"tasks_count" = "%d tasks";
+"no_emergency_tasks" = "No emergency tasks";
+"priority" = "P%d";
+"victim_marker" = "Victim Marker";
+
+/* Discover Cards */
+"download_for_offline_use" = "Download for offline use";
+"connect_to_nearby_devices" = "Connect to nearby devices";
+"mesh_nodes" = "Mesh Nodes";
+"view_network_topology" = "View network topology";
+"scan_or_share_id" = "Scan or share ID";
+
+/* SOS Cancel Confirmation */
+"sos_cancel_confirmation_message" = "Are you sure you want to cancel the active SOS alert?";
+
+
+/* PTT (Push-to-Talk) */
+"ptt_no_group" = "No Group";
+"ptt_error_no_group" = "Please select a group before using PTT";
+"ptt_error_title" = "PTT Error";
+"select_group" = "Select Group";
+"ptt_error_call_ended" = "The call has ended";
+"ptt_error_peer_ended" = "The other party ended the call";
+"ptt_error_call_dropped" = "Call was dropped due to poor connection";
+"ptt_error_network" = "Network error occurred. Please check your connection";
+"ptt_error_timeout" = "Call timed out. Please try again";
+"ptt_error_unknown" = "An unexpected error occurred";
+"ptt_error_mic_denied" = "Microphone access denied. Please enable in Settings";

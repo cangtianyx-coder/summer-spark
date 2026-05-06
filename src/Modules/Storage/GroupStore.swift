@@ -150,6 +150,8 @@ final class GroupStore {
         let symmetricKey = SymmetricKey(size: .bits256)
         group.groupKey = symmetricKey.withUnsafeBytes { Data($0) }
 
+        // Note: Owner is already added in Group.init() - no need to append again
+
         groups[group.id] = group
         addUserToGroupMapping(uid: currentUid, groupId: group.id)
         saveGroups()
@@ -222,6 +224,26 @@ final class GroupStore {
               currentMember.role == .owner || currentMember.role == .admin else {
             return false
         }
+
+        // Check if member already exists
+        if group.members.contains(where: { $0.uid == uid }) {
+            return false
+        }
+
+        let newMember = GroupMember(uid: uid, role: role, joinedAt: Date())
+        group.members.append(newMember)
+        group.updatedAt = Date()
+
+        groups[groupId] = group
+        addUserToGroupMapping(uid: uid, groupId: groupId)
+        saveGroups()
+
+        return true
+    }
+
+    /// Add a member to a group without permission check (for internal use like face-to-face join)
+    func addMemberWithoutPermission(groupId: String, uid: String, role: GroupMember.GroupRole = .member) -> Bool {
+        guard var group = groups[groupId] else { return false }
 
         // Check if member already exists
         if group.members.contains(where: { $0.uid == uid }) {

@@ -52,6 +52,22 @@ final class WiFiService {
         // Configuration placeholder - actual setup deferred to startListening
     }
 
+    func isEnabled() -> Bool {
+        return listener != nil
+    }
+
+    func enable() {
+        do {
+            try startListening()
+        } catch {
+            Logger.shared.error("WiFiService: Failed to enable - \(error)")
+        }
+    }
+
+    func disable() {
+        stopListening()
+    }
+
     func startListening() throws {
         let parameters = NWParameters.tcp
         parameters.allowLocalEndpointReuse = true

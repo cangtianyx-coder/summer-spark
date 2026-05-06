@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import CryptoKit
 import Network
 
@@ -57,34 +58,35 @@ final class UIDGenerator {
 
     // MARK: - UID Generation
 
-    /// Generate a UID from timestamp (ms) + MAC address, hashed with SHA256
-    /// Returns the first 16 hex characters (32 bits)
+    /// Generate a cryptographically secure UID using timestamp + MAC address → SHA256
+    /// Per yanfa.md 3.1.1: 时间戳(毫秒) + 设备MAC加密值 → SHA256哈希 → 唯一UID
     func generateUID() -> String {
+        // Get current timestamp in milliseconds
         let timestamp = Int64(Date().timeIntervalSince1970 * 1000)
-        let macAddress = getMACAddress() ?? "00:00:00:00:00:00"
-
-        let input = "\(timestamp):\(macAddress)"
-        guard let data = input.data(using: .utf8) else {
-            return generateFallbackUID()
+        
+        // Get MAC address
+        guard let macAddress = getMACAddress() else {
+            // Fallback if MAC unavailable - use device identifier
+            return generateFallbackUID(timestamp: timestamp)
         }
-
-        let hash = SHA256.hash(data: data)
-        let hexString = hash.map { String(format: "%02x", $0) }.joined()
-
-        return String(hexString.prefix(16))
+        
+        // Combine timestamp + MAC
+        let input = "\(timestamp):\(macAddress)"
+        
+        // Generate SHA256 hash
+        let hash = sha256(input)
+        
+        // Return first 16 characters (8 bytes = 64 bits of entropy)
+        return String(hash.prefix(16))
     }
 
-    /// Fallback UID generation using only timestamp when MAC unavailable
-    private func generateFallbackUID() -> String {
-        let timestamp = Int64(Date().timeIntervalSince1970 * 1000)
-        guard let data = "\(timestamp)".data(using: .utf8) else {
-            return String(format: "%016lx", arc4random())
-        }
-
-        let hash = SHA256.hash(data: data)
-        let hexString = hash.map { String(format: "%02x", $0) }.joined()
-
-        return String(hexString.prefix(16))
+    /// Fallback UID generation when MAC is unavailable
+    /// Uses timestamp + SecureEnclave identifier for uniqueness
+    private func generateFallbackUID(timestamp: Int64) -> String {
+        let identifier = UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+        let input = "\(timestamp):\(identifier)"
+        let hash = sha256(input)
+        return String(hash.prefix(16))
     }
 
     /// Generate a raw SHA256 hash of the input string

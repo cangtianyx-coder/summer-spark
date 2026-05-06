@@ -49,11 +49,11 @@ struct SplashScreen: View {
 
                     // App Name
                     VStack(spacing: 8) {
-                        Text("SummerSpark")
+                        Text("夏日萤火")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
 
-                        Text("萤火星光 · 照亮希望")
+                        Text("SummerSpark · 萤火星光")
                             .font(.system(size: 14, weight: .light))
                             .foregroundColor(.white.opacity(0.7))
                     }
@@ -219,6 +219,25 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
+
+    // MARK: - Firefly Theme Colors
+
+    /// Firefly yellow - primary accent
+    static let fireflyYellow = Color(hex: "FFD700")
+    /// Firefly orange - secondary accent
+    static let fireflyOrange = Color(hex: "FF8C00")
+    /// Firefly glow - for effects
+    static let fireflyGlow = Color(hex: "FFA500")
+    /// Firefly green - for status indicators (online/success states)
+    static let fireflyGreen = Color(hex: "39FF14")
+    /// Summer night dark blue
+    static let nightDark = Color(hex: "0a1628")
+    /// Summer night medium blue
+    static let nightMedium = Color(hex: "1a2f4a")
+    /// Summer night purple
+    static let nightPurple = Color(hex: "2d1f3d")
+    /// Card background for dark theme (not system gray)
+    static let darkCard = Color(hex: "1a2f4a")
 }
 
 // MARK: - Preview

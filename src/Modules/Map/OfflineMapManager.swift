@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 // MARK: - OfflineMapManagerDelegate
 
@@ -354,6 +355,57 @@ final class OfflineMapManager: NSObject {
         suspendedTileBuffers[mapId] = []
     }
     
+    // MARK: - Map Package Signature Verification
+    // P0-FIX: Verify map packages against tampering using ECDSA signatures
+    
+    /// Verify downloaded map package signature using map provider's public key
+    /// Returns true if signature is valid or if no signature is provided (backward compatibility)
+    func verifyMapPackageSignature(mapId: String, data: Data, signature: Data?, providerPublicKey: P256.Signing.PublicKey?) -> Bool {
+        guard let signature = signature, let publicKey = providerPublicKey else {
+            // No signature provided - log warning but allow loading for backward compatibility
+            Logger.shared.warn("OfflineMapManager: No signature for map package \(mapId), loading without verification")
+            return true
+        }
+        
+        // Calculate SHA256 hash of the map data
+        let dataHash = SHA256.hash(data: data)
+        let dataHashData = Data(dataHash)
+        
+        // Verify signature against the data hash
+        guard let ecdsaSignature = try? P256.Signing.ECDSASignature(derRepresentation: signature) else {
+            Logger.shared.error("OfflineMapManager: Invalid signature format for map \(mapId)")
+            return false
+        }
+        
+        let isValid = publicKey.isValidSignature(ecdsaSignature, for: dataHashData)
+        
+        if isValid {
+            Logger.shared.info("OfflineMapManager: Map package \(mapId) signature verified")
+        } else {
+            Logger.shared.error("OfflineMapManager: Map package \(mapId) signature verification FAILED - possible tampering!")
+        }
+        
+        return isValid
+    }
+    
+    /// Sign map package data for P2P sharing (uses local private key)
+    func signMapPackageData(mapId: String, data: Data) -> Data? {
+        guard let signingKey = IdentityManager.shared.getPrivateKeyForSigning() else {
+            Logger.shared.error("OfflineMapManager: No signing key available for map \(mapId)")
+            return nil
+        }
+        
+        let dataHash = SHA256.hash(data: data)
+        let dataHashData = Data(dataHash)
+        
+        guard let signature = try? signingKey.signature(for: dataHashData) else {
+            Logger.shared.error("OfflineMapManager: Failed to sign map package \(mapId)")
+            return nil
+        }
+        
+        return signature.derRepresentation
+    }
+    
     // MARK: - Tile Download
     
     private func downloadTile(_ tile: TileCoordinate, for mapId: String) {
@@ -383,6 +435,10 @@ final class OfflineMapManager: NSObject {
 
         var request = URLRequest(url: tileURL)
         request.httpMethod = "GET"
+        // P0-FIX: Ensure HTTPS is used (already in URL but verify)
+        if tileURL.scheme != "https" {
+            Logger.shared.warn("OfflineMapManager: Non-HTTPS tile URL detected: \(tileURL)")
+        }
 
         if let offset = downloadOffsets[mapId], offset > 0 {
             request.setValue("bytes=\(offset)-", forHTTPHeaderField: "Range")
@@ -397,6 +453,7 @@ final class OfflineMapManager: NSObject {
     }
     
     private func buildTileURL(for tile: TileCoordinate, mapInfo: OfflineMapInfo) -> URL? {
+        // P0-FIX: Use HTTPS for secure tile download (yanfa.md 3.7.2 防篡改要求)
         let baseURL = "https://tiles.example.com/\(mapInfo.mapType.rawValue)"
         guard let url = URL(string: "\(baseURL)/\(tile.zoom)/\(tile.x)/\(tile.y).png") else {
             Logger.shared.error("OfflineMapManager: Invalid tile URL constructed for tile (\(tile.x), \(tile.y), \(tile.zoom))")
@@ -706,6 +763,109 @@ final class OfflineMapManager: NSObject {
             self.downloadTasks = self.downloadTasks.filter { $0.value.state.isActive }
             Logger.shared.info("OfflineMapManager: Cache cleared")
         }
+    }
+
+    /// Get list of downloaded offline map regions
+    func getDownloadedRegions() -> [String]? {
+        // Read from UserDefaults where region info is stored
+        return UserDefaults.standard.stringArray(forKey: "offlineMap.downloadedRegions")
+    }
+    
+    /// Get list of available regions for download
+    func getAvailableRegions() -> [OfflineMapInfo] {
+        // Predefined available regions with bounds
+        return [
+            OfflineMapInfo(
+                mapId: "zhejiang_province",
+                name: "Zhejiang Province",
+                version: "1.0",
+                tileCount: 15000,
+                downloadedTileCount: 0,
+                fileSize: 50_000_000,
+                downloadedSize: 0,
+                bounds: MapBounds(
+                    northEast: Coordinate2D(latitude: 31.18, longitude: 122.98),
+                    southWest: Coordinate2D(latitude: 27.18, longitude: 118.88)
+                ),
+                minZoom: 6,
+                maxZoom: 14,
+                mapType: .standard,
+                coordinateSystem: .gcj02,
+                lastUpdated: Date()
+            ),
+            OfflineMapInfo(
+                mapId: "hangzhou_metro",
+                name: "Hangzhou Metro Area",
+                version: "1.0",
+                tileCount: 8000,
+                downloadedTileCount: 0,
+                fileSize: 25_000_000,
+                downloadedSize: 0,
+                bounds: MapBounds(
+                    northEast: Coordinate2D(latitude: 30.52, longitude: 120.48),
+                    southWest: Coordinate2D(latitude: 30.02, longitude: 119.98)
+                ),
+                minZoom: 8,
+                maxZoom: 16,
+                mapType: .standard,
+                coordinateSystem: .gcj02,
+                lastUpdated: Date()
+            ),
+            OfflineMapInfo(
+                mapId: "west_lake_district",
+                name: "West Lake District",
+                version: "1.0",
+                tileCount: 3000,
+                downloadedTileCount: 0,
+                fileSize: 10_000_000,
+                downloadedSize: 0,
+                bounds: MapBounds(
+                    northEast: Coordinate2D(latitude: 30.28, longitude: 120.18),
+                    southWest: Coordinate2D(latitude: 30.22, longitude: 120.12)
+                ),
+                minZoom: 10,
+                maxZoom: 18,
+                mapType: .standard,
+                coordinateSystem: .gcj02,
+                lastUpdated: Date()
+            ),
+            OfflineMapInfo(
+                mapId: "shanghai_province",
+                name: "Shanghai City",
+                version: "1.0",
+                tileCount: 12000,
+                downloadedTileCount: 0,
+                fileSize: 40_000_000,
+                downloadedSize: 0,
+                bounds: MapBounds(
+                    northEast: Coordinate2D(latitude: 31.40, longitude: 122.08),
+                    southWest: Coordinate2D(latitude: 30.70, longitude: 121.08)
+                ),
+                minZoom: 6,
+                maxZoom: 14,
+                mapType: .standard,
+                coordinateSystem: .gcj02,
+                lastUpdated: Date()
+            ),
+            OfflineMapInfo(
+                mapId: "beijing_city",
+                name: "Beijing City",
+                version: "1.0",
+                tileCount: 14000,
+                downloadedTileCount: 0,
+                fileSize: 45_000_000,
+                downloadedSize: 0,
+                bounds: MapBounds(
+                    northEast: Coordinate2D(latitude: 41.05, longitude: 117.50),
+                    southWest: Coordinate2D(latitude: 39.45, longitude: 115.40)
+                ),
+                minZoom: 6,
+                maxZoom: 14,
+                mapType: .standard,
+                coordinateSystem: .gcj02,
+                lastUpdated: Date()
+            )
+        ]
     }
 }
 

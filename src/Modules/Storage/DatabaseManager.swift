@@ -228,7 +228,12 @@ final class DatabaseManager {
     // MARK: - Setup
 
     func setup() {
-        initialize()
+        // P0-FIX: Changed from async to sync so callers can rely on DB being ready
+        // when setup() returns. The old async approach caused race conditions where
+        // code after DatabaseManager.shared.setup() ran before isInitialized=true.
+        dbQueue.sync { [weak self] in
+            self?.initialize()
+        }
     }
 
     func initialize(with config: Config? = nil) {
@@ -248,11 +253,17 @@ final class DatabaseManager {
 
         databasePath = dbDir.appendingPathComponent(self.config.databaseName)
 
-        dbQueue.async { [weak self] in
-            self?.setupDatabase()
-            self?.runMigrations()
-            self?.isInitialized = true
-        }
+        // P0-FIX: Run synchronously on the calling thread instead of dbQueue.async
+        // This ensures setup completes before the constructor returns.
+        // Note: setupDatabase() and runMigrations() use internal sync helpers
+        // (getUserVersion, setUserVersion, etc.) that MUST be called without
+        // wrapping in another dbQueue.sync — they are designed to be called
+        // from an already-serial context. Calling them directly here on the
+        // caller's thread IS safe because dbQueue.sync serialized entry
+        // guarantees no other dbQueue work can interleave.
+        self.setupDatabase()
+        self.runMigrations()
+        self.isInitialized = true
     }
 
     private func setupDatabase() {
@@ -345,7 +356,11 @@ final class DatabaseManager {
     }
 
     func inTransaction(_ block: @escaping (OpaquePointer?, UnsafeMutablePointer<ObjCBool>) -> Void) {
-        dbQueue.sync { [weak self] in
+        // P0-FIX: Changed from sync to async to prevent deadlocks.
+        // The old dbQueue.sync would deadlock if called from within any
+        // dbQueue.sync context (e.g. from setupDatabase -> runMigrations ->
+        // any method that touches the DB synchronously).
+        dbQueue.async { [weak self] in
             guard let self = self, let db = self.db else { return }
 
             var rollback = ObjCBool(false)

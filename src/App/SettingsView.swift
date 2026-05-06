@@ -16,22 +16,22 @@ struct SettingsView: View {
                 Section(header: Text("settings_permissions".localized)) {
                     PermissionRow(
                         icon: "location.fill",
-                        title: "Location Permission",
-                        description: "位置权限用于紧急救援和离线地图功能。当您发送SOS时，救援人员需要知道您的位置。",
+                        title: "location_permission".localized,
+                        description: "location_permission_desc".localized,
                         isGranted: LocationManager.shared.hasLocationPermission()
                     )
 
                     PermissionRow(
                         icon: "antenna.radiowaves.left.and.right",
-                        title: "Bluetooth Permission",
-                        description: "蓝牙权限用于Mesh网络发现和连接附近的设备，实现离线通信。",
+                        title: "bluetooth_permission".localized,
+                        description: "bluetooth_permission_desc".localized,
                         isGranted: true
                     )
 
                     PermissionRow(
                         icon: "bell.fill",
-                        title: "Notification Permission",
-                        description: "通知权限用于接收紧急SOS警报和消息通知。",
+                        title: "notification_permission".localized,
+                        description: "notification_permission_desc".localized,
                         isGranted: false
                     )
                 }
@@ -247,9 +247,9 @@ struct AboutView: View {
         ScrollView {
             VStack(spacing: 20) {
                 // App 图标
-                Image(systemName: "ant.fill")
+                Image(systemName: "flame.fill")
                     .font(.system(size: 80))
-                    .foregroundColor(.blue)
+                    .foregroundColor(.orange)
                     .padding(.top, 40)
                 
                 // App 名称
